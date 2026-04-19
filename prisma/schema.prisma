@@ -1,0 +1,391 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model anggota {
+  id                     Int             @id @default(autoincrement())
+  kode                   String?         @db.Char(20)
+  nik                    String          @default("") @db.VarChar(50)
+  noidentitas            String          @db.VarChar(50)
+  nama                   String          @default("") @db.VarChar(50)
+  jk                     String          @db.Char(2)
+  tempat_lahir           String          @db.VarChar(50)
+  tgl_lahir              DateTime        @db.Date
+  alamat                 String          @default("") @db.VarChar(255)
+  kota                   String?         @db.VarChar(50)
+  hp                     String          @db.Char(30)
+  perusahaan             String?         @db.VarChar(100)
+  unit_seksi             String?         @db.VarChar(100)
+  jabatan                String?         @db.VarChar(50)
+  level_anggota_id       Int?
+  gaji                   Int?
+  nama_pasangan          String?         @db.VarChar(50)
+  jml_anak               Int?
+  tgl_masuk              DateTime?       @db.Date
+  status                 anggota_status?
+  foto                   String?         @db.VarChar(50)
+  pwd                    String?         @db.VarChar(50)
+  user_id                Int?
+  insert_date            DateTime?       @db.Date
+  update_date            DateTime?       @db.Date
+  dokumen                String?         @db.VarChar(50)
+  email                  String?         @db.VarChar(255)
+  reset_token            String?         @db.Text
+  reset_token_expiration DateTime?       @db.DateTime(0)
+}
+
+model anggota_asli {
+  id               Int                  @id
+  kode             String?              @db.Char(20)
+  nik              String               @default("") @db.VarChar(50)
+  noidentitas      String               @db.VarChar(50)
+  nama             String               @default("") @db.VarChar(50)
+  jk               String               @db.Char(2)
+  tempat_lahir     String               @db.VarChar(50)
+  tgl_lahir        DateTime             @db.Date
+  alamat           String               @default("") @db.VarChar(255)
+  kota             String?              @db.VarChar(50)
+  hp               String               @db.Char(30)
+  perusahaan       String?              @db.VarChar(100)
+  unit_seksi       String?              @db.VarChar(100)
+  jabatan          String?              @db.VarChar(50)
+  level_anggota_id Int?
+  gaji             Int?
+  nama_pasangan    String?              @db.VarChar(50)
+  jml_anak         Int?
+  tgl_masuk        DateTime?            @db.Date
+  status           anggota_asli_status?
+  foto             String?              @db.VarChar(50)
+  pwd              String?              @db.VarChar(50)
+  user_id          Int?
+  insert_date      DateTime?            @db.Date
+  update_date      DateTime?            @db.Date
+  dokumen          String?              @db.VarChar(50)
+}
+
+model anggota_copy1 {
+  id               Int                   @id
+  kode             String?               @db.Char(20)
+  nik              String                @default("") @db.VarChar(50)
+  noidentitas      String                @db.VarChar(50)
+  nama             String                @default("") @db.VarChar(50)
+  jk               String                @db.Char(2)
+  tempat_lahir     String                @db.VarChar(50)
+  tgl_lahir        DateTime              @db.Date
+  alamat           String                @default("") @db.VarChar(255)
+  kota             String?               @db.VarChar(50)
+  hp               String                @db.Char(30)
+  perusahaan       String?               @db.VarChar(100)
+  unit_seksi       String?               @db.VarChar(100)
+  jabatan          String?               @db.VarChar(50)
+  level_anggota_id Int?
+  gaji             Int?
+  nama_pasangan    String?               @db.VarChar(50)
+  jml_anak         Int?
+  tgl_masuk        DateTime?             @db.Date
+  status           anggota_copy1_status?
+  foto             String?               @db.VarChar(50)
+  pwd              String?               @db.VarChar(50)
+  user_id          Int?
+  insert_date      DateTime?             @db.Date
+  update_date      DateTime?             @db.Date
+  dokumen          String?               @db.VarChar(50)
+}
+
+model ci_sessions {
+  id         String @db.VarChar(128)
+  ip_address String @db.VarChar(45)
+  timestamp  Int    @default(0) @db.UnsignedInt
+  data       Bytes  @db.Blob
+
+  @@id([id, ip_address])
+  @@index([timestamp], map: "ci_sessions_timestamp")
+}
+
+model formula_shu {
+  id            Int       @id @db.UnsignedInt
+  periode_tahun Int?      @db.Year
+  tgl_awal      DateTime? @db.Date
+  tgl_akhir     DateTime? @db.Date
+  laba_bersih   Float?    @db.Float
+  jasa_anggota  Float?    @db.Float
+  user_id       Int?
+  insert_date   DateTime? @db.DateTime(0)
+  update_date   DateTime? @db.DateTime(0)
+}
+
+model informasi {
+  id          Int       @id @db.UnsignedInt
+  judul       String?   @db.VarChar(255)
+  isi         String?   @db.MediumText
+  gambar      String?   @db.VarChar(50)
+  user_id     Int?
+  insert_date DateTime? @db.DateTime(0)
+  update_date DateTime? @db.DateTime(0)
+}
+
+model jenis_pinjaman {
+  id          Int                    @id @default(autoincrement()) @db.UnsignedInt
+  nama        String?                @db.VarChar(50)
+  lama        Int?
+  satuan      jenis_pinjaman_satuan?
+  bunga       Float?                 @db.Float
+  jumlah      Int?
+  user_id     Int?
+  insert_date DateTime?              @db.DateTime(0)
+  update_date DateTime?              @db.DateTime(0)
+}
+
+model jenis_simpanan {
+  id          Int       @id @default(autoincrement())
+  nama        String    @default("") @db.VarChar(50)
+  jumlah      Int
+  keterangan  String?   @db.VarChar(255)
+  user_id     Int?
+  insert_date DateTime? @db.DateTime(0)
+  update_date DateTime? @db.DateTime(0)
+}
+
+model kategori_pinjaman {
+  kategpinj_id   Int     @default(autoincrement())
+  kategpinj_kode String  @db.Char(4)
+  kategpinj_nama String? @db.VarChar(50)
+
+  @@id([kategpinj_id, kategpinj_kode])
+}
+
+model level {
+  id    Int     @id @db.UnsignedInt
+  level String? @db.VarChar(50)
+  akses String? @db.MediumText
+}
+
+model level_anggota {
+  id          Int       @id @db.UnsignedInt
+  nama        String?   @db.VarChar(100)
+  user_id     Int?
+  insert_date DateTime? @db.DateTime(0)
+  update_date DateTime? @db.DateTime(0)
+}
+
+model level_simpanan {
+  id                Int       @id @db.UnsignedInt
+  level_anggota_id  Int?
+  jenis_simpanan_id Int?
+  jumlah            Int?
+  user_id           Int?
+  insert_date       DateTime? @db.DateTime(0)
+  update_date       DateTime? @db.DateTime(0)
+}
+
+model menu {
+  id    Int         @id @db.UnsignedInt
+  kode  Int?
+  nama  String?     @db.VarChar(50)
+  root  Int?
+  url   String?     @db.VarChar(50)
+  icon  String?     @db.VarChar(50)
+  class String?     @db.VarChar(50)
+  aktif menu_aktif?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model pengajuan_pinjaman {
+  id                Int                        @db.UnsignedInt
+  nomor             String                     @default("") @db.Char(20)
+  tanggal           DateTime                   @db.Date
+  anggota_id        Int
+  jenis_pinjaman_id Int
+  lama              Int?
+  satuan            String?                    @db.Char(10)
+  bunga             Float?                     @db.Float
+  jumlah            Float?
+  status            pengajuan_pinjaman_status?
+  keperluan         String?                    @db.MediumText
+  user_id           Int?
+  insert_date       DateTime?                  @db.Timestamp(0)
+  update_date       DateTime?                  @db.Timestamp(0)
+
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model perusahaan {
+  id          Int       @db.UnsignedInt
+  nama        String?   @db.VarChar(100)
+  user_id     Int?
+  insert_date DateTime? @db.DateTime(0)
+  update_date DateTime? @db.DateTime(0)
+
+  @@ignore
+}
+
+model pinjaman_detail {
+  id              Int       @id @default(autoincrement()) @db.UnsignedInt
+  pinjaman_id     Int
+  cicilan         Int       @db.SmallInt
+  angsuran        Int
+  bunga           Int
+  tgl_jatuh_tempo DateTime? @db.Date
+  nomor_bayar     String?   @db.Char(15)
+  tgl_bayar       String?   @default("") @db.Char(11)
+  jumlah_bayar    Int
+  ket             String?   @db.VarChar(100)
+  insert_user_id  Int?
+  insert_date     DateTime? @db.DateTime(0)
+  update_user_id  Int?
+  update_date     DateTime? @db.DateTime(0)
+}
+
+model pinjaman_header {
+  id                Int       @id @default(autoincrement())
+  nomor             String?   @db.Char(15)
+  tgl               DateTime  @db.Date
+  anggota_id        Int
+  jenis_pinjaman_id Int?
+  lama              Int       @db.SmallInt
+  satuan            String?   @db.Char(10)
+  bunga             Float     @db.Float
+  jumlah            Int
+  user_id           Int
+  insert_date       DateTime? @db.DateTime(0)
+  update_date       DateTime? @db.DateTime(0)
+  kategpinj_id      Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model profile {
+  id       Int
+  koperasi String? @db.VarChar(100)
+  alamat   String? @db.VarChar(100)
+  kota     String? @db.VarChar(50)
+  kode_pos String? @db.Char(10)
+  hp       String? @db.VarChar(30)
+  fax      String? @db.VarChar(30)
+  email    String? @db.VarChar(50)
+  logo     String? @db.VarChar(100)
+
+  @@ignore
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model simpanan {
+  id                Int             @id @default(autoincrement())
+  nomor             String?         @db.Char(12)
+  tgl               DateTime        @db.Date
+  tgl_akhir         DateTime        @db.Date
+  anggota_id        Int
+  jenis_simpanan_id Int
+  jumlah            Int
+  jenis             simpanan_jenis?
+  user_id           Int
+  insert_date       DateTime?       @db.DateTime(0)
+  update_date       DateTime?       @db.DateTime(0)
+  entry             simpanan_entry?
+}
+
+model t_anggota_arisan {
+  id         Int       @id @default(autoincrement())
+  id_anggota Int?
+  id_arisan  Int?
+  id_lelang  Int?
+  nama       String?   @db.VarChar(255)
+  bln_lelang DateTime? @db.Date
+  nom_lelang Int?
+  status     Int?      @default(0) @db.SmallInt
+}
+
+model t_arisan {
+  id            Int     @id @default(autoincrement())
+  nama_arisan   String? @db.VarChar(255)
+  total_anggota Int?
+  nominal_iuran Int?
+  max_anggota   Int?
+  status_arisan Int?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model t_email {
+  dosen_id           String? @db.VarChar(255)
+  dosen_nama_lengkap String? @db.VarChar(255)
+  user_email         String? @db.VarChar(255)
+
+  @@ignore
+}
+
+model t_lelang {
+  id               Int       @id @default(autoincrement())
+  id_arisan        Int?
+  bulan            DateTime? @db.Date
+  iuran            BigInt?
+  saldo_sebelumnya BigInt?
+  jumlah           Int?
+  lelang           Int?
+  total            BigInt?
+  jml_arisan       Int?
+  saldo            BigInt?
+  jml_pemenang     Int?
+  peserta          String?   @db.VarChar(11)
+}
+
+model users {
+  id          Int           @id @default(autoincrement())
+  username    String?       @db.VarChar(50)
+  password    String        @db.VarChar(50)
+  namalengkap String?       @db.VarChar(100)
+  level_id    Int
+  foto        String        @db.VarChar(50)
+  blokir      users_blokir?
+}
+
+enum jenis_pinjaman_satuan {
+  Minggu
+  Bulan
+  Tahun
+}
+
+enum users_blokir {
+  Y
+  T
+}
+
+enum menu_aktif {
+  Y
+  T
+}
+
+enum simpanan_jenis {
+  S
+  T
+}
+
+enum pengajuan_pinjaman_status {
+  Open
+  Cancel
+  Acc
+}
+
+enum simpanan_entry {
+  G
+  I
+}
+
+enum anggota_status {
+  Aktif
+  Keluar
+}
+
+enum anggota_asli_status {
+  Aktif
+  Keluar
+}
+
+enum anggota_copy1_status {
+  Aktif
+  Keluar
+}
