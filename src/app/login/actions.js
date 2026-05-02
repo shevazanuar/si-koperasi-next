@@ -4,14 +4,23 @@ import prisma from "@/lib/prisma";
 import CryptoJS from "crypto-js";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  username: z.string().min(1, "Username / NIK wajib diisi"),
+  password: z.string().min(4, "Password minimal 4 karakter"),
+});
 
 export async function loginAction(prevState, formData) {
-  const username = formData.get("username");
-  const password = formData.get("password");
-
-  if (!username || !password) {
-    return { error: "Username dan password wajib diisi." };
+  const data = Object.fromEntries(formData.entries());
+  
+  // Validate using Zod
+  const validation = loginSchema.safeParse(data);
+  if (!validation.success) {
+    return { error: validation.error.errors[0].message };
   }
+
+  const { username, password } = validation.data;
 
   // Hash password using MD5 to match database
   const hashedPassword = CryptoJS.MD5(password).toString();
