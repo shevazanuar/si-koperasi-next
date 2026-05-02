@@ -21,6 +21,11 @@ export default async function EditAnggotaPage({ params }) {
     tgl_lahir: data.tgl_lahir ? new Date(data.tgl_lahir).toISOString().split('T')[0] : ""
   };
 
+  const levelListRaw = await prisma.$queryRawUnsafe("SELECT id, nama FROM level_anggota ORDER BY id ASC");
+  const levelList = levelListRaw.map(l => ({ ...l, id: typeof l.id === 'bigint' ? Number(l.id) : l.id }));
+  const perusahaanListRaw = await prisma.$queryRawUnsafe("SELECT id, nama FROM perusahaan ORDER BY nama ASC");
+  const perusahaanList = perusahaanListRaw.map(p => ({ ...p, id: typeof p.id === 'bigint' ? Number(p.id) : p.id }));
+
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
       <div className="flex items-center justify-between mb-8">
@@ -38,7 +43,7 @@ export default async function EditAnggotaPage({ params }) {
       </div>
 
       <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-        <EditAnggotaForm data={formattedData} />
+        <EditAnggotaForm data={formattedData} levelList={levelList} perusahaanList={perusahaanList} />
       </div>
     </div>
   );

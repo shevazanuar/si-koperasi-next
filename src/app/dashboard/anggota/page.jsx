@@ -2,23 +2,34 @@ import prisma from "@/lib/prisma";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import SearchInput from "./SearchInput";
+import LimitFilter from "@/components/dashboard/LimitFilter";
+import ImportExcelButton from "@/components/dashboard/ImportExcelButton";
 
 export default async function AnggotaPage({ searchParams }) {
-  const query = (await searchParams)?.q || "";
+  const params = await searchParams;
+  const query = params?.q || "";
+  const limit = parseInt(params?.limit) || 20;
   
-  // Fetch members with filtering
-  const anggota = await prisma.anggota.findMany({
-    where: {
-      OR: [
-        { nama: { contains: query } },
-        { nik: { contains: query } },
-      ]
-    },
-    take: 50,
-    orderBy: {
-      nama: "asc"
-    }
-  });
+  // Ensure limit is one of the allowed values to prevent unexpected large queries
+  const safeLimit = [20, 40, 80, 120].includes(limit) ? limit : 20;
+
+  // Fetch members with JOIN to level_anggota for level name
+  const angkotaRaw = await prisma.$queryRawUnsafe(`
+    SELECT a.id, a.nik, a.nama, a.perusahaan, a.unit_seksi, a.jabatan, a.status,
+           la.nama as level_nama
+    FROM anggota a
+    LEFT JOIN level_anggota la ON a.level_anggota_id = la.id
+    WHERE (
+      a.nama LIKE ? OR a.nik LIKE ?
+    )
+    ORDER BY a.nama ASC
+    LIMIT ?
+  `, `%${query}%`, `%${query}%`, safeLimit);
+
+  const anggota = angkotaRaw.map(a => ({
+    ...a,
+    id: typeof a.id === 'bigint' ? Number(a.id) : a.id,
+  }));
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -30,6 +41,11 @@ export default async function AnggotaPage({ searchParams }) {
           <p className="text-gray-500 mt-1">Kelola data keanggotaan koperasi</p>
         </div>
         <div className="relative z-10 flex items-center gap-3">
+           <ImportExcelButton 
+            type="anggota" 
+            title="Import Data Anggota" 
+            apiUrl="/api/import/anggota"
+           />
            <Link 
             href="/dashboard/anggota/tambah"
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-blue-500/20"
@@ -47,9 +63,14 @@ export default async function AnggotaPage({ searchParams }) {
       {/* Table Area */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center bg-gray-50/50 gap-4">
-          <SearchInput />
-          <div className="text-sm text-gray-500 font-medium">
-             Menampilkan {anggota.length} Data {query && `untuk "${query}"`}
+          <div className="flex items-center gap-4">
+            <LimitFilter />
+          </div>
+          <div className="flex items-center gap-4">
+            <SearchInput />
+            <div className="text-sm text-gray-500 font-medium">
+               Menampilkan {anggota.length} Data {query && `untuk "${query}"`}
+            </div>
           </div>
         </div>
 
@@ -59,8 +80,8 @@ export default async function AnggotaPage({ searchParams }) {
               <tr className="bg-gray-50 text-gray-500 text-[10px] uppercase font-bold tracking-widest border-b border-gray-100">
                 <th className="py-4 px-6">NIK</th>
                 <th className="py-4 px-6">Nama Lengkap</th>
-                <th className="py-4 px-6">Unit / Seksi</th>
-                <th className="py-4 px-6">Jabatan</th>
+                <th className="py-4 px-6">Perusahaan</th>
+                <th className="py-4 px-6">Level</th>
                 <th className="py-4 px-6">Status</th>
                 <th className="py-4 px-6 text-right">Aksi</th>
               </tr>
@@ -72,8 +93,14 @@ export default async function AnggotaPage({ searchParams }) {
                   <td className="py-4 px-6">
                     <div className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{item.nama}</div>
                   </td>
-                  <td className="py-4 px-6 text-gray-600 font-medium">{item.unit_seksi || '-'}</td>
-                  <td className="py-4 px-6 text-gray-600 font-medium">{item.jabatan || '-'}</td>
+                  <td className="py-4 px-6 text-gray-600 font-medium">{item.perusahaan || '-'}</td>
+                  <td className="py-4 px-6">
+                    {item.level_nama ? (
+                      <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
+                        {item.level_nama}
+                      </span>
+                    ) : <span className="text-gray-400">-</span>}
+                  </td>
                   <td className="py-4 px-6">
                     <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
                       item.status === 'Aktif' 

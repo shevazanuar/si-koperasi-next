@@ -15,6 +15,15 @@ export async function createAnggota(prevState, formData) {
   const alamat = formData.get("alamat");
   const hp = formData.get("hp");
   const kota = formData.get("kota");
+  const perusahaan = formData.get("perusahaan");
+  const unit_seksi = formData.get("unit_seksi");
+  const jabatan = formData.get("jabatan");
+  const level_anggota_id = formData.get("level_anggota_id");
+  const gaji = formData.get("gaji");
+  const nama_pasangan = formData.get("nama_pasangan");
+  const jml_anak = formData.get("jml_anak");
+  const tgl_masuk = formData.get("tgl_masuk");
+  const status = formData.get("status");
 
   if (!nik || !nama || !noidentitas) {
     return { error: "NIK, Nama, dan No Identitas wajib diisi." };
@@ -38,9 +47,16 @@ export async function createAnggota(prevState, formData) {
         alamat,
         hp,
         kota,
-        status: "Aktif",
+        perusahaan,
+        unit_seksi,
+        jabatan,
+        level_anggota_id: level_anggota_id ? parseInt(level_anggota_id) : null,
+        gaji: gaji ? parseInt(gaji) : null,
+        nama_pasangan,
+        jml_anak: jml_anak ? parseInt(jml_anak) : null,
+        status: status || "Aktif",
         pwd: CryptoJS.MD5(nik).toString(), // Default password is NIK
-        tgl_masuk: new Date(),
+        tgl_masuk: tgl_masuk ? new Date(tgl_masuk) : new Date(),
         insert_date: new Date(),
       },
     });
@@ -63,6 +79,14 @@ export async function updateAnggota(id, prevState, formData) {
   const alamat = formData.get("alamat");
   const hp = formData.get("hp");
   const kota = formData.get("kota");
+  const perusahaan = formData.get("perusahaan");
+  const unit_seksi = formData.get("unit_seksi");
+  const jabatan = formData.get("jabatan");
+  const level_anggota_id = formData.get("level_anggota_id");
+  const gaji = formData.get("gaji");
+  const nama_pasangan = formData.get("nama_pasangan");
+  const jml_anak = formData.get("jml_anak");
+  const tgl_masuk = formData.get("tgl_masuk");
   const status = formData.get("status");
 
   try {
@@ -78,7 +102,15 @@ export async function updateAnggota(id, prevState, formData) {
         alamat,
         hp,
         kota,
+        perusahaan,
+        unit_seksi,
+        jabatan,
+        level_anggota_id: level_anggota_id ? parseInt(level_anggota_id) : null,
+        gaji: gaji ? parseInt(gaji) : null,
+        nama_pasangan,
+        jml_anak: jml_anak ? parseInt(jml_anak) : null,
         status: status || "Aktif",
+        tgl_masuk: tgl_masuk ? new Date(tgl_masuk) : undefined,
         update_date: new Date(),
       },
     });
