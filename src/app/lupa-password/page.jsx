@@ -33,6 +33,16 @@ export default function ForgotPasswordPage() {
           {/* Form */}
           {!state?.success ? (
             <form action={formAction} className="space-y-5">
+              {/* Honeypot field (hidden from users) */}
+              <div className="hidden" aria-hidden="true">
+                <input
+                  name="website"
+                  type="text"
+                  tabIndex="-1"
+                  autoComplete="off"
+                />
+              </div>
+
               <div>
                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 ml-1">Email Terdaftar</label>
                 <div className="relative">

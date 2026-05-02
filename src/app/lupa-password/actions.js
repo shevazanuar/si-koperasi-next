@@ -12,6 +12,12 @@ const forgotPasswordSchema = z.object({
 export async function forgotPasswordAction(prevState, formData) {
   const data = Object.fromEntries(formData.entries());
   
+  // Honeypot check: If the hidden 'website' field is filled, it's a bot
+  if (data.website) {
+    console.warn("Honeypot triggered! Bot detected.");
+    return { success: "Jika email terdaftar, instruksi reset password telah dikirim." }; // Pretend it worked
+  }
+  
   const validation = forgotPasswordSchema.safeParse(data);
   if (!validation.success) {
     return { error: validation.error.issues?.[0]?.message || "Input tidak valid" };
