@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { loginAction } from "./actions";
 import { User, Lock, Loader2, Landmark, ShieldCheck } from "lucide-react";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
@@ -57,7 +58,7 @@ export default function LoginPage() {
               <div>
                 <div className="flex items-center justify-between mb-2 ml-1">
                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest">Password</label>
-                  <a href="#" className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-tighter">Lupa Password?</a>
+                  <Link href="/lupa-password" className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-tighter">Lupa Password?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

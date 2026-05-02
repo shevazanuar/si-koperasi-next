@@ -17,7 +17,8 @@ export async function loginAction(prevState, formData) {
   // Validate using Zod
   const validation = loginSchema.safeParse(data);
   if (!validation.success) {
-    return { error: validation.error.errors[0].message };
+    const errorMsg = validation.error.issues?.[0]?.message || "Input tidak valid";
+    return { error: errorMsg };
   }
 
   const { username, password } = validation.data;

@@ -15,6 +15,7 @@ const anggotaSchema = z.object({
   tgl_lahir: z.string().min(1, "Tanggal lahir wajib diisi"),
   alamat: z.string().optional(),
   hp: z.string().optional(),
+  email: z.string().email("Format email tidak valid").or(z.literal("")).optional(),
   kota: z.string().optional(),
   perusahaan: z.string().optional(),
   unit_seksi: z.string().optional(),
@@ -33,7 +34,8 @@ export async function createAnggota(prevState, formData) {
   // Validate using Zod
   const validation = anggotaSchema.safeParse(rawData);
   if (!validation.success) {
-    return { error: validation.error.errors[0].message };
+    const errorMsg = validation.error.issues?.[0]?.message || "Input tidak valid";
+    return { error: errorMsg };
   }
 
   const data = validation.data;
@@ -45,6 +47,7 @@ export async function createAnggota(prevState, formData) {
   const tgl_lahir = data.tgl_lahir;
   const alamat = data.alamat;
   const hp = data.hp;
+  const email = data.email;
   const kota = data.kota;
   const perusahaan = data.perusahaan;
   const unit_seksi = data.unit_seksi;
@@ -73,6 +76,7 @@ export async function createAnggota(prevState, formData) {
         tgl_lahir: new Date(tgl_lahir),
         alamat,
         hp,
+        email: email || null,
         kota,
         perusahaan,
         unit_seksi,
@@ -105,6 +109,7 @@ export async function updateAnggota(id, prevState, formData) {
   const tgl_lahir = formData.get("tgl_lahir");
   const alamat = formData.get("alamat");
   const hp = formData.get("hp");
+  const email = formData.get("email");
   const kota = formData.get("kota");
   const perusahaan = formData.get("perusahaan");
   const unit_seksi = formData.get("unit_seksi");
@@ -128,6 +133,7 @@ export async function updateAnggota(id, prevState, formData) {
         tgl_lahir: new Date(tgl_lahir),
         alamat,
         hp,
+        email: email || null,
         kota,
         perusahaan,
         unit_seksi,

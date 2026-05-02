@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { LogOut, User as UserIcon, Bell } from "lucide-react";
 
 export default async function Header() {
@@ -28,15 +29,15 @@ export default async function Header() {
         
         <div className="h-8 w-px bg-gray-200"></div>
 
-        <div className="flex items-center gap-3">
+        <Link href="/dashboard/profile" className="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-2xl transition-colors group">
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-gray-900 leading-none">{user.name}</p>
+            <p className="text-sm font-semibold text-gray-900 leading-none group-hover:text-blue-600 transition-colors">{user.name}</p>
             <p className="text-xs text-gray-500 mt-1 capitalize">{user.role}</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center border-2 border-white shadow-sm">
+          <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center border-2 border-white shadow-sm group-hover:scale-110 transition-transform">
             <UserIcon className="w-5 h-5" />
           </div>
-        </div>
+        </Link>
 
         <form action={async () => {
           "use server";
