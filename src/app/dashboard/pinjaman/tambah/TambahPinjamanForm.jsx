@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { createPinjaman } from "../actions";
-import { CreditCard, User, Calendar, Save, Loader2, Clock, Percent } from "lucide-react";
+import { CreditCard, User, Calendar, Save, Loader2, Clock, Percent, FileSearch } from "lucide-react";
 
 export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
   const [state, formAction, isPending] = useActionState(createPinjaman, null);
@@ -86,9 +86,11 @@ export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
             <input
               name="jumlah"
               type="number"
-              defaultValue={selectedType?.jumlah || ""}
+              value={selectedType?.jumlah || ""}
+              readOnly={!!selectedType}
+              onChange={() => {}} // Controlled but read-only
               placeholder="0"
-              className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-lg"
+              className={`w-full px-4 py-3 border border-transparent rounded-2xl transition-all outline-none font-bold text-lg ${selectedType ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-gray-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500'}`}
               required
             />
           </div>
@@ -102,8 +104,10 @@ export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
                   <input
                     name="lama"
                     type="number"
-                    defaultValue={selectedType?.lama || ""}
-                    className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold pr-10"
+                    value={selectedType?.lama || ""}
+                    readOnly={!!selectedType}
+                    onChange={() => {}}
+                    className={`w-full px-4 py-3 border border-transparent rounded-2xl transition-all outline-none font-bold pr-10 ${selectedType ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-gray-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500'}`}
                     required
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 uppercase">Bln</span>
@@ -119,8 +123,10 @@ export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
                     name="bunga"
                     type="number"
                     step="0.1"
-                    defaultValue={selectedType?.bunga || ""}
-                    className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold pr-10"
+                    value={selectedType?.bunga || ""}
+                    readOnly={!!selectedType}
+                    onChange={() => {}}
+                    className={`w-full px-4 py-3 border border-transparent rounded-2xl transition-all outline-none font-bold pr-10 ${selectedType ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-gray-50 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500'}`}
                     required
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400 uppercase">%</span>
@@ -142,6 +148,18 @@ export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
             required
           />
         </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-gray-700 ml-1 flex items-center gap-2">
+             <FileSearch className="w-4 h-4 text-gray-400" />
+             Keperluan Pinjaman
+          </label>
+          <textarea
+            name="keperluan"
+            placeholder="Contoh: Biaya pendidikan, Renovasi rumah, dll..."
+            className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium text-sm min-h-[100px]"
+          ></textarea>
+        </div>
       </div>
 
       {state?.error && (
@@ -156,7 +174,7 @@ export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
           className="w-full bg-orange-600 hover:bg-orange-700 text-white py-4 rounded-2xl font-bold shadow-xl shadow-orange-500/20 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 text-lg"
         >
           {isPending ? <Loader2 className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
-          Proses Pinjaman
+          Kirim Pengajuan Pinjaman
         </button>
       </div>
     </form>

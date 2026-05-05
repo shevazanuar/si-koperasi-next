@@ -1,16 +1,25 @@
 "use client";
 import { useState, useEffect } from "react";
 import { FileSearch, CheckCircle, XCircle, Clock } from "lucide-react";
+import Link from "next/link";
 
 export default function PengajuanPinjamanPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState({ msg: "", type: "success" });
+  const [user, setUser] = useState(null);
 
   const showInfo = (msg, type = "success") => { setInfo({ msg, type }); setTimeout(() => setInfo({ msg: "", type: "success" }), 3000); };
 
+  const fetchUser = async () => {
+    const res = await fetch("/api/auth/session"); // Assuming this exists or I'll create it
+    const json = await res.json();
+    setUser(json.user || null);
+  };
+
   const fetchData = async () => {
     setLoading(true);
+    await fetchUser();
     const res = await fetch("/api/transaksi/pengajuan-pinjaman");
     const json = await res.json();
     setData(json.data || []);
@@ -61,11 +70,13 @@ export default function PengajuanPinjamanPage() {
             <thead><tr className="bg-gray-50 border-b border-gray-100">
               <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">No. Pengajuan</th>
               <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Anggota</th>
-              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Perusahaan</th>
-              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Jenis Pinjaman</th>
-              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Tanggal</th>
+              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Jenis & Jumlah</th>
+              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Tenor</th>
+              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Keperluan</th>
               <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase">Status</th>
-              <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase">Aksi</th>
+              {user?.role === "admin" && (
+                <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase">Aksi</th>
+              )}
             </tr></thead>
             <tbody>{data.map((item) => (
               <tr key={item.nomor} className="border-b border-gray-50 hover:bg-blue-50/20">
@@ -74,24 +85,34 @@ export default function PengajuanPinjamanPage() {
                   <p className="font-bold text-gray-900">{item.nama_anggota}</p>
                   <p className="text-xs text-gray-400">{item.nik}</p>
                 </td>
-                <td className="px-6 py-3 text-gray-600">{item.perusahaan || "-"}</td>
-                <td className="px-6 py-3 text-gray-600">{item.nama_jenis}</td>
-                <td className="px-6 py-3 text-gray-500">{item.tanggal ? new Date(item.tanggal).toLocaleDateString("id-ID") : "-"}</td>
-                <td className="px-6 py-3 text-center">{statusBadge(item.status)}</td>
-                <td className="px-6 py-3 text-center">
-                  {(!item.status || item.status === "Open") ? (
-                    <div className="flex justify-center gap-1">
-                      <button onClick={() => handleStatus(item.nomor, "Acc")} className="p-1.5 hover:bg-emerald-50 rounded-lg text-emerald-600 transition" title="Setujui">
-                        <CheckCircle className="w-5 h-5" />
-                      </button>
-                      <button onClick={() => handleStatus(item.nomor, "Cancel")} className="p-1.5 hover:bg-red-50 rounded-lg text-red-500 transition" title="Tolak">
-                        <XCircle className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="text-xs text-gray-400 italic">Selesai</span>
-                  )}
+                <td className="px-6 py-3">
+                  <p className="text-gray-600 font-semibold">{item.nama_jenis}</p>
+                  <p className="text-sm font-black text-blue-700">Rp {new Intl.NumberFormat("id-ID").format(item.jumlah || 0)}</p>
                 </td>
+                <td className="px-6 py-3 text-gray-600">{item.lama} {item.satuan || 'Bulan'}</td>
+                <td className="px-6 py-3 text-gray-500 text-xs italic max-w-xs truncate" title={item.keperluan}>
+                  {item.keperluan || "-"}
+                </td>
+                <td className="px-6 py-3 text-center">{statusBadge(item.status)}</td>
+                {user?.role === "admin" && (
+                  <td className="px-6 py-3 text-center">
+                    <div className="flex justify-center gap-1">
+                      <Link href={`/dashboard/transaksi/pengajuan-pinjaman/${item.id}`} className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-600 transition" title="Detail">
+                        <FileSearch className="w-5 h-5" />
+                      </Link>
+                      {(!item.status || item.status === "Open") && user?.role === "admin" && (
+                        <>
+                          <button onClick={() => handleStatus(item.nomor, "Acc")} className="p-1.5 hover:bg-emerald-50 rounded-lg text-emerald-600 transition" title="Setujui">
+                            <CheckCircle className="w-5 h-5" />
+                          </button>
+                          <button onClick={() => handleStatus(item.nomor, "Cancel")} className="p-1.5 hover:bg-red-50 rounded-lg text-red-500 transition" title="Tolak">
+                            <XCircle className="w-5 h-5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}</tbody>
           </table>

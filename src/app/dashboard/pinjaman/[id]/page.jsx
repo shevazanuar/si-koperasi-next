@@ -21,8 +21,22 @@ export default async function PinjamanDetailPage({ params }) {
 
   const { id } = await params;
   
+  const pinjamanId = parseInt(id);
+  if (isNaN(pinjamanId)) return notFound();
+
   const pinjaman = await prisma.pinjaman_header.findUnique({
-    where: { id: parseInt(id) }
+    where: { id: pinjamanId },
+    select: {
+      id: true,
+      nomor: true,
+      tgl: true,
+      anggota_id: true,
+      jenis_pinjaman_id: true,
+      lama: true,
+      satuan: true,
+      bunga: true,
+      jumlah: true
+    }
   });
 
   if (!pinjaman) {
@@ -34,10 +48,31 @@ export default async function PinjamanDetailPage({ params }) {
       return notFound();
   }
 
-  const [anggota, jenis] = await Promise.all([
-    prisma.anggota.findUnique({ where: { id: pinjaman.anggota_id } }),
-    prisma.jenis_pinjaman.findUnique({ where: { id: pinjaman.jenis_pinjaman_id || 0 } })
+  const [anggota, jenis, installments] = await Promise.all([
+    prisma.anggota.findUnique({ 
+      where: { id: pinjaman.anggota_id },
+      select: { id: true, nama: true, nik: true }
+    }),
+    prisma.jenis_pinjaman.findUnique({ 
+      where: { id: pinjaman.jenis_pinjaman_id || 0 },
+      select: { id: true, nama: true }
+    }),
+    prisma.pinjaman_detail.findMany({ 
+      where: { pinjaman_id: pinjaman.id },
+      orderBy: { cicilan: 'asc' },
+      select: {
+        id: true,
+        cicilan: true,
+        angsuran: true,
+        bunga: true,
+        tgl_jatuh_tempo: true,
+        tgl_bayar: true,
+        jumlah_bayar: true
+      }
+    })
   ]);
+
+  const totalBayar = installments.reduce((acc, curr) => acc + (curr.jumlah_bayar || 0), 0);
 
   const stats = [
     { label: "Pokok Pinjaman", value: pinjaman.jumlah, icon: CreditCard, color: "text-orange-600", bg: "bg-orange-50" },
@@ -156,16 +191,107 @@ export default async function PinjamanDetailPage({ params }) {
            </div>
 
            <div className="mt-8 p-6 bg-gray-900 rounded-3xl text-white relative overflow-hidden group">
-              <div className="relative z-10">
-                 <h4 className="font-bold text-sm mb-1">Status Angsuran</h4>
-                 <p className="text-gray-400 text-[10px] leading-relaxed mb-6 italic">Fitur jadwal angsuran akan segera hadir dikesempatan berikutnya.</p>
-                 <button className="w-full bg-white/10 border border-white/20 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed opacity-50">
-                    Cek Angsuran
-                 </button>
-              </div>
-              <Clock className="absolute -right-4 -bottom-4 w-24 h-24 opacity-10 group-hover:scale-110 transition-transform duration-700" />
-           </div>
+               <div className="relative z-10">
+                  <h4 className="font-bold text-sm mb-1">Status Pinjaman</h4>
+                  <p className="text-gray-400 text-[10px] leading-relaxed mb-6 italic">Informasi ringkasan pembayaran pinjaman.</p>
+                  <div className="flex items-center justify-between text-xs font-bold mb-2">
+                     <span>Total Bayar</span>
+                     <span className="text-emerald-400">Rp {new Intl.NumberFormat('id-ID').format(totalBayar)}</span>
+                  </div>
+                  <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mb-6">
+                     <div 
+                        className="bg-emerald-500 h-full transition-all duration-1000" 
+                        style={{ width: `${Math.min(100, (totalBayar / (pinjaman.jumlah || 1)) * 100)}%` }}
+                     ></div>
+                  </div>
+                  <button className="w-full bg-white text-gray-900 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gray-100 transition-colors">
+                     Unduh Laporan
+                  </button>
+               </div>
+               <Clock className="absolute -right-4 -bottom-4 w-24 h-24 opacity-10 group-hover:scale-110 transition-transform duration-700" />
+            </div>
         </div>
+      </div>
+
+      {/* Installment Table */}
+      <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
+         <div className="p-6 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
+            <div>
+               <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Jadwal Angsuran</h3>
+               <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">Rincian rencana dan riwayat pembayaran</p>
+            </div>
+            <div className="flex items-center gap-2">
+               <span className="px-3 py-1 bg-blue-50 text-blue-700 text-[10px] font-black uppercase rounded-full border border-blue-100">
+                  {installments.length} Cicilan
+               </span>
+            </div>
+         </div>
+         <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left">
+               <thead>
+                  <tr className="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">
+                     <th className="px-6 py-4">Cicilan</th>
+                     <th className="px-6 py-4">Jatuh Tempo</th>
+                     <th className="px-6 py-4 text-right">Pokok</th>
+                     <th className="px-6 py-4 text-right">Bunga</th>
+                     <th className="px-6 py-4 text-right">Total Tagihan</th>
+                     <th className="px-6 py-4 text-center">Status</th>
+                     <th className="px-6 py-4">Tgl Bayar</th>
+                     <th className="px-6 py-4 text-right">Jml Bayar</th>
+                  </tr>
+               </thead>
+               <tbody className="divide-y divide-gray-50">
+                  {installments.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="px-6 py-12 text-center text-gray-400 italic">
+                        Belum ada jadwal angsuran untuk pinjaman ini.
+                      </td>
+                    </tr>
+                  ) : (
+                    installments.map((inst) => {
+                      const isPaid = inst.jumlah_bayar > 0;
+                      const totalTagihan = inst.angsuran + inst.bunga;
+                      return (
+                          <tr key={inst.id} className={`hover:bg-gray-50/50 transition-colors ${isPaid ? 'bg-emerald-50/10' : ''}`}>
+                            <td className="px-6 py-4">
+                                <span className="font-black text-gray-900">#{inst.cicilan}</span>
+                            </td>
+                            <td className="px-6 py-4 text-gray-600 font-medium whitespace-nowrap">
+                                {inst.tgl_jatuh_tempo ? new Date(inst.tgl_jatuh_tempo).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                            </td>
+                            <td className="px-6 py-4 text-right font-medium text-gray-700">
+                                {new Intl.NumberFormat('id-ID').format(inst.angsuran)}
+                            </td>
+                            <td className="px-6 py-4 text-right font-medium text-orange-600">
+                                {new Intl.NumberFormat('id-ID').format(inst.bunga)}
+                            </td>
+                            <td className="px-6 py-4 text-right font-black text-gray-900">
+                                {new Intl.NumberFormat('id-ID').format(totalTagihan)}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                                {isPaid ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase">
+                                      Lunas
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[10px] font-black uppercase">
+                                      Belum
+                                  </span>
+                                )}
+                            </td>
+                            <td className="px-6 py-4 text-gray-500 text-xs font-medium italic">
+                                {inst.tgl_bayar || '-'}
+                            </td>
+                            <td className="px-6 py-4 text-right font-bold text-emerald-600">
+                                {inst.jumlah_bayar > 0 ? new Intl.NumberFormat('id-ID').format(inst.jumlah_bayar) : '-'}
+                            </td>
+                          </tr>
+                      );
+                    })
+                  )}
+               </tbody>
+            </table>
+         </div>
       </div>
 
     </div>
