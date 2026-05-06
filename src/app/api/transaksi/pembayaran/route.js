@@ -3,9 +3,29 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
+    const user = await getSession();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    let pinjamanWhere = {};
+    if (user.role === "anggota") {
+      pinjamanWhere = { anggota_id: user.id };
+    }
+
+    // Get all relevant pinjaman headers first if we are an anggota
+    const myPinjaman = await prisma.pinjaman_header.findMany({
+      where: pinjamanWhere,
+      select: { id: true }
+    });
+    const myPinjamanIds = myPinjaman.map(p => p.id);
+
     // Get paid installments (nomor_bayar is not null/empty)
+    const whereClause = { nomor_bayar: { not: null } };
+    if (user.role === "anggota") {
+      whereClause.pinjaman_id = { in: myPinjamanIds };
+    }
+
     const details = await prisma.pinjaman_detail.findMany({
-      where: { nomor_bayar: { not: null } },
+      where: whereClause,
       orderBy: { nomor_bayar: "desc" },
       take: 200,
     });
@@ -51,12 +71,20 @@ export async function GET() {
 
 export async function POST(request) {
   try {
+    const user = await getSession();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const body = await request.json();
 
     if (body.action === "list_pinjaman") {
-      // Get outstanding cicilan for an anggota
+      // Security Check: Member can only list their own pinjaman
+      const targetAnggotaId = parseInt(body.anggota_id);
+      if (user.role === "anggota" && targetAnggotaId !== user.id) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+
       const headers = await prisma.pinjaman_header.findMany({
-        where: { anggota_id: parseInt(body.anggota_id) },
+        where: { anggota_id: targetAnggotaId },
       });
       const headerIds = headers.map((h) => h.id);
       const details = await prisma.pinjaman_detail.findMany({
@@ -70,6 +98,11 @@ export async function POST(request) {
         nomor_pinjaman: headerMap[d.pinjaman_id]?.nomor || "-",
       }));
       return NextResponse.json({ data });
+    }
+
+    // Admin-only actions below
+    if (user.role !== "admin") {
+        return NextResponse.json({ error: "Hanya Admin yang dapat melakukan tindakan ini" }, { status: 403 });
     }
 
     if (body.action === "bayar") {

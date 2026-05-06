@@ -3,16 +3,27 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // Fetch all anggota with simpanan/penarikan aggregates
+    const user = await getSession();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    let whereClause = { status: "Aktif" };
+    if (user.role === "anggota") {
+      whereClause = { id: user.id, status: "Aktif" };
+    }
+
+    // Fetch anggota with simpanan/penarikan aggregates
     const anggotaList = await prisma.anggota.findMany({
-      where: { status: "Aktif" },
+      where: whereClause,
       select: { id: true, nik: true, nama: true, jk: true },
       orderBy: { nama: "asc" },
     });
 
+    const targetIds = anggotaList.map(a => a.id);
+
     // Aggregate simpanan and penarikan per anggota
     const simpananAgg = await prisma.simpanan.groupBy({
       by: ["anggota_id", "jenis"],
+      where: { anggota_id: { in: targetIds } },
       _sum: { jumlah: true },
     });
 
@@ -47,12 +58,21 @@ export async function GET() {
 
 export async function POST(request) {
   try {
+    const user = await getSession();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
     const body = await request.json();
 
     if (body.action === "detail") {
+      // Security Check: Member can only see their own details
+      const targetAnggotaId = parseInt(body.anggota_id);
+      if (user.role === "anggota" && targetAnggotaId !== user.id) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+
       // Get detail penarikan per anggota
       const details = await prisma.simpanan.findMany({
-        where: { anggota_id: parseInt(body.anggota_id), jenis: "T" },
+        where: { anggota_id: targetAnggotaId, jenis: "T" },
         orderBy: { nomor: "desc" },
         take: 30,
       });
@@ -72,17 +92,28 @@ export async function POST(request) {
     }
 
     if (body.action === "saldo") {
+      // Security Check: Member can only see their own saldo
+      const targetAnggotaId = parseInt(body.anggota_id);
+      if (user.role === "anggota" && targetAnggotaId !== user.id) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+      }
+
       // Get saldo for specific jenis simpanan
       const simpanan = await prisma.simpanan.aggregate({
-        where: { anggota_id: parseInt(body.anggota_id), jenis_simpanan_id: parseInt(body.jenis_simpanan_id), jenis: "S" },
+        where: { anggota_id: targetAnggotaId, jenis_simpanan_id: parseInt(body.jenis_simpanan_id), jenis: "S" },
         _sum: { jumlah: true },
       });
       const penarikan = await prisma.simpanan.aggregate({
-        where: { anggota_id: parseInt(body.anggota_id), jenis_simpanan_id: parseInt(body.jenis_simpanan_id), jenis: "T" },
+        where: { anggota_id: targetAnggotaId, jenis_simpanan_id: parseInt(body.jenis_simpanan_id), jenis: "T" },
         _sum: { jumlah: true },
       });
       const saldo = (simpanan._sum.jumlah || 0) - (penarikan._sum.jumlah || 0);
       return NextResponse.json({ saldo });
+    }
+
+    // Admin-only actions below
+    if (user.role !== "admin") {
+        return NextResponse.json({ error: "Hanya Admin yang dapat melakukan tindakan ini" }, { status: 403 });
     }
 
     if (body.action === "simpan") {
@@ -113,7 +144,7 @@ export async function POST(request) {
           jenis_simpanan_id: parseInt(body.jenis_simpanan_id),
           jumlah: parseInt(body.jumlah),
           jenis: "T",
-          user_id: 1,
+          user_id: user.id,
           insert_date: new Date(),
         },
       });

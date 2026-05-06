@@ -11,6 +11,21 @@ export default function PembayaranPage() {
   const [cicilans, setCicilans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const res = await fetch("/api/auth/session");
+      const json = await res.json();
+      if (!json.user || json.user.role !== "admin") {
+        window.location.href = "/dashboard";
+        return;
+      }
+      setUser(json.user);
+    };
+    checkAuth();
+  }, []);
+
   const [info, setInfo] = useState({ msg: "", type: "success" });
   const [payForm, setPayForm] = useState({ detail_id: null, tgl_bayar: new Date().toISOString().split("T")[0], jumlah_bayar: "" });
   const [payingId, setPayingId] = useState(null);

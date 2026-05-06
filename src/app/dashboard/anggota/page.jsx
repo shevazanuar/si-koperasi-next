@@ -5,7 +5,13 @@ import SearchInput from "./SearchInput";
 import LimitFilter from "@/components/dashboard/LimitFilter";
 import ImportExcelButton from "@/components/dashboard/ImportExcelButton";
 
+import { getSession } from "@/lib/session";
+import { redirect } from "next/navigation";
+
 export default async function AnggotaPage({ searchParams }) {
+  const user = await getSession();
+  if (!user || user.role !== "admin") redirect("/dashboard");
+
   const params = await searchParams;
   const query = params?.q || "";
   const limit = parseInt(params?.limit) || 20;

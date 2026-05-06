@@ -4,6 +4,19 @@ import { getSession } from "@/lib/session";
 
 export async function GET() {
   try {
+    const user = await getSession();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    let where = "";
+    const params = [];
+
+    if (user.role === "anggota") {
+      where = "WHERE a.anggota_id = ?";
+      params.push(user.id);
+    }
+
     const data = await prisma.$queryRawUnsafe(`
       SELECT a.id, a.nomor, a.tanggal, a.anggota_id, a.status, a.keperluan,
              a.jumlah, a.lama, a.satuan,
@@ -12,8 +25,10 @@ export async function GET() {
       FROM pengajuan_pinjaman a
       LEFT JOIN jenis_pinjaman b ON a.jenis_pinjaman_id = b.id
       LEFT JOIN anggota c ON a.anggota_id = c.id
+      ${where}
       ORDER BY a.id DESC
-    `);
+    `, ...params);
+
     const safe = data.map((d) => ({
       ...d,
       id: typeof d.id === "bigint" ? Number(d.id) : d.id,

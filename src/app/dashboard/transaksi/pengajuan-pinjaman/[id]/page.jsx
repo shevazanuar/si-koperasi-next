@@ -47,6 +47,11 @@ export default async function PengajuanDetailPage({ params }) {
     return notFound();
   }
 
+  // Security Check: Member can only view their own pengajuan
+  if (userSession.role === "anggota" && pengajuan.anggota_id !== userSession.id) {
+      return notFound();
+  }
+
   const [anggota, jenis] = await Promise.all([
     prisma.anggota.findUnique({ 
       where: { id: pengajuan.anggota_id },
