@@ -1,7 +1,6 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import CryptoJS from "crypto-js";
 import { z } from "zod";
 
 const resetPasswordSchema = z.object({
@@ -43,7 +42,8 @@ export async function resetPasswordAction(prevState, formData) {
     }
 
     // Hash new password
-    const hashedNew = CryptoJS.MD5(newPassword).toString();
+    const { hashPassword } = await import("@/lib/password");
+    const hashedNew = await hashPassword(newPassword);
 
     // Update password and clear token
     await prisma.$executeRawUnsafe(
