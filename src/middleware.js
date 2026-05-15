@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export function middleware(request) {
-  const session = request.cookies.get("session")?.value;
+  const session = request.cookies.get("si_koperasi_session")?.value;
   const pathname = request.nextUrl.pathname;
 
   // Protect all dashboard routes

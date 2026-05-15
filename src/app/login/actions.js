@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { cookies } from "next/headers";
+import { setSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -68,20 +68,12 @@ export async function loginAction(prevState, formData) {
       }
     }
 
-    // Set Session Cookie
-    const sessionData = {
+    // Set signed session via iron-session
+    await setSession({
       id: user.id,
       username: role === "admin" ? user.username : user.nik,
       name: role === "admin" ? user.namalengkap : user.nama,
       role: role,
-    };
-
-    const cookieStore = await cookies();
-    cookieStore.set("session", JSON.stringify(sessionData), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 24, // 1 day
-      path: "/",
     });
 
     // Successful login

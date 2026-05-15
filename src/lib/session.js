@@ -1,36 +1,65 @@
+import { getIronSession } from "iron-session";
 import { cookies } from "next/headers";
 
+const SESSION_OPTIONS = {
+  password: process.env.SESSION_SECRET,
+  cookieName: "si_koperasi_session",
+  cookieOptions: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 60 * 60 * 24, // 1 day
+    path: "/",
+    sameSite: "lax",
+  },
+};
+
 /**
- * Get the current session from cookies
- * @returns {Object|null} Session data { id, username, name, role } or null
+ * Get the current iron-session object
+ * @returns {Promise<import("iron-session").IronSession>}
+ */
+export async function getIronSessionData() {
+  const cookieStore = await cookies();
+  return getIronSession(cookieStore, SESSION_OPTIONS);
+}
+
+/**
+ * Get the current user from session
+ * @returns {Promise<{id, username, name, role}|null>}
  */
 export async function getSession() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
+  const session = await getIronSessionData();
+  return session?.user ?? null;
+}
 
-  if (!sessionCookie) return null;
+/**
+ * Save user data into signed session cookie
+ */
+export async function setSession(userData) {
+  const session = await getIronSessionData();
+  session.user = userData;
+  await session.save();
+}
 
-  try {
-    return JSON.parse(sessionCookie.value);
-  } catch (error) {
-    return null;
-  }
+/**
+ * Destroy session (logout)
+ */
+export async function destroySession() {
+  const session = await getIronSessionData();
+  session.destroy();
 }
 
 /**
  * Check if the current user is an admin
- * @returns {Boolean}
  */
 export async function isAdmin() {
-  const session = await getSession();
-  return session?.role === "admin";
+  const user = await getSession();
+  return user?.role === "admin";
 }
 
 /**
  * Check if the current user is a member (anggota)
- * @returns {Boolean}
  */
 export async function isAnggota() {
-  const session = await getSession();
-  return session?.role === "anggota";
+  const user = await getSession();
+  return user?.role === "anggota";
 }
