@@ -38,8 +38,8 @@ export default function AdminDashboard({ stats, chartData, profileInfo, informas
       {/* Welcome Banner */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg shadow-blue-600/20">
         <p className="text-blue-100 text-sm">
-          ✅ Selamat Datang di Halaman Administrator,{" "}
-          <strong className="text-white">SIKKPRI Polines (v1.1.2)</strong>, Menu utama ada di
+          Selamat Datang di Halaman Administrator,{" "}
+          <strong className="text-white">SIKKPRI Polines</strong>, Menu utama ada di
           sebelah kiri, selamat bekerja.
         </p>
       </div>

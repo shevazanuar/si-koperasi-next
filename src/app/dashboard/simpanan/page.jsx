@@ -2,7 +2,6 @@ import prisma from "@/lib/prisma";
 import { Wallet, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
-import ImportExcelButton from "@/components/dashboard/ImportExcelButton";
 import { redirect } from "next/navigation";
 import TypeFilter from "./TypeFilter";
 import LimitFilter from "@/components/dashboard/LimitFilter";
@@ -89,11 +88,7 @@ export default async function SimpananPage({ searchParams }) {
           <p className="text-gray-400 text-sm mt-0.5">Kelola dan pantau seluruh transaksi simpanan</p>
         </div>
         <div className="flex items-center gap-2">
-          <ImportExcelButton
-            type="simpanan"
-            title="Import Data Simpanan"
-            apiUrl="/api/import/simpanan"
-          />
+
           <Link
             href="/dashboard/simpanan/tambah"
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 active:scale-95 text-sm"

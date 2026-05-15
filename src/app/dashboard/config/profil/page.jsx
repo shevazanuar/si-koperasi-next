@@ -31,9 +31,11 @@ export default function ProfilPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-3">
         <div className="bg-teal-600 p-2.5 rounded-xl text-white"><Building2 className="w-5 h-5" /></div>
         <div><h1 className="text-xl font-black text-gray-900">Profil Koperasi</h1><p className="text-sm text-gray-500">Kelola informasi profil koperasi</p></div>
+      </div>
       </div>
       {info && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm">✅ {info}</div>}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">

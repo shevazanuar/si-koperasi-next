@@ -129,29 +129,25 @@ export default function Sidebar({ role = "admin" }) {
               <div key={item.name}>
                 <button
                   onClick={() => toggleMenu(item.name)}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${
-                    childActive
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${childActive
                       ? "bg-blue-50 text-blue-700 font-medium"
                       : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
+                    }`}
                 >
                   <item.icon
-                    className={`w-5 h-5 ${
-                      childActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
-                    }`}
+                    className={`w-5 h-5 ${childActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
+                      }`}
                   />
                   <span className="flex-1 text-left">{item.name}</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      isOpen ? "rotate-180" : ""
-                    } ${childActive ? "text-blue-500" : "text-gray-400"}`}
+                    className={`w-4 h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+                      } ${childActive ? "text-blue-500" : "text-gray-400"}`}
                   />
                 </button>
 
                 <div
-                  className={`overflow-hidden transition-all duration-200 ${
-                    isOpen ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"
-                  }`}
+                  className={`overflow-hidden transition-all duration-200 ${isOpen ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"
+                    }`}
                 >
                   <div className="ml-4 pl-4 border-l-2 border-gray-100 space-y-1">
                     {item.children.map((child) => {
@@ -161,18 +157,16 @@ export default function Sidebar({ role = "admin" }) {
                         <Link
                           key={child.href}
                           href={child.href}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm group ${
-                            isActive
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm group ${isActive
                               ? "bg-blue-50 text-blue-700 font-medium"
                               : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                          }`}
+                            }`}
                         >
                           <child.icon
-                            className={`w-4 h-4 ${
-                              isActive
+                            className={`w-4 h-4 ${isActive
                                 ? "text-blue-600"
                                 : "text-gray-400 group-hover:text-gray-600"
-                            }`}
+                              }`}
                           />
                           {child.name}
                           {isActive && (
@@ -196,16 +190,14 @@ export default function Sidebar({ role = "admin" }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${
-                isActive
+              className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${isActive
                   ? "bg-blue-50 text-blue-700 font-medium"
                   : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-              }`}
+                }`}
             >
               <item.icon
-                className={`w-5 h-5 ${
-                  isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
-                }`}
+                className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"
+                  }`}
               />
               {item.name}
               {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-600"></div>}
@@ -216,8 +208,8 @@ export default function Sidebar({ role = "admin" }) {
 
       <div className="p-4 border-t border-gray-50 m-4 bg-gray-50 rounded-xl">
         <p className="text-xs text-gray-500 text-center font-medium">
-          SI Koperasi Next.js <br />
-          v1.0.0
+          Koperasi Polines <br />
+
         </p>
       </div>
     </aside>

@@ -1,7 +1,6 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import CryptoJS from "crypto-js";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -23,35 +22,50 @@ export async function loginAction(prevState, formData) {
 
   const { username, password } = validation.data;
 
-  // Hash password using MD5 to match database
-  const hashedPassword = CryptoJS.MD5(password).toString();
-
   try {
+    const { verifyLegacyOrBcrypt, shouldRehashPassword, rehashPassword } = await import("@/lib/legacy-password");
+
     // 1. Check Users table (Admin/Staff)
     let user = await prisma.users.findFirst({
       where: {
         username: username,
-        password: hashedPassword,
         blokir: "T",
       },
     });
 
     let role = "admin";
+    let storedPassword = user?.password;
 
     // 2. If not found in users, check Anggota table
     if (!user) {
       user = await prisma.anggota.findFirst({
         where: {
           nik: username,
-          pwd: hashedPassword,
           status: "Aktif",
         },
       });
       role = "anggota";
+      storedPassword = user?.pwd;
     }
 
     if (!user) {
       return { error: "Username atau password salah." };
+    }
+
+    const isValid = await verifyLegacyOrBcrypt(password, storedPassword);
+    if (!isValid) {
+      return { error: "Username atau password salah." };
+    }
+
+    // 3. Migrate password if it's still MD5
+    const needsRehash = await shouldRehashPassword(storedPassword);
+    if (needsRehash) {
+      const newHash = await rehashPassword(password);
+      if (role === "admin") {
+        await prisma.users.update({ where: { id: user.id }, data: { password: newHash } });
+      } else {
+        await prisma.anggota.update({ where: { id: user.id }, data: { pwd: newHash } });
+      }
     }
 
     // Set Session Cookie

@@ -29,7 +29,7 @@ model anggota {
   tgl_masuk              DateTime?       @db.Date
   status                 anggota_status?
   foto                   String?         @db.VarChar(50)
-  pwd                    String?         @db.VarChar(50)
+  pwd                    String?         @db.VarChar(255)
   user_id                Int?
   insert_date            DateTime?       @db.Date
   update_date            DateTime?       @db.Date
@@ -39,62 +39,18 @@ model anggota {
   reset_token_expiration DateTime?       @db.DateTime(0)
 }
 
+/// Backup tabel — tidak dipakai aplikasi. Gunakan tabel `anggota`.
 model anggota_asli {
-  id               Int                  @id
-  kode             String?              @db.Char(20)
-  nik              String               @default("") @db.VarChar(50)
-  noidentitas      String               @db.VarChar(50)
-  nama             String               @default("") @db.VarChar(50)
-  jk               String               @db.Char(2)
-  tempat_lahir     String               @db.VarChar(50)
-  tgl_lahir        DateTime             @db.Date
-  alamat           String               @default("") @db.VarChar(255)
-  kota             String?              @db.VarChar(50)
-  hp               String               @db.Char(30)
-  perusahaan       String?              @db.VarChar(100)
-  unit_seksi       String?              @db.VarChar(100)
-  jabatan          String?              @db.VarChar(50)
-  level_anggota_id Int?
-  gaji             Int?
-  nama_pasangan    String?              @db.VarChar(50)
-  jml_anak         Int?
-  tgl_masuk        DateTime?            @db.Date
-  status           anggota_asli_status?
-  foto             String?              @db.VarChar(50)
-  pwd              String?              @db.VarChar(50)
-  user_id          Int?
-  insert_date      DateTime?            @db.Date
-  update_date      DateTime?            @db.Date
-  dokumen          String?              @db.VarChar(50)
+  id Int @id
+
+  @@ignore
 }
 
+/// Backup tabel — tidak dipakai aplikasi. Gunakan tabel `anggota`.
 model anggota_copy1 {
-  id               Int                   @id
-  kode             String?               @db.Char(20)
-  nik              String                @default("") @db.VarChar(50)
-  noidentitas      String                @db.VarChar(50)
-  nama             String                @default("") @db.VarChar(50)
-  jk               String                @db.Char(2)
-  tempat_lahir     String                @db.VarChar(50)
-  tgl_lahir        DateTime              @db.Date
-  alamat           String                @default("") @db.VarChar(255)
-  kota             String?               @db.VarChar(50)
-  hp               String                @db.Char(30)
-  perusahaan       String?               @db.VarChar(100)
-  unit_seksi       String?               @db.VarChar(100)
-  jabatan          String?               @db.VarChar(50)
-  level_anggota_id Int?
-  gaji             Int?
-  nama_pasangan    String?               @db.VarChar(50)
-  jml_anak         Int?
-  tgl_masuk        DateTime?             @db.Date
-  status           anggota_copy1_status?
-  foto             String?               @db.VarChar(50)
-  pwd              String?               @db.VarChar(50)
-  user_id          Int?
-  insert_date      DateTime?             @db.Date
-  update_date      DateTime?             @db.Date
-  dokumen          String?               @db.VarChar(50)
+  id Int @id
+
+  @@ignore
 }
 
 model ci_sessions {
@@ -330,7 +286,7 @@ model t_lelang {
 model users {
   id          Int           @id @default(autoincrement())
   username    String?       @db.VarChar(50)
-  password    String        @db.VarChar(50)
+  password    String        @db.VarChar(255)
   namalengkap String?       @db.VarChar(100)
   level_id    Int
   foto        String        @db.VarChar(50)
@@ -370,16 +326,6 @@ enum simpanan_entry {
 }
 
 enum anggota_status {
-  Aktif
-  Keluar
-}
-
-enum anggota_asli_status {
-  Aktif
-  Keluar
-}
-
-enum anggota_copy1_status {
   Aktif
   Keluar
 }

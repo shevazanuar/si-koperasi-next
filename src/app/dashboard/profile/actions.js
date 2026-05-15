@@ -1,7 +1,6 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import CryptoJS from "crypto-js";
 import { getSession } from "@/lib/session";
 import { z } from "zod";
 
@@ -28,17 +27,21 @@ export async function changePassword(prevState, formData) {
   }
 
   const { oldPassword, newPassword } = validation.data;
-  const hashedOld = CryptoJS.MD5(oldPassword).toString();
-  const hashedNew = CryptoJS.MD5(newPassword).toString();
 
   try {
+    const { verifyLegacyOrBcrypt, rehashPassword } = await import("@/lib/legacy-password");
+    const hashedNew = await rehashPassword(newPassword);
+
     if (user.role === "admin") {
       // Check old password in users table
       const dbUser = await prisma.users.findUnique({
         where: { id: user.id }
       });
 
-      if (!dbUser || dbUser.password !== hashedOld) {
+      if (!dbUser) return { error: "User tidak ditemukan" };
+      
+      const isValid = await verifyLegacyOrBcrypt(oldPassword, dbUser.password);
+      if (!isValid) {
         return { error: "Password lama salah" };
       }
 
@@ -53,7 +56,10 @@ export async function changePassword(prevState, formData) {
         where: { id: user.id }
       });
 
-      if (!dbAnggota || dbAnggota.pwd !== hashedOld) {
+      if (!dbAnggota) return { error: "User tidak ditemukan" };
+
+      const isValid = await verifyLegacyOrBcrypt(oldPassword, dbAnggota.pwd);
+      if (!isValid) {
         return { error: "Password lama salah" };
       }
 

@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FDFBF7;
+  --foreground: #31271D;
 }
 
 @theme inline {
@@ -10,12 +10,48 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Primary Brand (Earthy Brown instead of Blue) */
+  --color-blue-50: #FDF3E7;
+  --color-blue-100: #F7E5D4;
+  --color-blue-200: #EACCAE;
+  --color-blue-300: #DDB388;
+  --color-blue-400: #D19A62;
+  --color-blue-500: #C4813C;
+  --color-blue-600: #B47B5A;
+  --color-blue-700: #9C6141;
+  --color-blue-800: #804E33;
+  --color-blue-900: #663C26;
+
+  /* Neutral Backgrounds and Text (Warm Grays instead of Slate/Gray) */
+  --color-gray-50: #FDFBF7;
+  --color-gray-100: #F6F0E7;
+  --color-gray-200: #EBE3D5;
+  --color-gray-300: #DED3C1;
+  --color-gray-400: #C0B19D;
+  --color-gray-500: #9C8C78;
+  --color-gray-600: #7A6A58;
+  --color-gray-700: #5A4D3E;
+  --color-gray-800: #42372A;
+  --color-gray-900: #31271D;
+
+  /* Remap slate to warm gray */
+  --color-slate-50: var(--color-gray-50);
+  --color-slate-100: var(--color-gray-100);
+  --color-slate-200: var(--color-gray-200);
+  --color-slate-300: var(--color-gray-300);
+  --color-slate-400: var(--color-gray-400);
+  --color-slate-500: var(--color-gray-500);
+  --color-slate-600: var(--color-gray-600);
+  --color-slate-700: var(--color-gray-700);
+  --color-slate-800: var(--color-gray-800);
+  --color-slate-900: var(--color-gray-900);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1A1510;
+    --foreground: #F6F0E7;
   }
 }
 
@@ -25,19 +61,29 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+@layer base {
+  input, select, textarea {
+    color: #000000 !important;
+  }
+  input::placeholder, textarea::placeholder {
+    color: #000000 !important;
+    opacity: 0.6 !important;
+  }
+}
+
 @layer utilities {
   .mesh-gradient {
-    background-color: #000000;
+    background-color: #1A1510;
     background-image: 
-      radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-      radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-      radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(25, 40%, 15%, 1) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, hsla(30, 30%, 20%, 1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, hsla(20, 50%, 15%, 1) 0, transparent 50%);
   }
 
   .glass {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(253, 243, 231, 0.05);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(180, 123, 90, 0.1);
   }
 }

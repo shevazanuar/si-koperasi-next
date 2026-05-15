@@ -48,8 +48,8 @@ export default function DashboardCharts({ data }) {
             <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorSimpanan" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#B47B5A" stopOpacity={0.1}/>
+                  <stop offset="95%" stopColor="#B47B5A" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
@@ -68,7 +68,7 @@ export default function DashboardCharts({ data }) {
                 type="monotone" 
                 dataKey="simpanan" 
                 name="Simpanan"
-                stroke="#2563eb" 
+                stroke="#B47B5A" 
                 strokeWidth={3}
                 fillOpacity={1} 
                 fill="url(#colorSimpanan)" 
@@ -101,7 +101,7 @@ export default function DashboardCharts({ data }) {
               <Bar 
                 dataKey="pinjaman" 
                 name="Pinjaman"
-                fill="#ea580c" 
+                fill="#D19A62" 
                 radius={[6, 6, 0, 0]}
                 barSize={30}
                 animationDuration={2000}
