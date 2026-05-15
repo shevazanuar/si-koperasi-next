@@ -4,6 +4,9 @@ import prisma from "@/lib/prisma";
 import CryptoJS from "crypto-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getSession } from "@/lib/session";
+import { writeAuditLog, AUDIT_AKSI } from "@/lib/audit-log";
+import { headers } from "next/headers";
 import { z } from "zod";
 
 const anggotaSchema = z.object({
@@ -29,6 +32,14 @@ const anggotaSchema = z.object({
 });
 
 export async function createAnggota(prevState, formData) {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    return { error: "Akses ditolak. Hanya Admin yang dapat menambah anggota." };
+  }
+  
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+
   const rawData = Object.fromEntries(formData.entries());
   
   // Validate using Zod
@@ -66,7 +77,7 @@ export async function createAnggota(prevState, formData) {
       return { error: "NIK sudah terdaftar." };
     }
 
-    await prisma.anggota.create({
+    const newAnggota = await prisma.anggota.create({
       data: {
         nik,
         nama,
@@ -86,11 +97,24 @@ export async function createAnggota(prevState, formData) {
         nama_pasangan,
         jml_anak: jml_anak ? parseInt(jml_anak) : null,
         status: status || "Aktif",
-        pwd: CryptoJS.MD5(nik).toString(), // Default password is NIK
+        pwd: CryptoJS.MD5(nik).toString(), // Default password is NIK (MD5 for legacy support, will auto-migrate)
         tgl_masuk: tgl_masuk ? new Date(tgl_masuk) : new Date(),
         insert_date: new Date(),
       },
     });
+
+    await writeAuditLog({
+      userId: session.id,
+      username: session.username,
+      aksi: AUDIT_AKSI.TAMBAH_ANGGOTA,
+      tabel: "anggota",
+      recordId: newAnggota.id,
+      beforeData: null,
+      afterData: newAnggota,
+      ipAddress: ip,
+      keterangan: `Menambah anggota baru NIK ${nik}`,
+    });
+
   } catch (e) {
     console.error("Create Anggota Error:", e);
     return { error: "Gagal menyimpan data anggota." };
@@ -101,6 +125,14 @@ export async function createAnggota(prevState, formData) {
 }
 
 export async function updateAnggota(id, prevState, formData) {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    return { error: "Akses ditolak. Hanya Admin yang dapat mengubah data anggota." };
+  }
+
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+
   const nik = formData.get("nik");
   const nama = formData.get("nama");
   const noidentitas = formData.get("noidentitas");
@@ -122,7 +154,9 @@ export async function updateAnggota(id, prevState, formData) {
   const status = formData.get("status");
 
   try {
-    await prisma.anggota.update({
+    const before = await prisma.anggota.findUnique({ where: { id: parseInt(id) } });
+
+    const updated = await prisma.anggota.update({
       where: { id: parseInt(id) },
       data: {
         nik,
@@ -147,6 +181,19 @@ export async function updateAnggota(id, prevState, formData) {
         update_date: new Date(),
       },
     });
+
+    await writeAuditLog({
+      userId: session.id,
+      username: session.username,
+      aksi: AUDIT_AKSI.EDIT_ANGGOTA,
+      tabel: "anggota",
+      recordId: updated.id,
+      beforeData: before,
+      afterData: updated,
+      ipAddress: ip,
+      keterangan: `Mengubah data anggota ID ${id}`,
+    });
+
   } catch (e) {
     console.error("Update Anggota Error:", e);
     return { error: "Gagal memperbarui data anggota." };
