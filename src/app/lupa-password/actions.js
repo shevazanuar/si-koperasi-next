@@ -4,12 +4,23 @@ import prisma from "@/lib/prisma";
 import nodemailer from "nodemailer";
 import { z } from "zod";
 import crypto from "crypto";
+import { rateLimit } from "@/lib/rate-limit";
+import { headers } from "next/headers";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Format email tidak valid"),
 });
 
 export async function forgotPasswordAction(prevState, formData) {
+  // Rate limiting
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const rl = rateLimit(`forgot:${ip}`);
+  if (!rl.success) {
+    const menit = Math.ceil(rl.retryAfterMs / 60000);
+    return { error: `Terlalu banyak permintaan. Coba lagi dalam ${menit} menit.` };
+  }
+
   const data = Object.fromEntries(formData.entries());
   
   // Honeypot check: If the hidden 'website' field is filled, it's a bot
@@ -26,31 +37,30 @@ export async function forgotPasswordAction(prevState, formData) {
   const { email } = validation.data;
 
   try {
-    // Check if email exists in anggota table using raw query
-    const dbAnggota = await prisma.$queryRawUnsafe(
-      "SELECT id, nama FROM anggota WHERE email = ? LIMIT 1",
-      email
-    );
+    // Check if email exists using safe Prisma ORM query
+    const anggota = await prisma.anggota.findFirst({
+      where: { email: email },
+      select: { id: true, nama: true },
+    });
 
-    if (!dbAnggota || dbAnggota.length === 0) {
+    if (!anggota) {
       // Return success anyway to prevent email enumeration (security best practice)
       return { success: "Jika email terdaftar, instruksi reset password telah dikirim." };
     }
-
-    const anggota = dbAnggota[0];
 
     // Generate secure token
     const token = crypto.randomBytes(32).toString("hex");
     const expiration = new Date();
     expiration.setHours(expiration.getHours() + 1); // Token expires in 1 hour
 
-    // Save token to database
-    await prisma.$executeRawUnsafe(
-      "UPDATE anggota SET reset_token = ?, reset_token_expiration = ? WHERE id = ?",
-      token,
-      expiration,
-      anggota.id
-    );
+    // Save token using safe Prisma ORM update
+    await prisma.anggota.update({
+      where: { id: anggota.id },
+      data: {
+        reset_token: token,
+        reset_token_expiration: expiration,
+      },
+    });
 
     // Create reset link
     // Assuming the app runs on localhost:3000 for development. In production, use the real domain.
