@@ -24,17 +24,15 @@ export async function resetPasswordAction(prevState, formData) {
   const { token, newPassword } = validation.data;
 
   try {
-    // Find user by token using raw query
-    const dbAnggota = await prisma.$queryRawUnsafe(
-      "SELECT id, reset_token_expiration FROM anggota WHERE reset_token = ? LIMIT 1",
-      token
-    );
+    // Find user by token using safe Prisma ORM
+    const anggota = await prisma.anggota.findFirst({
+      where: { reset_token: token },
+      select: { id: true, reset_token_expiration: true },
+    });
 
-    if (!dbAnggota || dbAnggota.length === 0) {
+    if (!anggota) {
       return { error: "Link reset password tidak valid atau sudah kadaluarsa." };
     }
-
-    const anggota = dbAnggota[0];
 
     // Check expiration
     if (new Date() > new Date(anggota.reset_token_expiration)) {
@@ -45,12 +43,15 @@ export async function resetPasswordAction(prevState, formData) {
     const { hashPassword } = await import("@/lib/password");
     const hashedNew = await hashPassword(newPassword);
 
-    // Update password and clear token
-    await prisma.$executeRawUnsafe(
-      "UPDATE anggota SET pwd = ?, reset_token = NULL, reset_token_expiration = NULL WHERE id = ?",
-      hashedNew,
-      anggota.id
-    );
+    // Update password and clear token using safe Prisma ORM
+    await prisma.anggota.update({
+      where: { id: anggota.id },
+      data: {
+        pwd: hashedNew,
+        reset_token: null,
+        reset_token_expiration: null,
+      },
+    });
 
     return { success: "Password berhasil direset. Silakan login dengan password baru Anda." };
 
