@@ -2,6 +2,9 @@
 
 import prisma from "@/lib/prisma";
 import { setSession } from "@/lib/session";
+import { rateLimit } from "@/lib/rate-limit";
+import { writeAuditLog, AUDIT_AKSI } from "@/lib/audit-log";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -11,6 +14,15 @@ const loginSchema = z.object({
 });
 
 export async function loginAction(prevState, formData) {
+  // Rate limiting: 5 percobaan / 15 menit / IP
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const rl = rateLimit(`login:${ip}`);
+  if (!rl.success) {
+    const menit = Math.ceil(rl.retryAfterMs / 60000);
+    return { error: `Terlalu banyak percobaan. Coba lagi dalam ${menit} menit.` };
+  }
+
   const data = Object.fromEntries(formData.entries());
   
   // Validate using Zod
@@ -49,11 +61,13 @@ export async function loginAction(prevState, formData) {
     }
 
     if (!user) {
+      await writeAuditLog({ aksi: AUDIT_AKSI.LOGIN_FAILED, username, ipAddress: ip, keterangan: "User tidak ditemukan" });
       return { error: "Username atau password salah." };
     }
 
     const isValid = await verifyLegacyOrBcrypt(password, storedPassword);
     if (!isValid) {
+      await writeAuditLog({ aksi: AUDIT_AKSI.LOGIN_FAILED, username, ipAddress: ip, keterangan: "Password salah" });
       return { error: "Username atau password salah." };
     }
 
@@ -74,6 +88,15 @@ export async function loginAction(prevState, formData) {
       username: role === "admin" ? user.username : user.nik,
       name: role === "admin" ? user.namalengkap : user.nama,
       role: role,
+    });
+
+    // Audit: login berhasil
+    await writeAuditLog({
+      userId: user.id,
+      username: role === "admin" ? user.username : user.nik,
+      aksi: AUDIT_AKSI.LOGIN_SUCCESS,
+      ipAddress: ip,
+      keterangan: `Login sebagai ${role}`,
     });
 
     // Successful login

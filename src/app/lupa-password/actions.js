@@ -4,12 +4,23 @@ import prisma from "@/lib/prisma";
 import nodemailer from "nodemailer";
 import { z } from "zod";
 import crypto from "crypto";
+import { rateLimit } from "@/lib/rate-limit";
+import { headers } from "next/headers";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email("Format email tidak valid"),
 });
 
 export async function forgotPasswordAction(prevState, formData) {
+  // Rate limiting
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const rl = rateLimit(`forgot:${ip}`);
+  if (!rl.success) {
+    const menit = Math.ceil(rl.retryAfterMs / 60000);
+    return { error: `Terlalu banyak permintaan. Coba lagi dalam ${menit} menit.` };
+  }
+
   const data = Object.fromEntries(formData.entries());
   
   // Honeypot check: If the hidden 'website' field is filled, it's a bot
