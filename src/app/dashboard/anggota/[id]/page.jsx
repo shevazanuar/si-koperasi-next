@@ -27,10 +27,43 @@ export default async function AnggotaDetailPage({ params }) {
       return notFound();
   }
 
+  // Calculate Total Simpanan
+  const simpananData = await prisma.simpanan.groupBy({
+    by: ['jenis'],
+    where: { anggota_id: parseInt(id) },
+    _sum: { jumlah: true }
+  });
+
+  let totalSimpanan = 0;
+  simpananData.forEach(s => {
+    if (s.jenis === 'S') totalSimpanan += s._sum.jumlah || 0;
+    if (s.jenis === 'T') totalSimpanan -= s._sum.jumlah || 0;
+  });
+
+  // Calculate Pinjaman Aktif (Sisa = Pokok - Jumlah Bayar)
+  const pinjamanHeaders = await prisma.pinjaman_header.findMany({
+    where: { anggota_id: parseInt(id) },
+    select: { id: true, jumlah: true }
+  });
+  
+  let totalPinjamanAktif = 0;
+  if (pinjamanHeaders.length > 0) {
+    const pinjamanIds = pinjamanHeaders.map(ph => ph.id);
+    const pinjamanDetails = await prisma.pinjaman_detail.aggregate({
+      where: { pinjaman_id: { in: pinjamanIds } },
+      _sum: { jumlah_bayar: true }
+    });
+    
+    const totalPinjaman = pinjamanHeaders.reduce((sum, ph) => sum + ph.jumlah, 0);
+    const totalBayar = pinjamanDetails._sum.jumlah_bayar || 0;
+    totalPinjamanAktif = Math.max(0, totalPinjaman - totalBayar);
+  }
+
+  const fmt = (n) => `Rp ${new Intl.NumberFormat("id-ID").format(n || 0)}`;
+
   const statCards = [
-    { label: "Total Simpanan", value: "Rp 0", icon: Wallet, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Pinjaman Aktif", value: "Rp 0", icon: CreditCard, color: "text-orange-600", bg: "bg-orange-50" },
-    { label: "SHU Berjalan", value: "Rp 0", icon: Scale, color: "text-emerald-600", bg: "bg-emerald-50" }
+    { label: "Total Simpanan", value: fmt(totalSimpanan), icon: Wallet, color: "text-blue-600", bg: "bg-blue-50" },
+    { label: "Pinjaman Aktif", value: fmt(totalPinjamanAktif), icon: CreditCard, color: "text-orange-600", bg: "bg-orange-50" }
   ];
 
   return (
@@ -79,7 +112,7 @@ export default async function AnggotaDetailPage({ params }) {
       </div>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {statCards.map((stat, i) => (
           <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center gap-5 group hover:shadow-md transition-shadow">
              <div className={`w-14 h-14 ${stat.bg} ${stat.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform`}>

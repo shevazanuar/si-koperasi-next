@@ -84,9 +84,11 @@ export default function PenarikanPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="bg-orange-600 p-2.5 rounded-xl text-white"><ArrowDownCircle className="w-5 h-5" /></div>
-        <div><h1 className="text-xl font-black text-gray-900">Penarikan Dana</h1><p className="text-sm text-gray-500">Kelola penarikan simpanan anggota</p></div>
+      <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="bg-orange-600 p-2.5 rounded-xl text-white"><ArrowDownCircle className="w-5 h-5" /></div>
+          <div><h1 className="text-xl font-black text-gray-900">Penarikan Dana</h1><p className="text-sm text-gray-500">Kelola penarikan simpanan anggota</p></div>
+        </div>
       </div>
       {info && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm">✅ {info}</div>}
 

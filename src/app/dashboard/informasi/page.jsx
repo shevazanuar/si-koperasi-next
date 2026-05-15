@@ -61,7 +61,7 @@ export default function InformasiPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="bg-emerald-600 p-2.5 rounded-xl text-white">
             <Newspaper className="w-5 h-5" />

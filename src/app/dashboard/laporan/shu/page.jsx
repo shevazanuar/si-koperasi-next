@@ -30,11 +30,13 @@ export default function LaporanSHUPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="bg-purple-600 p-2.5 rounded-xl text-white"><PieChart className="w-5 h-5" /></div>
-        <div>
-          <h1 className="text-xl font-black text-gray-900">Laporan SHU</h1>
-          <p className="text-sm text-gray-500">Sisa Hasil Usaha berdasarkan data pinjaman</p>
+      <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="bg-purple-600 p-2.5 rounded-xl text-white"><PieChart className="w-5 h-5" /></div>
+          <div>
+            <h1 className="text-xl font-black text-gray-900">Laporan SHU</h1>
+            <p className="text-sm text-gray-500">Sisa Hasil Usaha berdasarkan data pinjaman</p>
+          </div>
         </div>
       </div>
 

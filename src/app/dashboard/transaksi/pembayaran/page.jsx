@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { BadgeCheck, Search, Trash2, Save, X, CreditCard } from "lucide-react";
 
 const fmt = (n) => new Intl.NumberFormat("id-ID").format(n || 0);
@@ -89,9 +89,11 @@ export default function PembayaranPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-3">
-        <div className="bg-emerald-600 p-2.5 rounded-xl text-white"><BadgeCheck className="w-5 h-5" /></div>
-        <div><h1 className="text-xl font-black text-gray-900">Pembayaran Cicilan</h1><p className="text-sm text-gray-500">Bayar cicilan pinjaman anggota</p></div>
+      <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="bg-emerald-600 p-2.5 rounded-xl text-white"><BadgeCheck className="w-5 h-5" /></div>
+          <div><h1 className="text-xl font-black text-gray-900">Pembayaran Cicilan</h1><p className="text-sm text-gray-500">Bayar cicilan pinjaman anggota</p></div>
+        </div>
       </div>
 
       {info.msg && (
@@ -150,8 +152,8 @@ export default function PembayaranPage() {
                       <th className="text-center px-4 py-3 text-xs font-bold text-gray-500 uppercase">Aksi</th>
                     </tr></thead>
                     <tbody>{cicilans.map((c) => (
-                      <>
-                        <tr key={c.id} className="border-b border-gray-50 hover:bg-blue-50/20">
+                      <React.Fragment key={c.id}>
+                        <tr className="border-b border-gray-50 hover:bg-blue-50/20">
                           <td className="px-4 py-2.5 font-mono text-xs text-blue-600">{c.nomor_pinjaman}</td>
                           <td className="px-4 py-2.5 text-center font-bold text-gray-700">#{c.cicilan}</td>
                           <td className="px-4 py-2.5 text-gray-600">{c.tgl_jatuh_tempo ? new Date(c.tgl_jatuh_tempo).toLocaleDateString("id-ID") : "-"}</td>
@@ -186,7 +188,7 @@ export default function PembayaranPage() {
                             </td>
                           </tr>
                         )}
-                      </>
+                      </React.Fragment>
                     ))}</tbody>
                   </table>
                 </div>

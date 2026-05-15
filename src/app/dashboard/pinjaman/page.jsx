@@ -3,7 +3,6 @@ import { CreditCard, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
-import ImportExcelButton from "@/components/dashboard/ImportExcelButton";
 import LimitFilter from "@/components/dashboard/LimitFilter";
 
 export default async function PinjamanPage({ searchParams }) {
@@ -83,11 +82,7 @@ export default async function PinjamanPage({ searchParams }) {
           <p className="text-gray-400 text-sm mt-0.5">Kelola permohonan dan pemantauan pinjaman</p>
         </div>
         <div className="flex items-center gap-2">
-          <ImportExcelButton
-            type="pinjaman"
-            title="Import Data Pinjaman"
-            apiUrl="/api/import/pinjaman"
-          />
+
           <Link
             href="/dashboard/pinjaman/tambah"
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 active:scale-95 text-sm"
@@ -133,11 +128,6 @@ export default async function PinjamanPage({ searchParams }) {
                 <th className="py-3 px-4">NIK</th>
                 <th className="py-3 px-4">Nama</th>
                 <th className="py-3 px-4 text-center">Kategori</th>
-                <th className="py-3 px-4 text-center">Lama</th>
-                <th className="py-3 px-4 text-right">Jumlah</th>
-                <th className="py-3 px-4 text-center">Bunga</th>
-                <th className="py-3 px-4 text-right">Jumlah Bayar</th>
-                <th className="py-3 px-4 text-center">Jumlah Cicilan</th>
                 <th className="py-3 px-4 text-right">Sisa</th>
                 <th className="py-3 px-4 text-center">Aksi</th>
               </tr>
@@ -159,11 +149,6 @@ export default async function PinjamanPage({ searchParams }) {
                       </span>
                     ) : <span className="text-gray-300">-</span>}
                   </td>
-                  <td className="py-3 px-4 text-center text-gray-600 whitespace-nowrap text-xs">{item.lama} {item.satuan}</td>
-                  <td className="py-3 px-4 text-right font-medium text-gray-800 whitespace-nowrap">{fmt(item.jumlah)}</td>
-                  <td className="py-3 px-4 text-center text-gray-600 text-xs whitespace-nowrap">{item.bunga}%/{item.satuan}</td>
-                  <td className="py-3 px-4 text-right font-medium text-gray-700 whitespace-nowrap">{fmt(item.jumlah_bayar)}</td>
-                  <td className="py-3 px-4 text-center text-gray-600">{fmt(item.jumlah_cicilan)}</td>
                   <td className={`py-3 px-4 text-right font-bold whitespace-nowrap ${item.sisa > 0 ? "text-red-600" : "text-green-600"}`}>
                     {fmt(item.sisa)}
                   </td>
@@ -182,7 +167,7 @@ export default async function PinjamanPage({ searchParams }) {
 
               {data.length === 0 && (
                 <tr>
-                  <td colSpan={13} className="py-20 text-center text-gray-400 text-sm">
+                  <td colSpan={8} className="py-20 text-center text-gray-400 text-sm">
                     Tidak ada data pinjaman ditemukan.
                   </td>
                 </tr>

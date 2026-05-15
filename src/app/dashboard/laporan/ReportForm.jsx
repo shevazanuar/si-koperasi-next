@@ -296,13 +296,13 @@ export default function ReportForm({
               h2 { margin-bottom: 5px; color: #333; }
               .subtitle { color: #666; font-size: 14px; margin-bottom: 15px; }
               table { border-collapse: collapse; width: 100%; font-size: 12px; }
-              th { background: #2563eb; color: white; padding: 8px 6px; text-align: center; border: 1px solid #1d4ed8; }
+              th { background: #B47B5A; color: white; padding: 8px 6px; text-align: center; border: 1px solid #9C6141; }
               td { padding: 6px; border: 1px solid #ddd; }
               tr:nth-child(even) { background: #f8f9fa; }
               tr:hover { background: #e3e8f0; }
               .text-right { text-align: right; }
               .text-center { text-align: center; }
-              .total-row { font-weight: bold; background: #e8edff !important; }
+              .total-row { font-weight: bold; background: #FDF3E7 !important; }
               @media print { body { margin: 10px; } }
             </style>
           </head>
