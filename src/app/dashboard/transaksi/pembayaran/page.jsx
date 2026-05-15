@@ -41,9 +41,14 @@ export default function PembayaranPage() {
   };
 
   const fetchAnggota = async () => {
-    const res = await fetch("/api/transaksi/penarikan");
-    const json = await res.json();
-    setAnggotaList(json.data || []);
+    try {
+      const res = await fetch("/api/anggota?status=Aktif");
+      if (!res.ok) throw new Error("Gagal mengambil data anggota");
+      const json = await res.json();
+      setAnggotaList(json.data ?? []);
+    } catch (error) {
+      console.error("fetchAnggota error:", error);
+    }
   };
 
   useEffect(() => { fetchPayments(); fetchAnggota(); }, []);
