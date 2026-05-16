@@ -37,6 +37,7 @@ model anggota {
   email                  String?         @db.VarChar(255)
   reset_token            String?         @db.Text
   reset_token_expiration DateTime?       @db.DateTime(0)
+  penjualan              penjualan[]
 }
 
 /// Backup tabel — tidak dipakai aplikasi. Gunakan tabel `anggota`.
@@ -328,4 +329,68 @@ enum simpanan_entry {
 enum anggota_status {
   Aktif
   Keluar
+}
+
+model kategori_produk {
+  id            Int              @id @default(autoincrement())
+  nama_kategori String           @db.VarChar(100)
+  created_at    DateTime         @default(now())
+  updated_at    DateTime?        @updatedAt
+
+  barang        master_barang[]
+}
+
+model master_barang {
+  id           Int                @id @default(autoincrement())
+  kode_barang  String             @unique @db.VarChar(50)
+  nama_barang  String             @db.VarChar(150)
+  kategori_id  Int
+  deskripsi    String?            @db.Text
+  gambar       String?            @db.VarChar(255)
+  stok         Int                @default(0)
+  harga_modal  Decimal            @db.Decimal(15, 2)
+  harga_jual   Decimal            @db.Decimal(15, 2)
+  satuan       String?            @db.VarChar(30)
+  status       String             @default("Aktif") @db.VarChar(20)
+  is_featured  Boolean            @default(false)
+  created_at   DateTime           @default(now())
+  updated_at   DateTime?          @updatedAt
+
+  kategori     kategori_produk    @relation(fields: [kategori_id], references: [id])
+  detail       detail_penjualan[]
+}
+
+model penjualan {
+  id                 Int                @id @default(autoincrement())
+  kode_penjualan     String             @unique @db.VarChar(50)
+  anggota_id         Int?
+  nama_pembeli       String?            @db.VarChar(100)
+  user_id            Int
+  tanggal_penjualan  DateTime           @default(now())
+  total_harga        Decimal            @default(0) @db.Decimal(15, 2)
+  total_modal        Decimal            @default(0) @db.Decimal(15, 2)
+  total_laba         Decimal            @default(0) @db.Decimal(15, 2)
+  metode_pembayaran  String?            @db.VarChar(50)
+  status             String             @default("Selesai") @db.VarChar(20)
+  created_at         DateTime           @default(now())
+  updated_at         DateTime?          @updatedAt
+
+  anggota            anggota?           @relation(fields: [anggota_id], references: [id])
+  detail             detail_penjualan[]
+}
+
+model detail_penjualan {
+  id              Int            @id @default(autoincrement())
+  penjualan_id    Int
+  barang_id       Int
+  qty             Int
+  harga_jual      Decimal        @db.Decimal(15, 2)
+  harga_modal     Decimal        @db.Decimal(15, 2)
+  subtotal_harga  Decimal        @db.Decimal(15, 2)
+  subtotal_modal  Decimal        @db.Decimal(15, 2)
+  subtotal_laba   Decimal        @db.Decimal(15, 2)
+  created_at      DateTime       @default(now())
+
+  penjualan       penjualan      @relation(fields: [penjualan_id], references: [id])
+  barang          master_barang  @relation(fields: [barang_id], references: [id])
 }
