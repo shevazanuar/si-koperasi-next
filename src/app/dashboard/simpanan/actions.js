@@ -57,7 +57,7 @@ export async function createSimpanan(prevState, formData) {
     const nomor = await generateSimpananNomor();
 
     // ── Prisma transaction: atomic create + audit ─────────────────────────
-    const simpanan = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const created = await tx.simpanan.create({
         data: {
           nomor,
@@ -81,8 +81,6 @@ export async function createSimpanan(prevState, formData) {
 
       return created;
     });
-
-    _ = simpanan; // lint
   } catch (e) {
     console.error("Create Simpanan Error:", e);
     return { error: "Gagal menyimpan transaksi simpanan." };

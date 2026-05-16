@@ -1,6 +1,6 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
-import CryptoJS from "crypto-js";
+import { hashPassword } from "@/lib/password";
 
 export async function GET() {
   try {
@@ -20,7 +20,7 @@ export async function POST(request) {
     const dt = {
       username,
       namalengkap,
-      password: CryptoJS.MD5(password).toString(),
+      password: await hashPassword(password),
       level_id: parseInt(level_id),
       foto: "",
       blokir: blokir || "T",
@@ -47,7 +47,7 @@ export async function PUT(request) {
     };
 
     if (password) {
-      dt.password = CryptoJS.MD5(password).toString();
+      dt.password = await hashPassword(password);
     }
 
     const user = await prisma.users.update({ where: { id: parseInt(id) }, data: dt });

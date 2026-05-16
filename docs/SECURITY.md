@@ -7,7 +7,7 @@ Dokumen ini merangkum lapisan keamanan (*Security Hardening*) yang diterapkan pa
 | Fitur | Status | Keterangan |
 |-------|--------|------------|
 | **Bcrypt Password Hashing** | Selesai | Sandi (password) kini di-hash otomatis dengan bcrypt. Termasuk auto-migrate dari sistem lama (MD5). |
-| **Pencegahan SQL Injection** | Selesai | Tidak ada lagi penggunaan `$queryRawUnsafe`. Semua query kompleks di laporan kini memakai `Prisma Tagged Templates` dengan *parameter binding* aman. |
+| **Pencegahan SQL Injection** | Selesai (Parsial) | Modul laporan utama sudah menggunakan `Prisma Tagged Templates` dengan *parameter binding* aman. Beberapa modul konfigurasi lama masih dalam proses refactor dari `$queryRawUnsafe` menuju Prisma ORM. |
 | **Session Terenkripsi (iron-session)** | Selesai | Session auth tidak lagi menyimpan JSON mentah. Di-signed & dienkripsi dengan `httpOnly` dan `sameSite: lax` untuk mencegah pencurian cookie dan CSRF ringan. |
 | **Proteksi Rate Limiting** | Selesai | Mencegah eksploitasi *brute-force* pada endpoint `login` dan `lupa-password` (Batas: 5 percobaan / 15 menit per IP). |
 | **Validasi Backend (Zod)** | Selesai | Seluruh form yang berinteraksi dengan database divalidasi ganda di server untuk mencegah input palsu dari *DevTools* (misal: penarikan tunai nilai minus). |
