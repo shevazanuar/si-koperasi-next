@@ -6,7 +6,9 @@ import { Lock, Loader2, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-reac
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage() {
+import { Suspense } from "react";
+
+function ResetPasswordContent() {
   const [state, formAction, isPending] = useActionState(resetPasswordAction, null);
   const searchParams = useSearchParams();
   const [token, setToken] = useState("");
@@ -113,5 +115,17 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

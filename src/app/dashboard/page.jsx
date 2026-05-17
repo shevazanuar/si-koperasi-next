@@ -19,6 +19,9 @@ export default async function DashboardPage() {
     totalPenarikan: 0,
     totalPinjaman: 0,
     recentActivities: [],
+    pengajuanPinjaman: null,
+    produkTerbaru: [],
+    riwayatPembelian: [],
   };
 
   let chartData = [];
@@ -90,7 +93,7 @@ export default async function DashboardPage() {
 
     chartData = await aggregateChartData();
   } else {
-    const [totalSimpanan, totalPinjaman, recentSimpanan] = await Promise.all([
+    const [totalSimpanan, totalPinjaman, recentSimpanan, pengajuan, produk, pembelian] = await Promise.all([
       prisma.simpanan.aggregate({
         where: { anggota_id: user.id },
         _sum: { jumlah: true },
@@ -105,10 +108,28 @@ export default async function DashboardPage() {
         orderBy: { tgl: "desc" },
         select: { id: true, anggota_id: true, jumlah: true, tgl: true },
       }),
+      prisma.pengajuan_pinjaman.findFirst({
+        where: { anggota_id: user.id },
+        orderBy: { tanggal: "desc" },
+      }),
+      prisma.master_barang.findMany({
+        where: { status: "Aktif" },
+        orderBy: { created_at: "desc" },
+        take: 3,
+        include: { kategori: true }
+      }),
+      prisma.penjualan.findMany({
+        where: { anggota_id: user.id },
+        orderBy: { tanggal_penjualan: "desc" },
+        take: 3,
+      })
     ]);
 
     stats.totalSimpanan = totalSimpanan._sum.jumlah || 0;
     stats.totalPinjaman = totalPinjaman._sum.jumlah || 0;
+    stats.pengajuanPinjaman = pengajuan;
+    stats.produkTerbaru = produk;
+    stats.riwayatPembelian = pembelian;
     stats.recentActivities = recentSimpanan.map((s) => ({
       id: s.id,
       title: "Setoran Tabungan",

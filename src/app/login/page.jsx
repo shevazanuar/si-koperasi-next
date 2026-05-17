@@ -105,12 +105,12 @@ export default function LoginPage() {
         {/* Outer decorations */}
         <div className="mt-8 flex justify-center gap-6">
           <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase tracking-wider">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-sm shadow-emerald-500/50"></div>
-            Server Online
+
+
           </div>
           <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase tracking-wider">
-            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full shadow-sm shadow-blue-500/50"></div>
-            v2.0.4 Secure
+
+
           </div>
         </div>
       </div>

@@ -28,6 +28,7 @@ import {
   Printer,
   AlertCircle,
   PieChart,
+  Package,
 } from "lucide-react";
 
 const menuItems = [
@@ -58,6 +59,8 @@ const menuItems = [
       { name: "Pengguna", href: "/dashboard/config/pengguna", icon: UserCog },
       { name: "Anggota", href: "/dashboard/anggota", icon: Users },
       { name: "Informasi", href: "/dashboard/informasi", icon: Newspaper },
+      { name: "Kategori Produk", href: "/dashboard/master/kategori-produk", icon: Tag },
+      { name: "Barang", href: "/dashboard/master/barang", icon: Layers },
     ],
   },
   {
@@ -70,10 +73,16 @@ const menuItems = [
       { name: "Pinjaman", href: "/dashboard/pinjaman", icon: CreditCard },
       { name: "Pembayaran", href: "/dashboard/transaksi/pembayaran", icon: BadgeCheck },
       { name: "Pengajuan Pinjaman", href: "/dashboard/transaksi/pengajuan-pinjaman", icon: FileSearch },
+      { name: "Penjualan", href: "/dashboard/penjualan", icon: Receipt },
     ],
   },
-  { name: "Simpanan", href: "/dashboard/simpanan", icon: Wallet, roles: ["anggota"] },
-  { name: "Pinjaman", href: "/dashboard/pinjaman", icon: CreditCard, roles: ["anggota"] },
+  { name: "Simpanan Saya", href: "/dashboard/simpanan", icon: Wallet, roles: ["anggota"] },
+  { name: "Pinjaman Saya", href: "/dashboard/pinjaman", icon: CreditCard, roles: ["anggota"] },
+  { name: "Pengajuan Pinjaman", href: "/dashboard/transaksi/pengajuan-pinjaman", icon: FileSearch, roles: ["anggota"] },
+  { name: "Katalog Produk", href: "/dashboard/katalog", icon: Package, roles: ["anggota"] },
+  { name: "Riwayat Pembelian", href: "/dashboard/riwayat-pembelian", icon: Receipt, roles: ["anggota"] },
+  { name: "Informasi", href: "/dashboard/informasi", icon: Newspaper, roles: ["anggota"] },
+  { name: "Profil Saya", href: "/dashboard/profile", icon: UserCog, roles: ["anggota"] },
   {
     name: "Laporan",
     icon: Printer,
@@ -86,6 +95,7 @@ const menuItems = [
       { name: "Pembayaran", href: "/dashboard/laporan/pembayaran", icon: BadgeCheck },
       { name: "Tunggakan", href: "/dashboard/laporan/tunggakan", icon: AlertCircle },
       { name: "SHU", href: "/dashboard/laporan/shu", icon: PieChart },
+      { name: "Penjualan", href: "/dashboard/laporan/penjualan", icon: Receipt },
     ],
   },
 ];

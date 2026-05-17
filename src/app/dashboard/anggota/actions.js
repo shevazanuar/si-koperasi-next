@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import CryptoJS from "crypto-js";
+import { hashPassword } from "@/lib/password";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
@@ -97,7 +97,7 @@ export async function createAnggota(prevState, formData) {
         nama_pasangan,
         jml_anak: jml_anak ? parseInt(jml_anak) : null,
         status: status || "Aktif",
-        pwd: CryptoJS.MD5(nik).toString(), // Default password is NIK (MD5 for legacy support, will auto-migrate)
+        pwd: await hashPassword(nik), // Default password is NIK (migrated to bcrypt)
         tgl_masuk: tgl_masuk ? new Date(tgl_masuk) : new Date(),
         insert_date: new Date(),
       },

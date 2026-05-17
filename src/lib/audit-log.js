@@ -94,4 +94,12 @@ export const AUDIT_AKSI = {
 
   // Konfigurasi
   EDIT_CONFIG:         "EDIT_CONFIG",
+
+  // Penjualan & Master Barang
+  TAMBAH_PENJUALAN:    "TAMBAH_PENJUALAN",
+  BATAL_PENJUALAN:     "BATAL_PENJUALAN",
+  TAMBAH_BARANG:       "TAMBAH_BARANG",
+  EDIT_BARANG:         "EDIT_BARANG",
+  HAPUS_BARANG:        "HAPUS_BARANG",
+  UPDATE_STOK_BARANG:  "UPDATE_STOK_BARANG",
 };
