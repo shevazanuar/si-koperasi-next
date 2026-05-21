@@ -1,7 +1,20 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import { getSession } from "@/lib/session";
+
+const unauthorized = () =>
+  NextResponse.json({ error: "Akses ditolak" }, { status: 401 });
+
+async function authorize() {
+  const user = await getSession();
+  if (!user || user.role !== "admin" || user.id !== 1) return null;
+  return user;
+}
 
 export async function GET() {
+  const user = await authorize();
+  if (!user) return unauthorized();
+
   try {
     const levels = await prisma.level.findMany({ orderBy: { id: "asc" } });
     const menus = await prisma.menu.findMany({ orderBy: { kode: "asc" } });
@@ -12,6 +25,9 @@ export async function GET() {
 }
 
 export async function PUT(request) {
+  const user = await authorize();
+  if (!user) return unauthorized();
+
   try {
     const body = await request.json();
     const { level_id, akses } = body;
@@ -27,6 +43,9 @@ export async function PUT(request) {
     return NextResponse.json({ message: "Akses menu berhasil diperbarui" });
   } catch (error) {
     console.error("Management Menu PUT Error:", error);
-    return NextResponse.json({ error: "Gagal menyimpan data" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Gagal menyimpan data" },
+      { status: 500 },
+    );
   }
 }
