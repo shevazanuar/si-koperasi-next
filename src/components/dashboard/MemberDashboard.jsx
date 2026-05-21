@@ -1,4 +1,4 @@
-import { Wallet, CreditCard, PieChart, Activity, ChevronRight, LayoutDashboard, Package, Receipt, FileSearch, Tag } from "lucide-react";
+import { Wallet, CreditCard, Activity, ChevronRight, LayoutDashboard, FileSearch } from "lucide-react";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import Link from "next/link";
 
@@ -123,87 +123,6 @@ export default function MemberDashboard({ stats, chartData, user }) {
                 <span className="text-xs font-bold text-gray-600">Semua Riwayat</span>
                 <ChevronRight className="w-4 h-4 text-gray-400 group-hover:translate-x-1 transition-transform" />
               </Link>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Produk & Pembelian */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
-        {/* Produk Terbaru */}
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h3 className="font-black text-gray-900 uppercase text-xs tracking-widest">Produk Koperasi Terbaru</h3>
-              <p className="text-xs text-gray-400 mt-1">Cek barang terbaru yang tersedia</p>
-            </div>
-            <Link href="/dashboard/katalog" className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors">
-              Lihat Katalog
-            </Link>
-          </div>
-          
-          <div className="space-y-4">
-            {stats.produkTerbaru?.length > 0 ? (
-              stats.produkTerbaru.map((produk) => (
-                <div key={produk.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-blue-100 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-gray-400">
-                      <Package className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-800 text-sm">{produk.nama_barang}</h4>
-                      <p className="text-xs text-gray-500 mt-0.5">{produk.kategori?.nama_kategori || "Umum"}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-black text-blue-600 text-sm">Rp {fmt(Number(produk.harga_jual))}</p>
-                    <p className="text-[10px] font-bold text-gray-400 mt-0.5">{produk.stok} {produk.satuan}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="py-10 text-center text-gray-400 text-sm">Belum ada produk.</div>
-            )}
-          </div>
-        </div>
-
-        {/* Riwayat Pembelian Terakhir */}
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h3 className="font-black text-gray-900 uppercase text-xs tracking-widest">Riwayat Pembelian</h3>
-              <p className="text-xs text-gray-400 mt-1">Transaksi belanja Anda</p>
-            </div>
-            <Link href="/dashboard/riwayat-pembelian" className="text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-100 transition-colors">
-              Semua Riwayat
-            </Link>
-          </div>
-
-          <div className="space-y-4">
-            {stats.riwayatPembelian?.length > 0 ? (
-              stats.riwayatPembelian.map((pembelian) => (
-                <div key={pembelian.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-blue-100 transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-gray-400">
-                      <Receipt className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-800 text-sm">{pembelian.kode_penjualan}</h4>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {new Date(pembelian.tanggal_penjualan).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right flex flex-col items-end gap-1">
-                    <p className="font-black text-gray-900 text-sm">Rp {fmt(Number(pembelian.total_harga))}</p>
-                    <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-green-50 text-green-600 border border-green-100">
-                      {pembelian.status}
-                    </span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="py-10 text-center text-gray-400 text-sm">Belum ada riwayat pembelian.</div>
             )}
           </div>
         </div>

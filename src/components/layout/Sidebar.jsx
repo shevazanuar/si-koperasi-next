@@ -49,6 +49,7 @@ const menuItems = [
       { name: "Penjualan",          href: "/dashboard/penjualan",                    icon: Receipt,         dbId: null },
     ],
   },
+<<<<<<< HEAD
   { name: "Simpanan Saya",      href: "/dashboard/simpanan",                     icon: Wallet,     roles: ["anggota"], dbId: null },
   { name: "Pinjaman Saya",      href: "/dashboard/pinjaman",                     icon: CreditCard, roles: ["anggota"], dbId: null },
   { name: "Pengajuan Pinjaman", href: "/dashboard/transaksi/pengajuan-pinjaman", icon: FileSearch, roles: ["anggota"], dbId: null },
@@ -56,6 +57,13 @@ const menuItems = [
   { name: "Riwayat Pembelian",  href: "/dashboard/riwayat-pembelian",            icon: Receipt,    roles: ["anggota"], dbId: null },
   { name: "Informasi",          href: "/dashboard/informasi",                    icon: Newspaper,  roles: ["anggota"], dbId: null },
   { name: "Profil Saya",        href: "/dashboard/profile",                      icon: UserCog,    roles: ["anggota"], dbId: null },
+=======
+  { name: "Simpanan Saya", href: "/dashboard/simpanan", icon: Wallet, roles: ["anggota"] },
+  { name: "Pinjaman Saya", href: "/dashboard/pinjaman", icon: CreditCard, roles: ["anggota"] },
+  { name: "Pengajuan Pinjaman", href: "/dashboard/transaksi/pengajuan-pinjaman", icon: FileSearch, roles: ["anggota"] },
+  { name: "Informasi", href: "/dashboard/informasi", icon: Newspaper, roles: ["anggota"] },
+  { name: "Profil Saya", href: "/dashboard/profile", icon: UserCog, roles: ["anggota"] },
+>>>>>>> b1095c632d2adae2133485bcb6741b1b78d12b7e
   {
     name: "Laporan", icon: Printer, roles: ["admin"], dbId: 3,
     children: [
