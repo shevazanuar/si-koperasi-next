@@ -79,8 +79,6 @@ const menuItems = [
   { name: "Simpanan Saya", href: "/dashboard/simpanan", icon: Wallet, roles: ["anggota"] },
   { name: "Pinjaman Saya", href: "/dashboard/pinjaman", icon: CreditCard, roles: ["anggota"] },
   { name: "Pengajuan Pinjaman", href: "/dashboard/transaksi/pengajuan-pinjaman", icon: FileSearch, roles: ["anggota"] },
-  { name: "Katalog Produk", href: "/dashboard/katalog", icon: Package, roles: ["anggota"] },
-  { name: "Riwayat Pembelian", href: "/dashboard/riwayat-pembelian", icon: Receipt, roles: ["anggota"] },
   { name: "Informasi", href: "/dashboard/informasi", icon: Newspaper, roles: ["anggota"] },
   { name: "Profil Saya", href: "/dashboard/profile", icon: UserCog, roles: ["anggota"] },
   {
