@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Layers, Plus, Pencil, Trash2, Save, X } from "lucide-react";
+import { showConfirm, showSuccess, showError } from "@/lib/swal";
 
 const fmt = (n) => new Intl.NumberFormat("id-ID").format(n || 0);
 
@@ -12,7 +13,6 @@ export default function LevelSimpananPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ level_anggota_id: "", jenis_simpanan_id: "", jumlah: "" });
-  const [info, setInfo] = useState({ msg: "", type: "success" });
 
   const fetchData = async () => {
     setLoading(true);
@@ -25,7 +25,6 @@ export default function LevelSimpananPage() {
   };
 
   useEffect(() => { fetchData(); }, []);
-  const showInfo = (msg, type = "success") => { setInfo({ msg, type }); setTimeout(() => setInfo({ msg: "", type: "success" }), 3000); };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,8 +32,14 @@ export default function LevelSimpananPage() {
     const body = editId ? { ...form, id: editId } : form;
     const res = await fetch("/api/config/level-simpanan", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const json = await res.json();
-    showInfo(json.message || json.error, res.ok ? "success" : "error");
-    setShowForm(false); setEditId(null); setForm({ level_anggota_id: "", jenis_simpanan_id: "", jumlah: "" }); fetchData();
+    
+    if (res.ok) {
+      showSuccess("Berhasil", json.message || "Data berhasil disimpan");
+      setShowForm(false); setEditId(null); setForm({ level_anggota_id: "", jenis_simpanan_id: "", jumlah: "" });
+      fetchData();
+    } else {
+      showError("Gagal Menyimpan", json.error || "Gagal menyimpan data");
+    }
   };
 
   const handleEdit = (item) => {
@@ -44,10 +49,18 @@ export default function LevelSimpananPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Hapus?")) return;
+    const confirmed = await showConfirm("Konfirmasi Hapus", "Yakin ingin menghapus level simpanan ini?");
+    if (!confirmed) return;
+    
     const res = await fetch(`/api/config/level-simpanan?id=${id}`, { method: "DELETE" });
     const json = await res.json();
-    showInfo(json.message || json.error, res.ok ? "success" : "error"); fetchData();
+    
+    if (res.ok) {
+      showSuccess("Terhapus", json.message || "Data berhasil dihapus");
+      fetchData();
+    } else {
+      showError("Gagal Hapus", json.error || "Gagal menghapus data");
+    }
   };
 
   return (
@@ -61,7 +74,7 @@ export default function LevelSimpananPage() {
           <Plus className="w-4 h-4" /> Tambah
         </button>
       </div>
-      {info.msg && <div className={`px-4 py-3 rounded-xl text-sm font-medium border ${info.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-red-50 border-red-200 text-red-700"}`}>{info.type === "success" ? "✅" : "❌"} {info.msg}</div>}
+
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <h2 className="font-bold text-gray-900 mb-4">{editId ? "Edit" : "Tambah"} Level Simpanan</h2>

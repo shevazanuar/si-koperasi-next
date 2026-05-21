@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Fragment } from "react";
 import { ListTree, Plus, Pencil, Trash2, Save, X } from "lucide-react";
+import { showConfirm, showSuccess, showError } from "@/lib/swal";
 
 export default function MenuPage() {
   const [menus, setMenus] = useState([]);
@@ -9,7 +10,6 @@ export default function MenuPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ kode: "", nama: "", url: "", icon: "", class: "", root: "0" });
-  const [info, setInfo] = useState("");
 
   const fetchData = async () => {
     setLoading(true);
@@ -25,14 +25,21 @@ export default function MenuPage() {
     e.preventDefault();
     const method = editId ? "PUT" : "POST";
     const body = editId ? { ...form, id: editId } : form;
-    const res = await fetch("/api/menu", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    const json = await res.json();
-    setInfo(json.message || json.error);
-    setShowForm(false);
-    setEditId(null);
-    setForm({ kode: "", nama: "", url: "", icon: "", class: "", root: "0" });
-    fetchData();
-    setTimeout(() => setInfo(""), 3000);
+    try {
+      const res = await fetch("/api/menu", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || "Menu berhasil disimpan");
+        setShowForm(false);
+        setEditId(null);
+        setForm({ kode: "", nama: "", url: "", icon: "", class: "", root: "0" });
+        fetchData();
+      } else {
+        showError("Gagal", json.message || json.error || "Gagal menyimpan menu");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
   };
 
   const handleEdit = (item) => {
@@ -42,12 +49,20 @@ export default function MenuPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Yakin ingin menghapus menu ini?")) return;
-    const res = await fetch(`/api/menu?id=${id}`, { method: "DELETE" });
-    const json = await res.json();
-    setInfo(json.message || json.error);
-    fetchData();
-    setTimeout(() => setInfo(""), 3000);
+    const confirmed = await showConfirm("Hapus Menu?", "Apakah Anda yakin ingin menghapus menu ini?");
+    if (!confirmed) return;
+    try {
+      const res = await fetch(`/api/menu?id=${id}`, { method: "DELETE" });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || "Menu berhasil dihapus");
+        fetchData();
+      } else {
+        showError("Gagal", json.message || json.error || "Gagal menghapus menu");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
   };
 
   const rootMenus = menus.filter((m) => m.root === 0);
@@ -70,10 +85,6 @@ export default function MenuPage() {
           <Plus className="w-4 h-4" /> Tambah Menu
         </button>
       </div>
-
-      {info && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm font-medium">✅ {info}</div>
-      )}
 
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { CreditCard, Plus, Pencil, Trash2, Save, X } from "lucide-react";
+import { showConfirm, showSuccess, showError } from "@/lib/swal";
 
 const fmt = (n) => new Intl.NumberFormat("id-ID").format(n || 0);
 
@@ -10,7 +11,6 @@ export default function JenisPinjamanPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ nama: "", lama: "", satuan: "Bulan", bunga: "", jumlah: "" });
-  const [info, setInfo] = useState({ msg: "", type: "success" });
 
   const fetchData = async () => {
     setLoading(true);
@@ -22,15 +22,19 @@ export default function JenisPinjamanPage() {
 
   useEffect(() => { fetchData(); }, []);
 
-  const showInfo = (msg, type = "success") => { setInfo({ msg, type }); setTimeout(() => setInfo({ msg: "", type: "success" }), 3000); };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = editId ? "PUT" : "POST";
     const body = editId ? { ...form, id: editId } : form;
     const res = await fetch("/api/config/jenis-pinjaman", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const json = await res.json();
-    showInfo(json.message || json.error, res.ok ? "success" : "error");
+    
+    if (res.ok) {
+      showSuccess("Berhasil", json.message || "Data jenis pinjaman berhasil disimpan.");
+    } else {
+      showError("Gagal", json.error || "Gagal menyimpan data jenis pinjaman.");
+    }
+    
     setShowForm(false); setEditId(null); setForm({ nama: "", lama: "", satuan: "Bulan", bunga: "", jumlah: "" });
     fetchData();
   };
@@ -42,10 +46,18 @@ export default function JenisPinjamanPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Hapus data ini?")) return;
+    const yakin = await showConfirm("Konfirmasi Hapus", "Yakin ingin menghapus data jenis pinjaman ini?");
+    if (!yakin) return;
+    
     const res = await fetch(`/api/config/jenis-pinjaman?id=${id}`, { method: "DELETE" });
     const json = await res.json();
-    showInfo(json.message || json.error, res.ok ? "success" : "error");
+    
+    if (res.ok) {
+      showSuccess("Terhapus", json.message || "Data telah berhasil dihapus.");
+    } else {
+      showError("Gagal", json.error || "Gagal menghapus data.");
+    }
+    
     fetchData();
   };
 
@@ -62,11 +74,7 @@ export default function JenisPinjamanPage() {
         </button>
       </div>
 
-      {info.msg && (
-        <div className={`px-4 py-3 rounded-xl text-sm font-medium border ${info.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-red-50 border-red-200 text-red-700"}`}>
-          {info.type === "success" ? "✅" : "❌"} {info.msg}
-        </div>
-      )}
+
 
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">

@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { ScrollText, Trash2, AlertTriangle } from "lucide-react";
+import { showConfirm, showSuccess, showError } from "@/lib/swal";
 
 export default function LogPenggunaPage() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [info, setInfo] = useState("");
 
   const fetchData = async () => {
     setLoading(true);
@@ -19,21 +19,37 @@ export default function LogPenggunaPage() {
   useEffect(() => { fetchData(); }, []);
 
   const handleDelete = async (id, ip) => {
-    if (!confirm("Hapus log ini?")) return;
-    const res = await fetch(`/api/log-pengguna?id=${encodeURIComponent(id)}&ip=${encodeURIComponent(ip)}`, { method: "DELETE" });
-    const json = await res.json();
-    setInfo(json.message);
-    fetchData();
-    setTimeout(() => setInfo(""), 3000);
+    const confirmed = await showConfirm("Hapus Log?", "Apakah Anda yakin ingin menghapus log pengguna ini?");
+    if (!confirmed) return;
+    try {
+      const res = await fetch(`/api/log-pengguna?id=${encodeURIComponent(id)}&ip=${encodeURIComponent(ip)}`, { method: "DELETE" });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || "Log berhasil dihapus");
+        fetchData();
+      } else {
+        showError("Gagal", json.message || "Gagal menghapus log");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
   };
 
   const handleDeleteAll = async () => {
-    if (!confirm("Hapus SEMUA log?")) return;
-    const res = await fetch("/api/log-pengguna?all=true", { method: "DELETE" });
-    const json = await res.json();
-    setInfo(json.message);
-    fetchData();
-    setTimeout(() => setInfo(""), 3000);
+    const confirmed = await showConfirm("Hapus Semua Log?", "Apakah Anda yakin ingin menghapus SEMUA data log pengguna? Tindakan ini tidak dapat dibatalkan.");
+    if (!confirmed) return;
+    try {
+      const res = await fetch("/api/log-pengguna?all=true", { method: "DELETE" });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || "Semua log berhasil dihapus");
+        fetchData();
+      } else {
+        showError("Gagal", json.message || "Gagal menghapus semua log");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
   };
 
   return (
@@ -47,7 +63,6 @@ export default function LogPenggunaPage() {
           <Trash2 className="w-4 h-4" /> Hapus Semua
         </button>
       </div>
-      {info && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm">✅ {info}</div>}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {loading ? <div className="p-12 text-center text-gray-400">Memuat...</div> : logs.length === 0 ? (
           <div className="p-12 text-center"><AlertTriangle className="w-10 h-10 text-gray-300 mx-auto mb-3" /><p className="text-gray-400 text-sm">Tidak ada data.</p></div>

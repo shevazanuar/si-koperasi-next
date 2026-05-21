@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Package, Tag, ShoppingCart, Minus, Plus, Trash2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { showSuccess, showError } from "@/lib/swal";
 
 export default function KatalogClient({ produk }) {
   const router = useRouter();
@@ -62,12 +63,12 @@ export default function KatalogClient({ produk }) {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error);
 
-      alert("Pesanan berhasil dibuat!");
+      await showSuccess("Pesanan Berhasil", "Pesanan Anda berhasil dibuat dan sedang diproses!");
       setCart([]);
       setIsCartOpen(false);
       router.push("/dashboard/riwayat-pembelian");
     } catch (err) {
-      alert("Gagal: " + err.message);
+      showError("Gagal Checkout", err.message);
     } finally {
       setIsSubmitting(false);
     }

@@ -2,14 +2,12 @@
 import { useState, useEffect } from "react";
 import { FileSearch, CheckCircle, XCircle, Clock } from "lucide-react";
 import Link from "next/link";
+import { showConfirm, showSuccess, showError } from "@/lib/swal";
 
 export default function PengajuanPinjamanPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [info, setInfo] = useState({ msg: "", type: "success" });
   const [user, setUser] = useState(null);
-
-  const showInfo = (msg, type = "success") => { setInfo({ msg, type }); setTimeout(() => setInfo({ msg: "", type: "success" }), 3000); };
 
   const fetchUser = async () => {
     const res = await fetch("/api/auth/session"); // Assuming this exists or I'll create it
@@ -29,15 +27,30 @@ export default function PengajuanPinjamanPage() {
   useEffect(() => { fetchData(); }, []);
 
   const handleStatus = async (nomor, status) => {
-    const label = status === "Acc" ? "menyetujui" : "menolak";
-    if (!confirm(`Yakin ingin ${label} pengajuan ini?`)) return;
-    const res = await fetch("/api/transaksi/pengajuan-pinjaman", {
-      method: "PUT", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nomor, status }),
-    });
-    const json = await res.json();
-    showInfo(json.message || json.error, res.ok ? "success" : "error");
-    fetchData();
+    const isAcc = status === "Acc";
+    const label = isAcc ? "menyetujui" : "menolak";
+    const actionTitle = isAcc ? "Setujui Pengajuan?" : "Tolak Pengajuan?";
+    const actionText = isAcc 
+      ? `Apakah Anda yakin ingin menyetujui pengajuan pinjaman nomor ${nomor}?` 
+      : `Apakah Anda yakin ingin menolak pengajuan pinjaman nomor ${nomor}?`;
+    
+    const confirmed = await showConfirm(actionTitle, actionText, isAcc ? "Ya, Setujui" : "Ya, Tolak");
+    if (!confirmed) return;
+    try {
+      const res = await fetch("/api/transaksi/pengajuan-pinjaman", {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nomor, status }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || `Pengajuan pinjaman berhasil di-${label}`);
+        fetchData();
+      } else {
+        showError("Gagal", json.error || json.message || "Gagal memperbarui status pengajuan");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
   };
 
   const statusBadge = (s) => {
@@ -63,12 +76,6 @@ export default function PengajuanPinjamanPage() {
           </div>
         </div>
       </div>
-
-      {info.msg && (
-        <div className={`px-4 py-3 rounded-xl text-sm font-medium border ${info.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-red-50 border-red-200 text-red-700"}`}>
-          {info.type === "success" ? "✅" : "❌"} {info.msg}
-        </div>
-      )}
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {loading ? <div className="p-12 text-center text-gray-400">Memuat...</div> : data.length === 0 ? (

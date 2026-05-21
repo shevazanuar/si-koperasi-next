@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { BadgeCheck, Search, Trash2, Save, X, CreditCard } from "lucide-react";
+import { showConfirm, showSuccess, showError } from "@/lib/swal";
 
 const fmt = (n) => new Intl.NumberFormat("id-ID").format(n || 0);
 
@@ -26,11 +27,8 @@ export default function PembayaranPage() {
     checkAuth();
   }, []);
 
-  const [info, setInfo] = useState({ msg: "", type: "success" });
   const [payForm, setPayForm] = useState({ detail_id: null, tgl_bayar: new Date().toISOString().split("T")[0], jumlah_bayar: "" });
   const [payingId, setPayingId] = useState(null);
-
-  const showInfo = (msg, type = "success") => { setInfo({ msg, type }); setTimeout(() => setInfo({ msg: "", type: "success" }), 3000); };
 
   const fetchPayments = async () => {
     setLoading(true);
@@ -66,26 +64,43 @@ export default function PembayaranPage() {
 
   const handleBayar = async (e) => {
     e.preventDefault();
-    const res = await fetch("/api/transaksi/pembayaran", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "bayar", ...payForm }),
-    });
-    const json = await res.json();
-    showInfo(json.message || json.error, res.ok ? "success" : "error");
-    setPayingId(null);
-    if (selectedAnggota) handleSelectAnggota(selectedAnggota);
-    fetchPayments();
+    try {
+      const res = await fetch("/api/transaksi/pembayaran", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "bayar", ...payForm }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || "Pembayaran cicilan berhasil disimpan");
+        setPayingId(null);
+        if (selectedAnggota) handleSelectAnggota(selectedAnggota);
+        fetchPayments();
+      } else {
+        showError("Gagal", json.error || json.message || "Gagal memproses pembayaran");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
   };
 
   const handleHapus = async (id) => {
-    if (!confirm("Reset pembayaran ini?")) return;
-    const res = await fetch("/api/transaksi/pembayaran", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "hapus", id }),
-    });
-    const json = await res.json();
-    showInfo(json.message || json.error, res.ok ? "success" : "error");
-    fetchPayments();
+    const confirmed = await showConfirm("Reset Pembayaran?", "Apakah Anda yakin ingin mereset/menghapus pembayaran cicilan ini? Tindakan ini akan mengembalikan status cicilan menjadi belum dibayar.");
+    if (!confirmed) return;
+    try {
+      const res = await fetch("/api/transaksi/pembayaran", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "hapus", id }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || "Pembayaran cicilan berhasil direset");
+        fetchPayments();
+      } else {
+        showError("Gagal", json.error || json.message || "Gagal mereset pembayaran");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
   };
 
   const filtered = anggotaList.filter((a) =>
@@ -100,12 +115,6 @@ export default function PembayaranPage() {
           <div><h1 className="text-xl font-black text-gray-900">Pembayaran Cicilan</h1><p className="text-sm text-gray-500">Bayar cicilan pinjaman anggota</p></div>
         </div>
       </div>
-
-      {info.msg && (
-        <div className={`px-4 py-3 rounded-xl text-sm font-medium border ${info.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-red-50 border-red-200 text-red-700"}`}>
-          {info.type === "success" ? "✅" : "❌"} {info.msg}
-        </div>
-      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Anggota list */}

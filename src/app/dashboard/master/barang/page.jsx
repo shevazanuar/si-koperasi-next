@@ -4,6 +4,8 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import LimitFilter from "@/components/dashboard/LimitFilter";
+import { deleteBarang } from "./actions";
+import DeleteButton from "@/components/dashboard/DeleteButton";
 
 export default async function MasterBarangPage({ searchParams }) {
   const user = await getSession();
@@ -23,7 +25,10 @@ export default async function MasterBarangPage({ searchParams }) {
     take: limit,
     orderBy: { created_at: "desc" },
     include: {
-      kategori: true
+      kategori: true,
+      _count: {
+        select: { detail: true }
+      }
     }
   });
 
@@ -113,6 +118,13 @@ export default async function MasterBarangPage({ searchParams }) {
                       >
                         <Pencil className="w-4 h-4" />
                       </Link>
+                      <DeleteButton 
+                        id={item.id} 
+                        action={deleteBarang} 
+                        label="Barang"
+                        disabled={item._count.detail > 0}
+                        disabledMessage="Tidak dapat menghapus barang ini karena sudah digunakan dalam transaksi penjualan."
+                      />
                     </div>
                   </td>
                 </tr>

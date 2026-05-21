@@ -1,7 +1,7 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import { ArrowDownCircle, Search, Trash2, Save, X } from "lucide-react";
+import { showConfirm, showSuccess, showError } from "@/lib/swal";
 
 export default function PenarikanPage() {
   const [anggotaList, setAnggotaList] = useState([]);
@@ -13,7 +13,6 @@ export default function PenarikanPage() {
   const [form, setForm] = useState({ tgl: new Date().toISOString().split("T")[0], jenis_simpanan_id: "", jumlah: "" });
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [info, setInfo] = useState("");
 
   const fmt = (n) => new Intl.NumberFormat("id-ID").format(n || 0);
 
@@ -52,30 +51,45 @@ export default function PenarikanPage() {
   const handleSimpan = async (e) => {
     e.preventDefault();
     if (!selectedAnggota) return;
-    const res = await fetch("/api/transaksi/penarikan", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "simpan", anggota_id: selectedAnggota.id, ...form }),
-    });
-    const json = await res.json();
-    setInfo(json.message || json.error);
-    setShowForm(false);
-    setForm({ tgl: new Date().toISOString().split("T")[0], jenis_simpanan_id: "", jumlah: "" });
-    handleSelectAnggota(selectedAnggota);
-    fetchData();
-    setTimeout(() => setInfo(""), 3000);
+    try {
+      const res = await fetch("/api/transaksi/penarikan", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "simpan", anggota_id: selectedAnggota.id, ...form }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || "Transaksi penarikan berhasil disimpan");
+        setShowForm(false);
+        setForm({ tgl: new Date().toISOString().split("T")[0], jenis_simpanan_id: "", jumlah: "" });
+        handleSelectAnggota(selectedAnggota);
+        fetchData();
+      } else {
+        showError("Gagal", json.error || json.message || "Gagal memproses penarikan");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
   };
 
   const handleHapus = async (id) => {
-    if (!confirm("Hapus data penarikan ini?")) return;
-    const res = await fetch("/api/transaksi/penarikan", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "hapus", id }),
-    });
-    const json = await res.json();
-    setInfo(json.message);
-    if (selectedAnggota) handleSelectAnggota(selectedAnggota);
-    fetchData();
-    setTimeout(() => setInfo(""), 3000);
+    const confirmed = await showConfirm("Hapus Penarikan?", "Apakah Anda yakin ingin menghapus data penarikan ini? Saldo anggota akan dikembalikan.");
+    if (!confirmed) return;
+    try {
+      const res = await fetch("/api/transaksi/penarikan", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "hapus", id }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || "Data penarikan berhasil dihapus");
+        if (selectedAnggota) handleSelectAnggota(selectedAnggota);
+        fetchData();
+      } else {
+        showError("Gagal", json.error || json.message || "Gagal menghapus penarikan");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
   };
 
   const filtered = anggotaList.filter((a) =>
@@ -90,7 +104,6 @@ export default function PenarikanPage() {
           <div><h1 className="text-xl font-black text-gray-900">Penarikan Dana</h1><p className="text-sm text-gray-500">Kelola penarikan simpanan anggota</p></div>
         </div>
       </div>
-      {info && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm">✅ {info}</div>}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Daftar Anggota */}

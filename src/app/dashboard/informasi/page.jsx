@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Newspaper, Plus, Pencil, Trash2, Save, X } from "lucide-react";
+import { showConfirm, showSuccess, showError } from "@/lib/swal";
 
 export default function InformasiPage() {
   const [data, setData] = useState([]);
@@ -8,7 +9,6 @@ export default function InformasiPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ judul: "", isi: "" });
-  const [info, setInfo] = useState({ msg: "", type: "success" });
 
   const fetchData = async () => {
     setLoading(true);
@@ -20,11 +20,6 @@ export default function InformasiPage() {
 
   useEffect(() => { fetchData(); }, []);
 
-  const showInfo = (msg, type = "success") => {
-    setInfo({ msg, type });
-    setTimeout(() => setInfo({ msg: "", type: "success" }), 3000);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const method = editId ? "PUT" : "POST";
@@ -35,11 +30,16 @@ export default function InformasiPage() {
       body: JSON.stringify(body),
     });
     const json = await res.json();
-    showInfo(json.message || json.error, res.ok ? "success" : "error");
-    setShowForm(false);
-    setEditId(null);
-    setForm({ judul: "", isi: "" });
-    fetchData();
+    
+    if (res.ok) {
+      showSuccess("Berhasil", json.message || "Data berhasil disimpan");
+      setShowForm(false);
+      setEditId(null);
+      setForm({ judul: "", isi: "" });
+      fetchData();
+    } else {
+      showError("Gagal Menyimpan", json.error || "Gagal menyimpan data");
+    }
   };
 
   const handleEdit = (item) => {
@@ -49,11 +49,18 @@ export default function InformasiPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Hapus informasi ini?")) return;
+    const confirmed = await showConfirm("Konfirmasi Hapus", "Yakin ingin menghapus informasi ini?");
+    if (!confirmed) return;
+    
     const res = await fetch(`/api/master/informasi?id=${id}`, { method: "DELETE" });
     const json = await res.json();
-    showInfo(json.message || json.error, res.ok ? "success" : "error");
-    fetchData();
+    
+    if (res.ok) {
+      showSuccess("Terhapus", json.message || "Data berhasil dihapus");
+      fetchData();
+    } else {
+      showError("Gagal Hapus", json.error || "Gagal menghapus data");
+    }
   };
 
   const formatDate = (iso) =>
@@ -78,12 +85,6 @@ export default function InformasiPage() {
           <Plus className="w-4 h-4" /> Tambah
         </button>
       </div>
-
-      {info.msg && (
-        <div className={`px-4 py-3 rounded-xl text-sm font-medium border ${info.type === "success" ? "bg-emerald-50 border-emerald-200 text-emerald-700" : "bg-red-50 border-red-200 text-red-700"}`}>
-          {info.type === "success" ? "✅" : "❌"} {info.msg}
-        </div>
-      )}
 
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">

@@ -4,6 +4,7 @@ import { Save, X, Plus, Trash2, PackageSearch } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { showError } from "@/lib/swal";
 
 export default function TambahPenjualanPage() {
   const router = useRouter();
@@ -85,11 +86,12 @@ export default function TambahPenjualanPage() {
         throw new Error(data.error || "Gagal memproses transaksi");
       }
       
-      router.push("/dashboard/penjualan");
+      router.push("/dashboard/penjualan?success=true&message=Transaksi+penjualan+berhasil+disimpan");
       router.refresh();
     } catch (err) {
       setError(err.message);
       setIsPending(false);
+      showError("Gagal Menyimpan", err.message || "Terjadi kesalahan saat memproses transaksi");
     }
   };
 

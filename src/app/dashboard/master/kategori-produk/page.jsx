@@ -4,6 +4,8 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import LimitFilter from "@/components/dashboard/LimitFilter";
+import { deleteKategori } from "./actions";
+import DeleteButton from "@/components/dashboard/DeleteButton";
 
 export default async function KategoriProdukPage({ searchParams }) {
   const user = await getSession();
@@ -94,6 +96,13 @@ export default async function KategoriProdukPage({ searchParams }) {
                       >
                         <Pencil className="w-4 h-4" />
                       </Link>
+                      <DeleteButton 
+                        id={item.id} 
+                        action={deleteKategori} 
+                        label="Kategori"
+                        disabled={item._count.barang > 0}
+                        disabledMessage="Tidak dapat menghapus kategori ini karena masih memiliki barang/produk yang terdaftar."
+                      />
                     </div>
                   </td>
                 </tr>

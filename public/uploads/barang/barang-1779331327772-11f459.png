@@ -1,0 +1,31 @@
+digraph UseCaseKoperasi {
+	Anggota [shape=box]
+	Petugas [shape=box]
+	Admin [shape=box]
+	Login [shape=ellipse]
+	"Lihat Data" [shape=ellipse]
+	"Ajukan Pinjaman" [shape=ellipse]
+	"Isi Data Pengajuan" [shape=ellipse]
+	"Upload Jaminan" [shape=ellipse]
+	"Kelola Data Anggota" [shape=ellipse]
+	"Kelola Simpanan" [shape=ellipse]
+	"Verifikasi Pengajuan" [shape=ellipse]
+	"Cek Dokumen" [shape=ellipse]
+	"Approve Pinjaman" [shape=ellipse]
+	"Kelola Master Data" [shape=ellipse]
+	"Kelola Role" [shape=ellipse]
+	Petugas -> Anggota [arrowhead=empty]
+	Admin -> Petugas [arrowhead=empty]
+	Anggota -> Login
+	Anggota -> "Lihat Data"
+	Anggota -> "Ajukan Pinjaman"
+	Petugas -> "Kelola Data Anggota"
+	Petugas -> "Kelola Simpanan"
+	Petugas -> "Verifikasi Pengajuan"
+	Petugas -> "Approve Pinjaman"
+	Admin -> "Kelola Master Data"
+	Admin -> "Kelola Role"
+	"Ajukan Pinjaman" -> "Isi Data Pengajuan" [label=include style=dashed]
+	"Ajukan Pinjaman" -> "Upload Jaminan" [label=extend style=dashed]
+	"Verifikasi Pengajuan" -> "Cek Dokumen" [label=include style=dashed]
+}

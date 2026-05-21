@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Layers, Plus, Pencil, Trash2, Save, X } from "lucide-react";
+import { showConfirm, showSuccess, showError } from "@/lib/swal";
 
 export default function LevelPenggunaPage() {
   const [levels, setLevels] = useState([]);
@@ -9,7 +10,6 @@ export default function LevelPenggunaPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({ level: "" });
-  const [info, setInfo] = useState("");
 
   const fetchData = async () => {
     setLoading(true);
@@ -27,20 +27,35 @@ export default function LevelPenggunaPage() {
     const body = editId ? { ...form, id: editId } : form;
     const res = await fetch("/api/config/level", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const json = await res.json();
-    setInfo(json.message || json.error);
-    setShowForm(false); setEditId(null); setForm({ level: "" });
-    fetchData();
-    setTimeout(() => setInfo(""), 3000);
+    
+    if (res.ok) {
+      showSuccess("Berhasil", json.message || "Data berhasil disimpan");
+      setShowForm(false); setEditId(null); setForm({ level: "" });
+      fetchData();
+    } else {
+      showError("Gagal Menyimpan", json.error || "Gagal menyimpan data");
+    }
   };
 
-  const handleEdit = (l) => { setEditId(l.id); setForm({ level: l.level || "" }); setShowForm(true); };
+  const handleEdit = (l) => { 
+    setEditId(l.id); 
+    setForm({ level: l.level || "" }); 
+    setShowForm(true); 
+  };
 
   const handleDelete = async (id) => {
-    if (!confirm("Hapus level ini?")) return;
+    const confirmed = await showConfirm("Konfirmasi Hapus", "Yakin ingin menghapus level pengguna ini?");
+    if (!confirmed) return;
+    
     const res = await fetch(`/api/config/level?id=${id}`, { method: "DELETE" });
     const json = await res.json();
-    setInfo(json.message || json.error); fetchData();
-    setTimeout(() => setInfo(""), 3000);
+    
+    if (res.ok) {
+      showSuccess("Terhapus", json.message || "Data berhasil dihapus");
+      fetchData();
+    } else {
+      showError("Gagal Hapus", json.error || "Gagal menghapus data");
+    }
   };
 
   return (
@@ -55,7 +70,7 @@ export default function LevelPenggunaPage() {
           <Plus className="w-4 h-4" /> Tambah
         </button>
       </div>
-      {info && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm">✅ {info}</div>}
+
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
           <h2 className="font-bold text-gray-900 mb-4">{editId ? "Edit" : "Tambah"} Level</h2>

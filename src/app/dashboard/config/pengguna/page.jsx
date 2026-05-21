@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { UserCog, Plus, Pencil, Trash2, Save, X } from "lucide-react";
+import { showError, showConfirm, showSuccess } from "@/lib/swal";
 
 export default function PenggunaPage() {
   const [users, setUsers] = useState([]);
@@ -27,14 +28,22 @@ export default function PenggunaPage() {
     e.preventDefault();
     const method = editId ? "PUT" : "POST";
     const body = editId ? { ...form, id: editId } : form;
-    if (!editId && !form.password) { alert("Password wajib diisi"); return; }
+    if (!editId && !form.password) { 
+      showError("Gagal", "Password wajib diisi"); 
+      return; 
+    }
     const res = await fetch("/api/config/pengguna", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const json = await res.json();
-    setInfo(json.message || json.error);
+    
+    if (res.ok) {
+      showSuccess("Berhasil", json.message || "Data pengguna telah disimpan.");
+    } else {
+      showError("Gagal", json.error || "Gagal menyimpan data pengguna.");
+    }
+    
     setShowForm(false); setEditId(null);
     setForm({ username: "", namalengkap: "", password: "", level_id: "1", blokir: "T" });
     fetchData();
-    setTimeout(() => setInfo(""), 3000);
   };
 
   const handleEdit = (u) => {
@@ -44,12 +53,19 @@ export default function PenggunaPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Hapus pengguna ini?")) return;
+    const yakin = await showConfirm("Konfirmasi Hapus", "Yakin ingin menghapus pengguna ini?", "Ya, Hapus");
+    if (!yakin) return;
+    
     const res = await fetch(`/api/config/pengguna?id=${id}`, { method: "DELETE" });
     const json = await res.json();
-    setInfo(json.message || json.error);
+    
+    if (res.ok) {
+      showSuccess("Terhapus", json.message || "Pengguna telah berhasil dihapus.");
+    } else {
+      showError("Gagal", json.error || "Gagal menghapus pengguna.");
+    }
+    
     fetchData();
-    setTimeout(() => setInfo(""), 3000);
   };
 
   const getLevelName = (id) => levels.find((l) => l.id === id)?.level || "-";

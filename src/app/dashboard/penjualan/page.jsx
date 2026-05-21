@@ -4,6 +4,8 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import LimitFilter from "@/components/dashboard/LimitFilter";
+import { deletePenjualan } from "./actions";
+import DeleteButton from "@/components/dashboard/DeleteButton";
 
 export default async function PenjualanPage({ searchParams }) {
   const user = await getSession();
@@ -113,13 +115,14 @@ export default async function PenjualanPage({ searchParams }) {
                     </span>
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex items-center justify-center gap-2">
                       <Link
                         href={`/dashboard/penjualan/detail/${item.id}`}
-                        className="text-blue-600 hover:text-blue-800 font-bold text-[10px] uppercase bg-blue-50 px-2.5 py-1.5 rounded-lg border border-blue-100 transition-all active:scale-95"
+                        className="text-blue-600 hover:text-blue-800 font-bold text-[10px] uppercase bg-blue-50 px-2.5 py-1.5 rounded-lg border border-blue-100 transition-all active:scale-95 flex items-center justify-center h-8"
                       >
                         Detail
                       </Link>
+                      <DeleteButton id={item.id} action={deletePenjualan} label="Transaksi" />
                     </div>
                   </td>
                 </tr>
