@@ -88,6 +88,7 @@ export async function loginAction(prevState, formData) {
       username: role === "admin" ? user.username : user.nik,
       name: role === "admin" ? user.namalengkap : user.nama,
       role: role,
+      level_id: role === "admin" ? user.level_id : null,
     });
 
     // Audit: login berhasil

@@ -1,23 +1,15 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { LogOut, User as UserIcon, Bell } from "lucide-react";
+import { getSession, destroySession } from "@/lib/session";
 
 export default async function Header() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("session");
-  let user = { name: "User", role: "guest" };
-
-  if (sessionCookie) {
-    try {
-      user = JSON.parse(sessionCookie.value);
-    } catch(e) {}
-  }
+  const session = await getSession();
+  const user = session ?? { name: "User", role: "guest" };
 
   return (
     <header className="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-8 sticky top-0 z-10">
       <div className="flex items-center">
-        {/* Placeholder for mobile menu toggle if needed later */}
         <h2 className="text-xl font-semibold text-gray-800 hidden md:block">Overview</h2>
       </div>
 
@@ -26,7 +18,7 @@ export default async function Header() {
           <Bell className="w-5 h-5" />
           <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
-        
+
         <div className="h-8 w-px bg-gray-200"></div>
 
         <Link href="/dashboard/profile" className="flex items-center gap-3 hover:bg-gray-50 p-2 rounded-2xl transition-colors group">
@@ -41,8 +33,7 @@ export default async function Header() {
 
         <form action={async () => {
           "use server";
-          const cookieStore = await cookies();
-          cookieStore.delete("session");
+          await destroySession();
           redirect("/login");
         }}>
           <button className="text-gray-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50">
