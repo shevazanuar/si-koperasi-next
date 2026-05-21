@@ -10,7 +10,7 @@ const rateLimitCache = new LRUCache({
   ttl: 15 * 60 * 1000, // window 15 menit
 });
 
-const LIMIT = 5; // maks 5 percobaan per window
+const LIMIT = 10; // maks 10 percobaan per window
 
 /**
  * @param {string} ip
@@ -27,6 +27,15 @@ export function rateLimit(ip) {
 
   rateLimitCache.set(key, current + 1);
   return { success: true, remaining: LIMIT - current - 1, retryAfterMs: 0 };
+}
+
+/**
+ * Reset limit untuk IP tertentu
+ * @param {string} ip 
+ */
+export function resetRateLimit(ip) {
+  const key = `rl:${ip}`;
+  rateLimitCache.delete(key);
 }
 
 /**

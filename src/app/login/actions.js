@@ -2,7 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { setSession } from "@/lib/session";
-import { rateLimit } from "@/lib/rate-limit";
+import { rateLimit, resetRateLimit } from "@/lib/rate-limit";
 import { writeAuditLog, AUDIT_AKSI } from "@/lib/audit-log";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -98,6 +98,8 @@ export async function loginAction(prevState, formData) {
       ipAddress: ip,
       keterangan: `Login sebagai ${role}`,
     });
+
+    resetRateLimit(`login:${ip}`);
 
     // Successful login
   } catch (e) {
