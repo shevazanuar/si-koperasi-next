@@ -109,6 +109,12 @@ const menuItems = [
         icon: Tag,
         dbId: null,
       },
+      {
+        name: "Kategori Produk",
+        href: "/dashboard/master/kategori-produk",
+        icon: Tag,
+        dbId: null,
+      },
     ],
   },
   {
@@ -135,6 +141,12 @@ const menuItems = [
         href: "/dashboard/informasi",
         icon: Newspaper,
         dbId: 12,
+      },
+      {
+        name: "Barang",
+        href: "/dashboard/master/barang",
+        icon: Layers,
+        dbId: null,
       },
     ],
   },
