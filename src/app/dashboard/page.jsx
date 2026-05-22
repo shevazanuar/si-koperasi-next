@@ -27,6 +27,20 @@ export default async function DashboardPage() {
   let informasiList = [];
 
   if (isAdmin) {
+    // Otomatis cek dan simpan laporan pendapatan tahun sebelumnya jika belum ada
+    const currentYear = new Date().getFullYear();
+    const previousYear = currentYear - 1;
+    const periodePrevYear = `Tahun ${previousYear}`;
+    
+    const checkPendapatan = await prisma.pendapatan.findFirst({
+      where: { periode: periodePrevYear }
+    });
+
+    if (!checkPendapatan) {
+      const { simpanPendapatanTahunan } = await import('@/app/dashboard/laporan/pendapatan/actions');
+      await simpanPendapatanTahunan(previousYear);
+    }
+
     const [
       totalAnggota,
       countSimpanan,

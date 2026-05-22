@@ -1,5 +1,6 @@
 import { Users, CreditCard, Wallet, ArrowDownCircle, ArrowUpRight, Building2, Newspaper } from "lucide-react";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
+import ClockWidget from "@/components/dashboard/ClockWidget";
 
 export default function AdminDashboard({ stats, chartData, profileInfo, informasiList }) {
   const cards = [
@@ -36,12 +37,15 @@ export default function AdminDashboard({ stats, chartData, profileInfo, informas
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg shadow-blue-600/20">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white shadow-lg shadow-blue-600/20 flex flex-col md:flex-row items-center justify-between gap-4">
         <p className="text-blue-100 text-sm">
           Selamat Datang di Halaman Administrator,{" "}
           <strong className="text-white">SIKKPRI Polines</strong>, Menu utama ada di
           sebelah kiri, selamat bekerja.
         </p>
+        <div className="shrink-0">
+          <ClockWidget />
+        </div>
       </div>
 
       {/* Stat Cards */}

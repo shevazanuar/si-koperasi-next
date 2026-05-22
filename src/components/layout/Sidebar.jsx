@@ -261,6 +261,12 @@ const menuItems = [
         icon: Receipt,
         dbId: null,
       },
+      {
+        name: "Pendapatan",
+        href: "/dashboard/laporan/pendapatan",
+        icon: Landmark,
+        dbId: null,
+      },
     ],
   },
 ];
