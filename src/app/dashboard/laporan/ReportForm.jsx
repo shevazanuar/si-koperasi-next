@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Search,
   RefreshCw,
   Printer,
   FileText,
   ChevronDown,
+  Download,
 } from "lucide-react";
 import { exportToExcel } from "@/lib/exportUtils";
 
@@ -199,13 +200,17 @@ export default function ReportForm({
   const [anggotaId, setAnggotaId] = useState("");
   const [jenisSimpanan, setJenisSimpanan] = useState("");
   const [perusahaan, setPerusahaan] = useState("");
-  const [outputFormat, setOutputFormat] = useState("html");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const tableRef = useRef(null);
 
   const columns = COLUMN_DEFS[type] || [];
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchData = async () => {
     setLoading(true);
@@ -243,82 +248,84 @@ export default function ReportForm({
     setAnggotaId("");
     setJenisSimpanan("");
     setPerusahaan("");
-    setOutputFormat("html");
     setData(null);
     setError(null);
   };
 
-  const handleCetak = (e) => {
+  const handleCetakExcel = (e) => {
     e.preventDefault();
     if (!data || data.length === 0) return;
 
-    if (outputFormat === "excel") {
-      const excelData = data.map((row, idx) => {
-        const obj = { No: idx + 1 };
-        columns.forEach((col) => {
-          if (col.key === "no") return;
-          obj[col.label] = formatValue(row[col.key], col.formatType, row);
-        });
-        return obj;
-      });
-
-      // Add total row
-      const totalRow = { No: "" };
-      let firstDataCol = true;
+    const excelData = data.map((row, idx) => {
+      const obj = { No: idx + 1 };
       columns.forEach((col) => {
         if (col.key === "no") return;
-        if (firstDataCol) {
-          totalRow[col.label] = "TOTAL";
-          firstDataCol = false;
-        } else if (col.totalKey) {
-          totalRow[col.label] = formatValue(
-            calculateTotal(data, col),
-            "currency"
-          );
-        } else {
-          totalRow[col.label] = "";
-        }
+        obj[col.label] = formatValue(row[col.key], col.formatType, row);
       });
-      excelData.push(totalRow);
+      return obj;
+    });
 
-      exportToExcel(excelData, `${title.replace(/\s/g, "_")}`, title);
-    } else {
-      // HTML - print table
-      if (tableRef.current) {
-        const printWindow = window.open("", "_blank");
-        printWindow.document.write(`
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>${title}</title>
-            <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
-              h2 { margin-bottom: 5px; color: #333; }
-              .subtitle { color: #666; font-size: 14px; margin-bottom: 15px; }
-              table { border-collapse: collapse; width: 100%; font-size: 12px; }
-              th { background: #B47B5A; color: white; padding: 8px 6px; text-align: center; border: 1px solid #9C6141; }
-              td { padding: 6px; border: 1px solid #ddd; }
-              tr:nth-child(even) { background: #f8f9fa; }
-              tr:hover { background: #e3e8f0; }
-              .text-right { text-align: right; }
-              .text-center { text-align: center; }
-              .total-row { font-weight: bold; background: #FDF3E7 !important; }
-              @media print { body { margin: 10px; } }
-            </style>
-          </head>
-          <body>
-            <h2>${title}</h2>
-            <div class="subtitle">
-              ${fromDate ? `Dari: ${formatDate(fromDate)}` : ""}
-              ${toDate ? ` s/d ${formatDate(toDate)}` : ""}
-            </div>
-            ${tableRef.current.outerHTML}
-            <script>window.print();<\/script>
-          </body>
-          </html>
-        `);
-        printWindow.document.close();
+    // Add total row
+    const totalRow = { No: "" };
+    let firstDataCol = true;
+    columns.forEach((col) => {
+      if (col.key === "no") return;
+      if (firstDataCol) {
+        totalRow[col.label] = "TOTAL";
+        firstDataCol = false;
+      } else if (col.totalKey) {
+        totalRow[col.label] = formatValue(
+          calculateTotal(data, col),
+          "currency"
+        );
+      } else {
+        totalRow[col.label] = "";
       }
+    });
+    excelData.push(totalRow);
+
+    exportToExcel(excelData, `${title.replace(/\s/g, "_")}`, title);
+  };
+
+  const handleCetakPDF = (e) => {
+    e.preventDefault();
+    if (!data || data.length === 0) return;
+
+    // HTML - print table
+    if (tableRef.current) {
+      const printWindow = window.open("", "_blank");
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${title}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h2 { margin-bottom: 5px; color: #333; }
+            .subtitle { color: #666; font-size: 14px; margin-bottom: 15px; }
+            table { border-collapse: collapse; width: 100%; font-size: 12px; }
+            th { background: #B47B5A; color: white; padding: 8px 6px; text-align: center; border: 1px solid #9C6141; }
+            td { padding: 6px; border: 1px solid #ddd; }
+            tr:nth-child(even) { background: #f8f9fa; }
+            tr:hover { background: #e3e8f0; }
+            .text-right { text-align: right; }
+            .text-center { text-align: center; }
+            .total-row { font-weight: bold; background: #FDF3E7 !important; }
+            @media print { body { margin: 10px; } }
+          </style>
+        </head>
+        <body>
+          <h2>${title}</h2>
+          <div class="subtitle">
+            ${fromDate ? `Dari: ${formatDate(fromDate)}` : ""}
+            ${toDate ? ` s/d ${formatDate(toDate)}` : ""}
+          </div>
+          ${tableRef.current.outerHTML}
+          <script>window.print();<\/script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
     }
   };
 
@@ -357,69 +364,69 @@ export default function ReportForm({
 
   const colors = colorMap[accentColor] || colorMap.blue;
 
+  const historyTitleMap = {
+    simpanan: "History Laporan Simpanan Terbaru",
+    penarikan: "History Laporan Penarikan Terbaru",
+    pinjaman: "History Laporan Pinjaman Terbaru",
+    pembayaran: "History Laporan Pembayaran Terbaru",
+    tunggakan: "History Laporan Tunggakan Terbaru",
+  };
+
+  const historyTitle = historyTitleMap[type] || "History Laporan Terbaru";
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
       {/* Report Form Card */}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-slate-50 rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
         {/* Header */}
-        <div
-          className={`px-6 py-4 ${colors.headerBg} border-b ${colors.headerBorder}`}
-        >
-          <h1
-            className={`text-lg font-semibold ${colors.headerText} flex items-center gap-2`}
-          >
+        <div className="px-6 py-4 border-b" style={{ backgroundColor: "#B47B5A" }}>
+          <h1 className="text-lg font-semibold text-white flex items-center gap-2">
             <FileText className="w-5 h-5" />
             {title}
           </h1>
         </div>
 
         {/* Form Body */}
-        <form className="p-6" onSubmit={handleLihat}>
-          <div className="space-y-5">
+        <form className="p-6 sm:p-8" onSubmit={handleLihat}>
+          <div className="grid gap-5 xl:grid-cols-4">
             {/* Dari Tanggal */}
             {showDariTanggal && (
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-600">
                   {showSampaiTanggal ? "Dari Tanggal" : tanggalLabel}
                 </label>
-                <div className="relative flex-1 max-w-xs">
-                  <input
-                    type="date"
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white"
-                  />
-                </div>
+                <input
+                  type="date"
+                  value={fromDate}
+                  onChange={(e) => setFromDate(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white"
+                />
               </div>
             )}
 
             {/* Sampai Tanggal */}
             {showSampaiTanggal && (
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-600">
                   Sampai Tanggal
                 </label>
-                <div className="relative flex-1 max-w-xs">
-                  <input
-                    type="date"
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white"
-                  />
-                </div>
+                <input
+                  type="date"
+                  value={toDate}
+                  onChange={(e) => setToDate(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white"
+                />
               </div>
             )}
 
             {/* Nama Anggota */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-                Nama Anggota
-              </label>
-              <div className="relative flex-1 max-w-md">
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-600">Nama Anggota</label>
+              <div className="relative">
                 <select
                   value={anggotaId}
                   onChange={(e) => setAnggotaId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white appearance-none pr-10"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white appearance-none pr-10"
                 >
                   <option value="">Semua Data Anggota Aktif...</option>
                   {anggotaList.map((a) => (
@@ -428,21 +435,19 @@ export default function ReportForm({
                     </option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               </div>
             </div>
 
             {/* Jenis Simpanan (only for simpanan) */}
             {showJenisSimpanan && (
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-                  Jenis Simpanan
-                </label>
-                <div className="relative flex-1 max-w-md">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-600">Jenis Simpanan</label>
+                <div className="relative">
                   <select
                     value={jenisSimpanan}
                     onChange={(e) => setJenisSimpanan(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white appearance-none pr-10"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white appearance-none pr-10"
                   >
                     <option value="">Semua Data ...</option>
                     {jenisSimpananList.map((j) => (
@@ -451,22 +456,20 @@ export default function ReportForm({
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
               </div>
             )}
 
             {/* Perusahaan */}
             {showPerusahaan && (
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-                  Perusahaan
-                </label>
-                <div className="relative flex-1 max-w-md">
+              <div className="space-y-2">
+                <label className="text-sm font-semibold text-slate-600">Perusahaan</label>
+                <div className="relative">
                   <select
                     value={perusahaan}
                     onChange={(e) => setPerusahaan(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white appearance-none pr-10"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white appearance-none pr-10"
                   >
                     <option value="">Semua Data ...</option>
                     {perusahaanList.map((p, i) => (
@@ -475,78 +478,53 @@ export default function ReportForm({
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 </div>
               </div>
             )}
 
-            {/* Divider */}
-            <hr className="border-gray-200" />
 
-            {/* Output Format */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-              <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-                Output
-              </label>
-              <div className="flex flex-col gap-2">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="output"
-                    value="html"
-                    checked={outputFormat === "html"}
-                    onChange={(e) => setOutputFormat(e.target.value)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700 font-medium">
-                    HTML
-                  </span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="output"
-                    value="excel"
-                    checked={outputFormat === "excel"}
-                    onChange={(e) => setOutputFormat(e.target.value)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-700 font-medium">
-                    EXCEL
-                  </span>
-                </label>
-              </div>
-            </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-center gap-3 mt-8 pt-6 border-t border-gray-100">
+          <div className="flex flex-col md:flex-row items-center justify-end gap-3 mt-8 pt-4 border-t border-slate-200">
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-3 text-white text-sm font-semibold rounded-2xl hover:opacity-90 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+              style={{ backgroundColor: "#B47B5A" }}
             >
               <Search className="w-4 h-4" />
-              {loading ? "Memuat..." : "Lihat"}
+              {loading ? "Memuat..." : "LIHAT"}
             </button>
 
             <button
               type="button"
               onClick={handleRefresh}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white text-sm font-semibold rounded-lg hover:bg-red-600 transition-all shadow-sm active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-500 text-white text-sm font-semibold rounded-2xl hover:bg-slate-600 transition-all shadow-sm active:scale-95"
             >
               <RefreshCw className="w-4 h-4" />
-              Refresh
+              REFRESH
             </button>
 
             <button
               type="button"
-              onClick={handleCetak}
+              onClick={handleCetakExcel}
               disabled={!data || data.length === 0}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-500 text-white text-sm font-semibold rounded-lg hover:bg-sky-600 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white text-sm font-semibold rounded-2xl hover:bg-emerald-700 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Download className="w-4 h-4" />
+              CETAK EXCEL
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCetakPDF}
+              disabled={!data || data.length === 0}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white text-sm font-semibold rounded-2xl hover:bg-red-700 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Printer className="w-4 h-4" />
-              Cetak
+              CETAK PDF
             </button>
           </div>
         </form>
@@ -561,15 +539,11 @@ export default function ReportForm({
 
       {/* Data Table */}
       {data && (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-          <div
-            className={`px-6 py-4 ${colors.headerBg} border-b ${colors.headerBorder}`}
-          >
-            <h3
-              className={`font-semibold ${colors.headerText} flex items-center gap-2 text-sm`}
-            >
-              Data Detail
-              <span className="text-xs font-normal text-gray-500">
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+          <div className="px-6 py-4 border-b" style={{ backgroundColor: "#B47B5A" }}>
+            <h3 className="font-semibold text-white flex items-center gap-2 text-sm">
+              {historyTitle}
+              <span className="text-xs font-normal text-white/80">
                 ({data.length} data)
               </span>
             </h3>
@@ -636,9 +610,7 @@ export default function ReportForm({
                     ))}
 
                     {/* Total Row */}
-                    <tr
-                      className={`${colors.lightBg} font-bold border-t-2 border-gray-200`}
-                    >
+                          <tr className="bg-slate-50 font-bold border-t-2 border-slate-200">
                       {columns.map((col, colIdx) => {
                         if (col.key === "no") {
                           return (

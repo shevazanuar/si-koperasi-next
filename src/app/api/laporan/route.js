@@ -48,7 +48,7 @@ export async function GET(request) {
           AND (${anggotaId}      IS NULL OR s.anggota_id       = ${anggotaId})
           AND (${jenisSimpananId} IS NULL OR s.jenis_simpanan_id = ${jenisSimpananId})
           AND (${perusahaan}     IS NULL OR a.perusahaan       = ${perusahaan})
-        ORDER BY s.nomor ASC
+        ORDER BY s.tgl DESC, s.nomor DESC
       `;
       data = normalizeRows(raw).map((r) => ({ ...r, jumlah: Number(r.jumlah) }));
 
