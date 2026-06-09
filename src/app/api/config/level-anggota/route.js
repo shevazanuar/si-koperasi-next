@@ -13,11 +13,14 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
+    const last = await prisma.level_anggota.findFirst({ orderBy: { id: "desc" } });
+    const newId = last && last.id ? last.id + 1 : 1;
     const data = await prisma.level_anggota.create({
-      data: { nama: body.nama, insert_date: new Date() },
+      data: { id: newId, nama: body.nama, insert_date: new Date() },
     });
     return NextResponse.json({ message: "Data berhasil ditambahkan", data });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: "Gagal menyimpan data" }, { status: 500 });
   }
 }

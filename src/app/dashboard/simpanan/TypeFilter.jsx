@@ -3,6 +3,7 @@
 import { Filter } from "lucide-react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTransition } from "react";
+import CustomSelect from "@/components/CustomSelect";
 
 export default function TypeFilter({ types }) {
   const router = useRouter();
@@ -25,21 +26,24 @@ export default function TypeFilter({ types }) {
     });
   };
 
+  const options = [
+    { value: "", label: "Semua Jenis" },
+    ...types.map(t => ({ value: t.id.toString(), label: t.nama }))
+  ];
+
   return (
-    <div className={`flex items-center gap-2 p-1 bg-gray-50/50 border border-gray-100 rounded-xl transition-all ${isPending ? 'opacity-50' : 'opacity-100'}`}>
-      <div className="pl-2">
-        <Filter className="w-3 h-3 text-gray-400" />
+    <div className={`flex items-center p-1 pl-3 bg-white border border-gray-200 rounded-xl transition-all shadow-sm hover:shadow-md hover:border-blue-200 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
+      <div className="flex items-center gap-2 border-r border-gray-100 pr-2">
+        <Filter className="w-4 h-4 text-blue-500" />
+        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Filter</span>
       </div>
-      <select
+      <CustomSelect 
+        options={options}
         value={currentType}
-        onChange={(e) => handleChange(e.target.value)}
-        className="bg-transparent border-none text-xs font-bold text-gray-600 focus:ring-0 cursor-pointer pr-8"
-      >
-        <option value="">Semua Jenis</option>
-        {types.map((t) => (
-          <option key={t.id} value={t.id}>{t.nama}</option>
-        ))}
-      </select>
+        onChange={handleChange}
+        placeholder="Semua Jenis"
+        className="w-44"
+      />
     </div>
   );
 }

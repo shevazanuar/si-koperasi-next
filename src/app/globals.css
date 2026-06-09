@@ -65,6 +65,39 @@ body {
   input, select, textarea {
     color: #000000 !important;
   }
+  
+  /* Custom modern styling for select elements */
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C4813C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.2em;
+    padding-right: 2.5rem !important;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 0.75rem;
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+  }
+  
+  /* Warm earthy focus ring instead of default blue */
+  select:focus, input:focus, textarea:focus {
+    outline: none !important;
+    border-color: var(--color-blue-400) !important;
+    box-shadow: 0 0 0 4px rgba(196, 129, 60, 0.15) !important;
+  }
+
+  /* Style the options slightly where browser allows */
+  select option {
+    background-color: #ffffff;
+    color: #31271D;
+    padding: 12px;
+    font-weight: 500;
+  }
+
   input::placeholder, textarea::placeholder {
     color: #000000 !important;
     opacity: 0.6 !important;

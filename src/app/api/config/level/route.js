@@ -13,9 +13,12 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const level = await prisma.level.create({ data: { level: body.level, akses: "" } });
+    const last = await prisma.level.findFirst({ orderBy: { id: "desc" } });
+    const newId = last && last.id ? last.id + 1 : 1;
+    const level = await prisma.level.create({ data: { id: newId, level: body.level, akses: "" } });
     return NextResponse.json({ message: "Data berhasil ditambahkan", data: level });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: "Gagal menyimpan data" }, { status: 500 });
   }
 }

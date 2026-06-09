@@ -24,8 +24,11 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { level_anggota_id, jenis_simpanan_id, jumlah } = body;
+    const last = await prisma.level_simpanan.findFirst({ orderBy: { id: "desc" } });
+    const newId = last && last.id ? last.id + 1 : 1;
     const data = await prisma.level_simpanan.create({
       data: {
+        id: newId,
         level_anggota_id: parseInt(level_anggota_id),
         jenis_simpanan_id: parseInt(jenis_simpanan_id),
         jumlah: parseInt(jumlah) || 0,
@@ -34,6 +37,7 @@ export async function POST(request) {
     });
     return NextResponse.json({ message: "Data berhasil ditambahkan", data });
   } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: "Gagal menyimpan data" }, { status: 500 });
   }
 }

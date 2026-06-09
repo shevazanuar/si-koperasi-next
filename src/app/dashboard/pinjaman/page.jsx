@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import LimitFilter from "@/components/dashboard/LimitFilter";
+import { TypeFilter } from "./Filters";
 
 export default async function PinjamanPage({ searchParams }) {
   const user = await getSession();
@@ -11,6 +12,7 @@ export default async function PinjamanPage({ searchParams }) {
 
   const params = await searchParams;
   const query = params?.q || "";
+  const typeFilter = params?.type || "";
   const limit = parseInt(params?.limit) || 20;
   const safeLimit = [20, 40, 80, 120].includes(limit) ? limit : 20;
 
@@ -28,6 +30,11 @@ export default async function PinjamanPage({ searchParams }) {
     sqlParams.push(`%${query}%`, `%${query}%`, `%${query}%`);
   }
 
+  if (typeFilter) {
+    where += ` AND ph.jenis_pinjaman_id = ?`;
+    sqlParams.push(parseInt(typeFilter));
+  }
+
   // Main query: JOIN pinjaman_header, anggota, jenis_pinjaman, kategori_pinjaman
   // Calculate jumlah_bayar (total paid), jumlah_cicilan (count paid), sisa (remaining)
   const sql = `
@@ -42,23 +49,42 @@ export default async function PinjamanPage({ searchParams }) {
       a.nik,
       a.nama AS nama_anggota,
       kp.kategpinj_kode AS kategori,
+      jp.nama AS judul_pinjaman,
       COALESCE(SUM(pd.jumlah_bayar), 0) AS jumlah_bayar,
       COALESCE(COUNT(CASE WHEN pd.jumlah_bayar > 0 THEN 1 END), 0) AS jumlah_cicilan,
       (ph.jumlah - COALESCE(SUM(pd.jumlah_bayar), 0)) AS sisa
     FROM pinjaman_header ph
     JOIN anggota a ON ph.anggota_id = a.id
     LEFT JOIN kategori_pinjaman kp ON ph.kategpinj_id = kp.kategpinj_id
+    LEFT JOIN jenis_pinjaman jp ON ph.jenis_pinjaman_id = jp.id
     LEFT JOIN pinjaman_detail pd ON ph.id = pd.pinjaman_id
     ${where}
     GROUP BY ph.id, ph.nomor, ph.tgl, ph.lama, ph.satuan, ph.bunga, ph.jumlah,
-             a.nik, a.nama, kp.kategpinj_kode
+             a.nik, a.nama, kp.kategpinj_kode, jp.nama
     ORDER BY ph.tgl DESC
     LIMIT ?
   `;
 
   sqlParams.push(safeLimit);
 
+  const jenisRawSql = user.role === "anggota"
+    ? `SELECT DISTINCT jp.id, jp.nama 
+       FROM jenis_pinjaman jp 
+       JOIN pinjaman_header ph ON jp.id = ph.jenis_pinjaman_id 
+       WHERE ph.anggota_id = ? 
+       ORDER BY jp.id ASC`
+    : `SELECT id, nama FROM jenis_pinjaman ORDER BY id ASC`;
+
+  const jenisRawParams = user.role === "anggota" ? [user.id] : [];
+  
+  const jenisRaw = await prisma.$queryRawUnsafe(jenisRawSql, ...jenisRawParams);
+
   const raw = await prisma.$queryRawUnsafe(sql, ...sqlParams);
+
+  const jenisTypes = jenisRaw.map(j => ({
+    ...j,
+    id: typeof j.id === "bigint" ? Number(j.id) : j.id,
+  }));
 
   const data = raw.map((r, index) => ({
     ...r,
@@ -94,23 +120,29 @@ export default async function PinjamanPage({ searchParams }) {
       </div>
 
       {/* Table Card */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
 
         {/* Toolbar */}
-        <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50">
+        <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50 rounded-t-2xl">
           <div className="flex items-center gap-4">
             <LimitFilter />
           </div>
           <div className="flex items-center gap-4">
-            <form method="GET" className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                name="q"
-                defaultValue={query}
-                placeholder="Cari nomor / nama / NIK..."
-                className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all w-72"
-              />
-            </form>
+            {user.role !== "anggota" && (
+              <form method="GET" className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  name="q"
+                  defaultValue={query}
+                  placeholder="Cari nomor / nama / NIK..."
+                  className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all w-72"
+                />
+                {typeFilter && <input type="hidden" name="type" value={typeFilter} />}
+              </form>
+            )}
+            
+            <TypeFilter types={jenisTypes} />
+
             <div className="text-xs text-gray-400 font-bold uppercase tracking-widest">
               {data.length} Record
             </div>
@@ -122,11 +154,11 @@ export default async function PinjamanPage({ searchParams }) {
           <table className="w-full text-sm text-left border-collapse">
             <thead>
               <tr className="bg-gray-50 text-gray-500 text-[11px] uppercase font-bold tracking-wider border-b border-gray-200">
-                <th className="py-3 px-4 text-center">No</th>
                 <th className="py-3 px-4">Nomor</th>
                 <th className="py-3 px-4">Tanggal</th>
                 <th className="py-3 px-4">NIK</th>
                 <th className="py-3 px-4">Nama</th>
+                <th className="py-3 px-4">Judul Pinjaman</th>
                 <th className="py-3 px-4 text-center">Kategori</th>
                 <th className="py-3 px-4 text-right">Sisa</th>
                 <th className="py-3 px-4 text-center">Status</th>
@@ -136,13 +168,17 @@ export default async function PinjamanPage({ searchParams }) {
             <tbody className="divide-y divide-gray-100">
               {data.map((item) => (
                 <tr key={item.id} className="hover:bg-blue-50/30 transition-colors group">
-                  <td className="py-3 px-4 text-center text-gray-400 font-medium">{item.no}</td>
                   <td className="py-3 px-4 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">{item.nomor}</td>
                   <td className="py-3 px-4 text-gray-600 whitespace-nowrap text-xs">
                     {new Date(item.tgl).toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/\//g, "-")}
                   </td>
                   <td className="py-3 px-4 font-mono text-gray-500 text-xs whitespace-nowrap">{item.nik}</td>
                   <td className="py-3 px-4 font-semibold text-gray-800 whitespace-nowrap">{item.nama_anggota}</td>
+                  <td className="py-3 px-4">
+                    <span className="px-2 py-1 rounded bg-orange-50 text-orange-700 border border-orange-100 text-[11px] font-bold whitespace-nowrap">
+                      {item.judul_pinjaman || "-"}
+                    </span>
+                  </td>
                   <td className="py-3 px-4 text-center">
                     {item.kategori ? (
                       <span className="px-2 py-0.5 rounded bg-orange-50 text-orange-700 border border-orange-100 text-[10px] font-bold">

@@ -2,6 +2,8 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useTransition } from "react";
+import { Layers } from "lucide-react";
+import CustomSelect from "@/components/CustomSelect";
 
 export default function LimitFilter() {
   const router = useRouter();
@@ -24,20 +26,25 @@ export default function LimitFilter() {
     });
   };
 
+  const options = [
+    { value: "20", label: "20 Data" },
+    { value: "40", label: "40 Data" },
+    { value: "80", label: "80 Data" },
+    { value: "120", label: "120 Data" },
+  ];
+
   return (
-    <div className={`flex items-center gap-2 text-sm text-gray-500 font-medium ${isPending ? 'opacity-50' : 'opacity-100'}`}>
-      <span>Display</span>
-      <select
+    <div className={`flex items-center p-1 pl-3 bg-white border border-gray-200 rounded-xl transition-all shadow-sm hover:shadow-md hover:border-blue-200 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
+      <div className="flex items-center gap-2 border-r border-gray-100 pr-2">
+        <Layers className="w-4 h-4 text-blue-500" />
+        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Tampilkan</span>
+      </div>
+      <CustomSelect 
+        options={options}
         value={currentLimit}
-        onChange={(e) => handleChange(e.target.value)}
-        className="border border-gray-200 rounded-lg px-2 py-1 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-gray-700 font-semibold"
-      >
-        <option value="20">20</option>
-        <option value="40">40</option>
-        <option value="80">80</option>
-        <option value="120">120</option>
-      </select>
-      <span>records</span>
+        onChange={handleChange}
+        className="w-28"
+      />
     </div>
   );
 }
