@@ -187,6 +187,12 @@ const menuItems = [
         icon: Receipt,
         dbId: null,
       },
+      {
+        name: "Biaya Operasional",
+        href: "/dashboard/biaya",
+        icon: Wallet,
+        dbId: null,
+      },
     ],
   },
   {

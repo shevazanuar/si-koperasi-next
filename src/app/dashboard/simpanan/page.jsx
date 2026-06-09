@@ -40,8 +40,8 @@ export default async function SimpananPage({ searchParams }) {
     SELECT
       s.id,
       s.nomor,
-      s.tgl,
-      s.tgl_akhir,
+      CAST(s.tgl AS CHAR) AS tgl,
+      CAST(s.tgl_akhir AS CHAR) AS tgl_akhir,
       s.jumlah,
       s.jenis AS jenis_transaksi,
       s.entry,
@@ -78,6 +78,31 @@ export default async function SimpananPage({ searchParams }) {
 
   const fmt = (n) => new Intl.NumberFormat("id-ID").format(n);
 
+  // Summary Query
+  let summaryJoinCondition = "";
+  const summaryParams = [];
+  if (user.role === "anggota") {
+    summaryJoinCondition = "AND s.anggota_id = ?";
+    summaryParams.push(user.id);
+  }
+
+  const summarySql = `
+    SELECT 
+      js.nama AS jenis_nama,
+      COALESCE(SUM(CASE WHEN s.jenis = 'S' THEN s.jumlah ELSE 0 END) - 
+      SUM(CASE WHEN s.jenis = 'T' THEN s.jumlah ELSE 0 END), 0) AS total_saldo
+    FROM jenis_simpanan js
+    LEFT JOIN simpanan s ON s.jenis_simpanan_id = js.id ${summaryJoinCondition}
+    GROUP BY js.id, js.nama
+  `;
+  const summaryRaw = await prisma.$queryRawUnsafe(summarySql, ...summaryParams);
+  
+  const summaries = summaryRaw.map(s => ({
+    jenis_nama: s.jenis_nama,
+    total_saldo: Number(s.total_saldo)
+  }));
+  const totalAll = summaries.reduce((acc, curr) => acc + curr.total_saldo, 0);
+
   return (
     <div className="space-y-4 animate-in fade-in duration-500 pb-20">
 
@@ -97,6 +122,40 @@ export default async function SimpananPage({ searchParams }) {
             Tambah
           </Link>
         </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Keseluruhan */}
+        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/30 relative overflow-hidden">
+          <div className="relative z-10">
+            <div className="flex justify-between items-start mb-4">
+              <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm">
+                <Wallet className="w-5 h-5 text-white" />
+              </div>
+            </div>
+            <div>
+              <p className="text-blue-100 text-sm font-medium mb-1">Total Keseluruhan</p>
+              <h3 className="text-2xl font-black">Rp {fmt(totalAll)}</h3>
+            </div>
+          </div>
+          <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+        </div>
+
+        {/* Breakdown */}
+        {summaries.map((s, idx) => (
+          <div key={idx} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm relative overflow-hidden group hover:border-blue-100 hover:shadow-md transition-all">
+            <div className="flex justify-between items-start mb-4">
+              <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <Wallet className="w-5 h-5" />
+              </div>
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm font-medium mb-1">{s.jenis_nama}</p>
+              <h3 className="text-xl font-black text-gray-900">Rp {fmt(s.total_saldo)}</h3>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Table Card */}
@@ -148,7 +207,9 @@ export default async function SimpananPage({ searchParams }) {
                   <td className="py-3 px-4 text-center text-gray-400 font-medium">{item.no}</td>
                   <td className="py-3 px-4 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">{item.nomor || "-"}</td>
                   <td className="py-3 px-4 text-gray-600 text-xs whitespace-nowrap">
-                    {new Date(item.tgl).toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/\//g, "-")}
+                    {item.tgl && !item.tgl.startsWith("0000") 
+                      ? new Date(item.tgl).toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/\//g, "-")
+                      : "-"}
                   </td>
                   <td className="py-3 px-4 font-mono text-gray-500 text-xs whitespace-nowrap">{item.nik}</td>
                   <td className="py-3 px-4 font-semibold text-gray-800 whitespace-nowrap">{item.nama_anggota}</td>

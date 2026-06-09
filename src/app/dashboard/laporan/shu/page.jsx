@@ -10,6 +10,8 @@ export default function LaporanSHUPage() {
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({ tgl1: "", tgl2: "", anggota_id: "" });
 
+  const [summaryData, setSummaryData] = useState({ totalPendapatan: 0, totalBiayaOperasional: 0 });
+
   const fetchData = async () => {
     setLoading(true);
     const params = new URLSearchParams();
@@ -20,6 +22,10 @@ export default function LaporanSHUPage() {
     const json = await res.json();
     setData(json.data || []);
     setAnggotaList(json.anggotaList || []);
+    setSummaryData({
+      totalPendapatan: json.totalPendapatan || 0,
+      totalBiayaOperasional: json.totalBiayaOperasional || 0
+    });
     setLoading(false);
   };
 
@@ -71,23 +77,25 @@ export default function LaporanSHUPage() {
         </button>
       </div>
 
-      {/* Summary cards */}
-      {data.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
-            <p className="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Total Pinjaman</p>
-            <p className="text-xl font-black text-blue-700">Rp {fmt(totalJumlah)}</p>
-          </div>
-          <div className="bg-orange-50 rounded-2xl p-5 border border-orange-100">
-            <p className="text-xs font-bold text-orange-500 uppercase tracking-wider mb-1">Total Bunga (SHU)</p>
-            <p className="text-xl font-black text-orange-700">Rp {fmt(totalBunga)}</p>
-          </div>
-          <div className="bg-purple-50 rounded-2xl p-5 border border-purple-100">
-            <p className="text-xs font-bold text-purple-500 uppercase tracking-wider mb-1">Jumlah Transaksi</p>
-            <p className="text-xl font-black text-purple-700">{data.length} Pinjaman</p>
-          </div>
+      {/* Summary cards for SHU */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
+          <p className="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Total Bunga (Referal)</p>
+          <p className="text-xl font-black text-blue-700">Rp {fmt(totalBunga)}</p>
         </div>
-      )}
+        <div className="bg-green-50 rounded-2xl p-5 border border-green-100">
+          <p className="text-xs font-bold text-green-500 uppercase tracking-wider mb-1">Total Pendapatan</p>
+          <p className="text-xl font-black text-green-700">Rp {fmt(summaryData.totalPendapatan)}</p>
+        </div>
+        <div className="bg-red-50 rounded-2xl p-5 border border-red-100">
+          <p className="text-xs font-bold text-red-500 uppercase tracking-wider mb-1">Total Biaya Operasional</p>
+          <p className="text-xl font-black text-red-700">Rp {fmt(summaryData.totalBiayaOperasional)}</p>
+        </div>
+        <div className="bg-purple-50 rounded-2xl p-5 border border-purple-100">
+          <p className="text-xs font-bold text-purple-500 uppercase tracking-wider mb-1">Sisa Hasil Usaha (SHU)</p>
+          <p className="text-xl font-black text-purple-700">Rp {fmt(summaryData.totalPendapatan - summaryData.totalBiayaOperasional)}</p>
+        </div>
+      </div>
 
       {/* Table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">

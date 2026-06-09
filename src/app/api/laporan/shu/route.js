@@ -54,7 +54,35 @@ export async function GET(request) {
       orderBy: { nama: "asc" },
     });
 
-    return NextResponse.json({ data, anggotaList: anggotaForFilter });
+    // --- NEW LOGIC FOR SHU = PENDAPATAN - BIAYA OPR ---
+    // Calculate Total Pendapatan based on date filter
+    const wherePendapatan = {};
+    if (tgl1 && tgl2) {
+      wherePendapatan.tanggal_laporan = { gte: new Date(tgl1), lte: new Date(tgl2) };
+    }
+    const aggregatePendapatan = await prisma.pendapatan.aggregate({
+      where: wherePendapatan,
+      _sum: { nominal: true }
+    });
+    const totalPendapatanLainnya = parseFloat(aggregatePendapatan._sum.nominal || 0);
+
+    // Calculate Total Biaya Operasional based on date filter
+    const whereBiaya = {};
+    if (tgl1 && tgl2) {
+      whereBiaya.tanggal = { gte: new Date(tgl1), lte: new Date(tgl2) };
+    }
+    const aggregateBiaya = await prisma.biaya_opr.aggregate({
+      where: whereBiaya,
+      _sum: { nominal: true }
+    });
+    const totalBiayaOperasional = parseFloat(aggregateBiaya._sum.nominal || 0);
+
+    return NextResponse.json({ 
+      data, 
+      anggotaList: anggotaForFilter,
+      totalPendapatan: totalPendapatanLainnya,
+      totalBiayaOperasional
+    });
   } catch (error) {
     console.error("Laporan SHU Error:", error);
     return NextResponse.json({ error: "Gagal memuat data" }, { status: 500 });

@@ -129,6 +129,7 @@ export default async function PinjamanPage({ searchParams }) {
                 <th className="py-3 px-4">Nama</th>
                 <th className="py-3 px-4 text-center">Kategori</th>
                 <th className="py-3 px-4 text-right">Sisa</th>
+                <th className="py-3 px-4 text-center">Status</th>
                 <th className="py-3 px-4 text-center">Aksi</th>
               </tr>
             </thead>
@@ -153,6 +154,17 @@ export default async function PinjamanPage({ searchParams }) {
                     {fmt(item.sisa)}
                   </td>
                   <td className="py-3 px-4 text-center">
+                    {item.sisa > 0 ? (
+                      <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-bold whitespace-nowrap">
+                        Aktif
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded bg-green-50 text-green-700 border border-green-100 text-[10px] font-bold whitespace-nowrap">
+                        Lunas
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-3 px-4 text-center">
                     <div className="flex items-center justify-center gap-1">
                       <Link
                         href={`/dashboard/pinjaman/${item.id}`}
@@ -167,7 +179,7 @@ export default async function PinjamanPage({ searchParams }) {
 
               {data.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="py-20 text-center text-gray-400 text-sm">
+                  <td colSpan={9} className="py-20 text-center text-gray-400 text-sm">
                     Tidak ada data pinjaman ditemukan.
                   </td>
                 </tr>
