@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Save, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { showSuccess, showError, showAlert } from "@/lib/swal";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function TambahBiayaPage() {
   const router = useRouter();
@@ -16,16 +17,8 @@ export default function TambahBiayaPage() {
     keterangan: "",
   });
 
-  const formatRupiah = (val) => {
-    return val.replace(/[^0-9]/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
-
   const handleChange = (e) => {
-    if (e.target.name === "nominal") {
-      setFormData({ ...formData, nominal: formatRupiah(e.target.value) });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -42,7 +35,7 @@ export default function TambahBiayaPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          nominal: parseFloat(formData.nominal.replace(/\./g, "")),
+          nominal: parseFloat(formData.nominal),
         }),
       });
 
@@ -94,7 +87,7 @@ export default function TambahBiayaPage() {
               <label className="block text-sm font-bold text-gray-700 mb-2">Nominal (Rp) <span className="text-red-500">*</span></label>
               <div className="relative">
                 <span className="absolute left-4 top-3.5 text-gray-500 font-bold">Rp</span>
-                <input type="text" name="nominal" value={formData.nominal} onChange={handleChange} required placeholder="0"
+                <CurrencyInput value={formData.nominal} onChange={(val) => setFormData({ ...formData, nominal: val })} required placeholder="0"
                   className="w-full border border-gray-300 rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
               </div>
             </div>

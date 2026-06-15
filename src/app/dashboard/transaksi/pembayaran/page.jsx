@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { BadgeCheck, Search, Trash2, Save, X, CreditCard } from "lucide-react";
 import { showConfirm, showSuccess, showError } from "@/lib/swal";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 const fmt = (n) => new Intl.NumberFormat("id-ID").format(n || 0);
 
@@ -189,7 +190,7 @@ export default function PembayaranPage() {
                                 </div>
                                 <div>
                                   <label className="block text-xs font-semibold text-gray-500 mb-1">Jumlah Bayar (Rp)</label>
-                                  <input type="number" required value={payForm.jumlah_bayar} onChange={(e) => setPayForm({ ...payForm, jumlah_bayar: e.target.value })}
+                                  <CurrencyInput required value={payForm.jumlah_bayar} onChange={(val) => setPayForm({ ...payForm, jumlah_bayar: val })}
                                     className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none" />
                                 </div>
                                 <button type="submit" className="bg-emerald-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-emerald-700 text-sm font-medium">

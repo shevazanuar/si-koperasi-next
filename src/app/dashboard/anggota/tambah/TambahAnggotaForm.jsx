@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { createAnggota } from "../actions";
 import { User, IdCard, Phone, MapPin, Calendar, Save, Loader2, Briefcase, Users } from "lucide-react";
 import Link from "next/link";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function TambahAnggotaForm({ levelList, perusahaanList }) {
   const [state, formAction, isPending] = useActionState(createAnggota, null);
@@ -222,9 +223,8 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-semibold text-gray-700 ml-1">Gaji Dasar</label>
-                        <input
+                        <CurrencyInput
                           name="gaji"
-                          type="number"
                           placeholder="0"
                           className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                         />
@@ -249,6 +249,14 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
                           defaultValue={new Date().toISOString().split('T')[0]}
                           className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                           required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700 ml-1">Nominal Simpanan Wajib / Bulan</label>
+                        <CurrencyInput
+                          name="simpanan_wajib_per_bulan"
+                          placeholder="Kosongkan jika standar"
+                          className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                         />
                       </div>
                   </div>

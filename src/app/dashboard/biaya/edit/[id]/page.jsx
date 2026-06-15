@@ -4,6 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Save, ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { showSuccess, showError, showAlert } from "@/lib/swal";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function EditBiayaPage() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function EditBiayaPage() {
           setFormData({
             kode_biaya: d.kode_biaya,
             nama_biaya: d.nama_biaya,
-            nominal: d.nominal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, "."),
+            nominal: d.nominal,
             tanggal: new Date(d.tanggal).toISOString().slice(0, 10),
             keterangan: d.keterangan || "",
           });
@@ -47,16 +48,8 @@ export default function EditBiayaPage() {
     if (id) fetchDetail();
   }, [id, router]);
 
-  const formatRupiah = (val) => {
-    return val.replace(/[^0-9]/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
-
   const handleChange = (e) => {
-    if (e.target.name === "nominal") {
-      setFormData({ ...formData, nominal: formatRupiah(e.target.value) });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -73,7 +66,7 @@ export default function EditBiayaPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          nominal: parseFloat(formData.nominal.replace(/\./g, "")),
+          nominal: parseFloat(formData.nominal),
         }),
       });
 
@@ -129,7 +122,7 @@ export default function EditBiayaPage() {
               <label className="block text-sm font-bold text-gray-700 mb-2">Nominal (Rp) <span className="text-red-500">*</span></label>
               <div className="relative">
                 <span className="absolute left-4 top-3.5 text-gray-500 font-bold">Rp</span>
-                <input type="text" name="nominal" value={formData.nominal} onChange={handleChange} required placeholder="0"
+                <CurrencyInput value={formData.nominal} onChange={(val) => setFormData({ ...formData, nominal: val })} required placeholder="0"
                   className="w-full border border-gray-300 rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" />
               </div>
             </div>

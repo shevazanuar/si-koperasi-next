@@ -29,6 +29,7 @@ const anggotaSchema = z.object({
   jml_anak: z.string().optional(),
   tgl_masuk: z.string().optional(),
   status: z.string().optional(),
+  simpanan_wajib_per_bulan: z.string().optional(),
 });
 
 export async function createAnggota(prevState, formData) {
@@ -69,6 +70,7 @@ export async function createAnggota(prevState, formData) {
   const jml_anak = data.jml_anak;
   const tgl_masuk = data.tgl_masuk;
   const status = data.status;
+  const simpanan_wajib_per_bulan = data.simpanan_wajib_per_bulan;
 
   try {
     // Check if NIK already exists
@@ -93,12 +95,13 @@ export async function createAnggota(prevState, formData) {
         unit_seksi,
         jabatan,
         level_anggota_id: level_anggota_id ? parseInt(level_anggota_id) : null,
-        gaji: gaji ? parseInt(gaji) : null,
+        gaji: gaji && !isNaN(parseInt(gaji)) ? parseInt(gaji) : null,
         nama_pasangan,
-        jml_anak: jml_anak ? parseInt(jml_anak) : null,
+        jml_anak: jml_anak && !isNaN(parseInt(jml_anak)) ? parseInt(jml_anak) : null,
         status: status || "Aktif",
         pwd: await hashPassword(nik), // Default password is NIK (migrated to bcrypt)
         tgl_masuk: tgl_masuk ? new Date(tgl_masuk) : new Date(),
+        simpanan_wajib_per_bulan: simpanan_wajib_per_bulan && !isNaN(parseInt(simpanan_wajib_per_bulan)) ? parseInt(simpanan_wajib_per_bulan) : null,
         insert_date: new Date(),
       },
     });
@@ -152,6 +155,7 @@ export async function updateAnggota(id, prevState, formData) {
   const jml_anak = formData.get("jml_anak");
   const tgl_masuk = formData.get("tgl_masuk");
   const status = formData.get("status");
+  const simpanan_wajib_per_bulan = formData.get("simpanan_wajib_per_bulan");
 
   try {
     const before = await prisma.anggota.findUnique({ where: { id: parseInt(id) } });
@@ -173,11 +177,12 @@ export async function updateAnggota(id, prevState, formData) {
         unit_seksi,
         jabatan,
         level_anggota_id: level_anggota_id ? parseInt(level_anggota_id) : null,
-        gaji: gaji ? parseInt(gaji) : null,
+        gaji: (gaji && !isNaN(parseInt(gaji))) ? parseInt(gaji) : null,
         nama_pasangan,
-        jml_anak: jml_anak ? parseInt(jml_anak) : null,
+        jml_anak: (jml_anak && !isNaN(parseInt(jml_anak))) ? parseInt(jml_anak) : null,
         status: status || "Aktif",
         tgl_masuk: tgl_masuk ? new Date(tgl_masuk) : undefined,
+        simpanan_wajib_per_bulan: (simpanan_wajib_per_bulan && !isNaN(parseInt(simpanan_wajib_per_bulan))) ? parseInt(simpanan_wajib_per_bulan) : null,
         update_date: new Date(),
       },
     });

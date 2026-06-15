@@ -46,7 +46,7 @@ export default async function DashboardPage() {
       countSimpanan,
       countPenarikan,
       countPinjaman,
-      recentSimpanan,
+      recentSimpananRaw,
       profileData,
       informasiData,
     ] = await Promise.all([
@@ -54,17 +54,20 @@ export default async function DashboardPage() {
       prisma.simpanan.count({ where: { jenis: "S" } }),
       prisma.simpanan.count({ where: { jenis: "T" } }),
       prisma.pinjaman_header.count(),
-      prisma.simpanan.findMany({
-        take: 5,
-        orderBy: { tgl: "desc" },
-        select: { id: true, anggota_id: true, jumlah: true, tgl: true },
-      }),
+      prisma.$queryRawUnsafe(`SELECT id, anggota_id, jumlah, CAST(tgl AS CHAR) as tgl FROM simpanan ORDER BY tgl DESC LIMIT 5`),
       prisma.$queryRawUnsafe("SELECT * FROM profile WHERE id = 1 LIMIT 1"),
       prisma.informasi.findMany({
         orderBy: { id: "desc" },
         take: 20,
       }),
     ]);
+
+    const recentSimpanan = recentSimpananRaw.map(r => ({
+      id: Number(r.id),
+      anggota_id: Number(r.anggota_id),
+      jumlah: Number(r.jumlah),
+      tgl: r.tgl && !r.tgl.startsWith("0000") ? new Date(r.tgl) : new Date(),
+    }));
 
     stats.totalAnggota = totalAnggota;
     stats.totalSimpanan = countSimpanan;
@@ -105,7 +108,7 @@ export default async function DashboardPage() {
 
     chartData = await aggregateChartData();
   } else {
-    const [totalSimpanan, totalPinjaman, recentSimpanan, pengajuan] = await Promise.all([
+    const [totalSimpanan, totalPinjaman, recentSimpananRaw, pengajuan] = await Promise.all([
       prisma.simpanan.aggregate({
         where: { anggota_id: user.id },
         _sum: { jumlah: true },
@@ -114,17 +117,19 @@ export default async function DashboardPage() {
         where: { anggota_id: user.id },
         _sum: { jumlah: true },
       }),
-      prisma.simpanan.findMany({
-        where: { anggota_id: user.id },
-        take: 5,
-        orderBy: { tgl: "desc" },
-        select: { id: true, anggota_id: true, jumlah: true, tgl: true },
-      }),
+      prisma.$queryRawUnsafe(`SELECT id, anggota_id, jumlah, CAST(tgl AS CHAR) as tgl FROM simpanan WHERE anggota_id = ? ORDER BY tgl DESC LIMIT 5`, user.id),
       prisma.pengajuan_pinjaman.findFirst({
         where: { anggota_id: user.id },
         orderBy: { tanggal: "desc" },
       })
     ]);
+
+    const recentSimpanan = recentSimpananRaw.map(r => ({
+      id: Number(r.id),
+      anggota_id: Number(r.anggota_id),
+      jumlah: Number(r.jumlah),
+      tgl: r.tgl && !r.tgl.startsWith("0000") ? new Date(r.tgl) : new Date(),
+    }));
 
     stats.totalSimpanan = totalSimpanan._sum.jumlah || 0;
     stats.totalPinjaman = totalPinjaman._sum.jumlah || 0;

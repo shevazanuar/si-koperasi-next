@@ -4,11 +4,20 @@ import { useActionState } from "react";
 import { updateAnggota } from "../../actions";
 import { User, IdCard, Phone, MapPin, Calendar, Save, Loader2, Briefcase, Users } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
+import { showError } from "@/lib/swal";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function EditAnggotaForm({ data, levelList, perusahaanList }) {
   // Bind ID to the update action
   const updateAnggotaWithId = updateAnggota.bind(null, data.id);
   const [state, formAction, isPending] = useActionState(updateAnggotaWithId, null);
+
+  useEffect(() => {
+    if (state?.error) {
+      showError("Gagal Menyimpan", state.error);
+    }
+  }, [state?.error]);
 
   return (
     <form action={formAction} className="p-8 lg:p-12 space-y-8">
@@ -246,9 +255,8 @@ export default function EditAnggotaForm({ data, levelList, perusahaanList }) {
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-semibold text-gray-700 ml-1">Gaji Dasar</label>
-                        <input
+                        <CurrencyInput
                           name="gaji"
-                          type="number"
                           defaultValue={data.gaji || 0}
                           className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                         />
@@ -271,6 +279,15 @@ export default function EditAnggotaForm({ data, levelList, perusahaanList }) {
                           name="tgl_masuk"
                           type="date"
                           defaultValue={data.tgl_masuk ? new Date(data.tgl_masuk).toISOString().split('T')[0] : ""}
+                          className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-700 ml-1">Nominal Simpanan Wajib / Bulan</label>
+                        <CurrencyInput
+                          name="simpanan_wajib_per_bulan"
+                          defaultValue={data.simpanan_wajib_per_bulan || ""}
+                          placeholder="Kosongkan jika standar"
                           className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                         />
                       </div>

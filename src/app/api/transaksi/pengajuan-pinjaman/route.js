@@ -11,6 +11,9 @@ function clientIp(request) {
 const approveSchema = z.object({
   nomor: z.string().min(1, "Nomor pengajuan wajib diisi"),
   status: z.enum(["Acc", "Cancel"], { errorMap: () => ({ message: "Status harus Acc atau Cancel" }) }),
+  sumber_dana: z.string().optional(),
+  kas_id: z.coerce.number().int().optional().nullable(),
+  akun_bank_id: z.coerce.number().int().optional().nullable(),
 });
 
 export async function GET(request) {
@@ -74,7 +77,7 @@ export async function PUT(request) {
     if (!parsed.success)
       return NextResponse.json({ error: parsed.error.issues[0]?.message || "Input tidak valid" }, { status: 422 });
 
-    const { nomor, status } = parsed.data;
+    const { nomor, status, sumber_dana, kas_id, akun_bank_id } = parsed.data;
 
     // Ambil data pengajuan sebelum diubah
     const pengajuan = await prisma.pengajuan_pinjaman.findFirst({ where: { nomor } });
@@ -102,6 +105,22 @@ export async function PUT(request) {
           data: { status: "Acc", update_date: new Date() },
         });
 
+        if (sumber_dana === "Kas" && kas_id) {
+          const kas = await tx.kas.findUnique({ where: { id: kas_id } });
+          if (!kas || kas.saldo < Math.round(pengajuan.jumlah || 0)) throw new Error("Saldo Kas tidak mencukupi");
+          await tx.kas.update({
+            where: { id: kas_id },
+            data: { saldo: { decrement: Math.round(pengajuan.jumlah || 0) } }
+          });
+        } else if (sumber_dana === "Bank" && akun_bank_id) {
+          const bank = await tx.akun_bank.findUnique({ where: { id: akun_bank_id } });
+          if (!bank || bank.saldo < Math.round(pengajuan.jumlah || 0)) throw new Error("Saldo Bank tidak mencukupi");
+          await tx.akun_bank.update({
+            where: { id: akun_bank_id },
+            data: { saldo: { decrement: Math.round(pengajuan.jumlah || 0) } }
+          });
+        }
+
         // 2. Buat pinjaman header
         const newPinjaman = await tx.pinjaman_header.create({
           data: {
@@ -115,6 +134,10 @@ export async function PUT(request) {
             jumlah: Math.round(pengajuan.jumlah || 0),
             user_id: user.id,
             insert_date: new Date(),
+            sumber_dana,
+            kas_id,
+            akun_bank_id,
+            created_by: user.id
           },
         });
 

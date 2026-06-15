@@ -8,7 +8,7 @@ BigInt.prototype.toJSON = function () {
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const data = await prisma.biaya_opr.findUnique({
       where: { id: BigInt(id) },
@@ -27,7 +27,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
     const { kode_biaya, nama_biaya, nominal, tanggal, keterangan } = body;
 
@@ -73,7 +73,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
 
     const existing = await prisma.biaya_opr.findUnique({
       where: { id: BigInt(id) },

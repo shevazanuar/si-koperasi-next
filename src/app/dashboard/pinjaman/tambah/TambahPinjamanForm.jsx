@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { createPinjaman } from "../actions";
 import { CreditCard, User, Calendar, Save, Loader2, Clock, Percent, FileSearch } from "lucide-react";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
   const [state, formAction, isPending] = useActionState(createPinjaman, null);
@@ -83,9 +84,8 @@ export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 ml-1">Jumlah Pinjaman (Rp)</label>
-            <input
+            <CurrencyInput
               name="jumlah"
-              type="number"
               value={selectedType?.jumlah || ""}
               readOnly={!!selectedType}
               onChange={() => {}} // Controlled but read-only

@@ -15,10 +15,32 @@ export default async function EditAnggotaPage({ params }) {
     return notFound();
   }
 
+  // Check for auto-fill of simpanan_wajib_per_bulan if it is null
+  let autoFilledSimpananWajib = data.simpanan_wajib_per_bulan;
+  if (autoFilledSimpananWajib === null) {
+    const jenisWajib = await prisma.jenis_simpanan.findFirst({
+      where: { nama: { contains: "Wajib" } }
+    });
+    
+    if (jenisWajib) {
+      const lastSimpananWajib = await prisma.simpanan.findFirst({
+        where: { anggota_id: data.id, jenis_simpanan_id: jenisWajib.id },
+        orderBy: { tgl: 'desc' }
+      });
+      
+      if (lastSimpananWajib && lastSimpananWajib.jumlah) {
+        autoFilledSimpananWajib = lastSimpananWajib.jumlah;
+      } else {
+        autoFilledSimpananWajib = jenisWajib.jumlah;
+      }
+    }
+  }
+
   // Format date to YYYY-MM-DD for input
   const formattedData = {
     ...data,
-    tgl_lahir: data.tgl_lahir ? new Date(data.tgl_lahir).toISOString().split('T')[0] : ""
+    tgl_lahir: data.tgl_lahir ? new Date(data.tgl_lahir).toISOString().split('T')[0] : "",
+    simpanan_wajib_per_bulan: autoFilledSimpananWajib
   };
 
   const levelListRaw = await prisma.$queryRawUnsafe("SELECT id, nama FROM level_anggota ORDER BY id ASC");

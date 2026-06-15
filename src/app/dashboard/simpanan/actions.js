@@ -14,6 +14,9 @@ const simpananSchema = z.object({
   jenis_simpanan_id: z.coerce.number().int().positive("Jenis simpanan wajib dipilih"),
   jumlah: z.coerce.number().int().positive("Jumlah harus lebih dari 0"),
   tgl: z.string().min(1, "Tanggal wajib diisi"),
+  metode_pembayaran: z.string().optional(),
+  kas_id: z.coerce.number().int().optional().nullable(),
+  akun_bank_id: z.coerce.number().int().optional().nullable(),
 });
 
 async function generateSimpananNomor() {
@@ -43,6 +46,9 @@ export async function createSimpanan(prevState, formData) {
     jenis_simpanan_id: formData.get("jenis_simpanan_id"),
     jumlah: formData.get("jumlah"),
     tgl: formData.get("tgl") || new Date().toISOString().split("T")[0],
+    metode_pembayaran: formData.get("metode_pembayaran"),
+    kas_id: formData.get("kas_id") || null,
+    akun_bank_id: formData.get("akun_bank_id") || null,
   };
 
   const parsed = simpananSchema.safeParse(raw);
@@ -51,13 +57,26 @@ export async function createSimpanan(prevState, formData) {
     return { error: msg };
   }
 
-  const { anggota_id, jenis_simpanan_id, jumlah, tgl } = parsed.data;
+  const { anggota_id, jenis_simpanan_id, jumlah, tgl, metode_pembayaran, kas_id, akun_bank_id } = parsed.data;
 
   try {
     const nomor = await generateSimpananNomor();
 
     // ── Prisma transaction: atomic create + audit ─────────────────────────
     await prisma.$transaction(async (tx) => {
+      // Potong saldo/tambah saldo
+      if (metode_pembayaran === "Kas" && kas_id) {
+        await tx.kas.update({
+          where: { id: kas_id },
+          data: { saldo: { increment: jumlah } }
+        });
+      } else if (metode_pembayaran === "Bank" && akun_bank_id) {
+        await tx.akun_bank.update({
+          where: { id: akun_bank_id },
+          data: { saldo: { increment: jumlah } }
+        });
+      }
+
       const created = await tx.simpanan.create({
         data: {
           nomor,
@@ -70,6 +89,10 @@ export async function createSimpanan(prevState, formData) {
           insert_date: new Date(),
           entry: "I",
           jenis: "S",
+          metode_pembayaran,
+          kas_id,
+          akun_bank_id,
+          created_by: session.id
         },
       });
 

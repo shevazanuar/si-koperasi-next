@@ -8,50 +8,68 @@ export default function PengajuanPinjamanPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-
-  const fetchUser = async () => {
-    const res = await fetch("/api/auth/session"); // Assuming this exists or I'll create it
-    const json = await res.json();
-    setUser(json.user || null);
-  };
+  const [pendingCount, setPendingCount] = useState(0);
 
   const fetchData = async () => {
     setLoading(true);
-    await fetchUser();
+    
+    // Directly fetch session so we have the value immediately
+    const sessionRes = await fetch("/api/auth/session");
+    const sessionJson = await sessionRes.json();
+    const currentUser = sessionJson.user || null;
+    setUser(currentUser);
+
     const res = await fetch("/api/transaksi/pengajuan-pinjaman");
     const json = await res.json();
-    setData(json.data || []);
-    setLoading(false);
-  };
+    const historyData = (json.data || []).filter(item => {
+      if (currentUser?.role === "admin") return item.status === "Acc" || item.status === "Cancel";
+      return true; // Anggota melihat semua pengajuannya
+    });
+    setData(historyData);
 
-  useEffect(() => { fetchData(); }, []);
-
-  const handleStatus = async (nomor, status) => {
-    const isAcc = status === "Acc";
-    const label = isAcc ? "menyetujui" : "menolak";
-    const actionTitle = isAcc ? "Setujui Pengajuan?" : "Tolak Pengajuan?";
-    const actionText = isAcc 
-      ? `Apakah Anda yakin ingin menyetujui pengajuan pinjaman nomor ${nomor}?` 
-      : `Apakah Anda yakin ingin menolak pengajuan pinjaman nomor ${nomor}?`;
-    
-    const confirmed = await showConfirm(actionTitle, actionText, isAcc ? "Ya, Setujui" : "Ya, Tolak");
-    if (!confirmed) return;
-    try {
-      const res = await fetch("/api/transaksi/pengajuan-pinjaman", {
-        method: "PUT", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nomor, status }),
-      });
-      const json = await res.json();
-      if (res.ok) {
-        showSuccess("Berhasil", json.message || `Pengajuan pinjaman berhasil di-${label}`);
-        fetchData();
-      } else {
-        showError("Gagal", json.error || json.message || "Gagal memperbarui status pengajuan");
+    const fetchPendingCount = async () => {
+      if (currentUser?.role === "admin") {
+        try {
+          const countRes = await fetch("/api/transaksi/pengajuan-pinjaman/pending-count");
+          const countJson = await countRes.json();
+          setPendingCount(countJson.count || 0);
+        } catch (err) {}
       }
-    } catch (err) {
-      showError("Kesalahan", "Terjadi kesalahan koneksi server");
-    }
+    };
+
+    await fetchPendingCount();
+
+    setLoading(false);
+
+    // Listen for custom event when approval happens
+    const handleUpdate = () => fetchPendingCount();
+    window.addEventListener("pinjamanUpdated", handleUpdate);
+    
+    // Cleanup is tricky in an async fetchData inside a useEffect without a clean return,
+    // but we can attach it globally for the lifespan of the component.
+    // A better way is to move the event listener to the useEffect.
   };
+
+  useEffect(() => {
+    fetchData();
+
+    const handleUpdate = () => {
+      fetch("/api/transaksi/pengajuan-pinjaman/pending-count")
+        .then(res => res.json())
+        .then(data => setPendingCount(data.count || 0))
+        .catch(() => {});
+    };
+
+    window.addEventListener("pinjamanUpdated", handleUpdate);
+    const intervalId = setInterval(handleUpdate, 30000);
+
+    return () => {
+      window.removeEventListener("pinjamanUpdated", handleUpdate);
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  const handleStatus = async () => {}; // Moved to persetujuan page
 
   const statusBadge = (s) => {
     if (s === "Acc") return <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-50 text-emerald-700"><CheckCircle className="w-3 h-3" /> Disetujui</span>;
@@ -66,15 +84,23 @@ export default function PengajuanPinjamanPage() {
           <div className="bg-blue-600 p-2.5 rounded-xl text-white"><FileSearch className="w-5 h-5" /></div>
           <div>
             <h1 className="text-xl font-black text-gray-900">
-              {user?.role === "admin" ? "Pengajuan Pinjaman" : "Pengajuan Pinjaman Saya"}
+              {user?.role === "admin" ? "History Pengajuan Pinjaman" : "Pengajuan Pinjaman Saya"}
             </h1>
             <p className="text-sm text-gray-500">
               {user?.role === "admin" 
-                ? "Review dan approve pengajuan pinjaman anggota" 
+                ? "Riwayat seluruh pengajuan pinjaman" 
                 : "Pantau status pengajuan pinjaman Anda"}
             </p>
           </div>
         </div>
+        {user?.role === "admin" && (
+          <Link href="/dashboard/transaksi/pengajuan-pinjaman/persetujuan" className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all shadow-sm relative">
+            <Clock className="w-4 h-4" /> Persetujuan Pinjaman
+            {pendingCount > 0 && (
+               <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+            )}
+          </Link>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -118,16 +144,6 @@ export default function PengajuanPinjamanPage() {
                       <Link href={`/dashboard/transaksi/pengajuan-pinjaman/${item.id}`} className="p-1.5 hover:bg-blue-50 rounded-lg text-blue-600 transition" title="Detail">
                         <FileSearch className="w-5 h-5" />
                       </Link>
-                      {(!item.status || item.status === "Open") && user?.role === "admin" && (
-                        <>
-                          <button onClick={() => handleStatus(item.nomor, "Acc")} className="p-1.5 hover:bg-emerald-50 rounded-lg text-emerald-600 transition" title="Setujui">
-                            <CheckCircle className="w-5 h-5" />
-                          </button>
-                          <button onClick={() => handleStatus(item.nomor, "Cancel")} className="p-1.5 hover:bg-red-50 rounded-lg text-red-500 transition" title="Tolak">
-                            <XCircle className="w-5 h-5" />
-                          </button>
-                        </>
-                      )}
                     </div>
                   </td>
                 )}

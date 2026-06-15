@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Users,
@@ -196,6 +196,44 @@ const menuItems = [
     ],
   },
   {
+    name: "Keuangan",
+    icon: Landmark,
+    roles: ["admin"],
+    dbId: null,
+    children: [
+      {
+        name: "Manajemen Kas",
+        href: "/dashboard/kas",
+        icon: Wallet,
+        dbId: null,
+      },
+      {
+        name: "Akun Bank",
+        href: "/dashboard/akun-bank",
+        icon: CreditCard,
+        dbId: null,
+      },
+      {
+        name: "Mutasi Dana",
+        href: "/dashboard/mutasi",
+        icon: ArrowDownCircle,
+        dbId: null,
+      },
+      {
+        name: "Aset Lancar",
+        href: "/dashboard/aset-lancar",
+        icon: Receipt,
+        dbId: null,
+      },
+      {
+        name: "Aset Tetap",
+        href: "/dashboard/aset-tetap",
+        icon: Package,
+        dbId: null,
+      },
+    ],
+  },
+  {
     name: "Simpanan Saya",
     href: "/dashboard/simpanan",
     icon: Wallet,
@@ -292,6 +330,32 @@ const menuItems = [
 export default function Sidebar({ role = "admin", allowedMenuIds = null }) {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState({});
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    let intervalId;
+    const fetchPendingCount = () => {
+      if (role === "admin") {
+        fetch("/api/transaksi/pengajuan-pinjaman/pending-count")
+          .then((res) => res.json())
+          .then((data) => setPendingCount(data.count || 0))
+          .catch((err) => console.error(err));
+      }
+    };
+
+    fetchPendingCount();
+
+    // Listen for custom event when approval happens
+    window.addEventListener("pinjamanUpdated", fetchPendingCount);
+    
+    // Fallback polling every 30 seconds
+    intervalId = setInterval(fetchPendingCount, 30000);
+
+    return () => {
+      window.removeEventListener("pinjamanUpdated", fetchPendingCount);
+      clearInterval(intervalId);
+    };
+  }, [role]);
 
   // Set integer; null = tidak ada pembatasan (Super Admin / belum diset)
   const allowedSet = allowedMenuIds ? new Set(allowedMenuIds) : null;
@@ -387,7 +451,12 @@ export default function Sidebar({ role = "admin", allowedMenuIds = null }) {
                           <child.icon
                             className={`w-4 h-4 ${isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"}`}
                           />
-                          {child.name}
+                          <span className="flex-1">{child.name}</span>
+                          
+                          {child.name === "Pengajuan Pinjaman" && pendingCount > 0 && role === "admin" && (
+                            <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm shadow-red-500/50"></span>
+                          )}
+
                           {isActive && (
                             <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-600"></div>
                           )}

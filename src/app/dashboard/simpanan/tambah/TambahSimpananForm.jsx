@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { createSimpanan } from "../actions";
 import { Wallet, User, Calendar, Save, Loader2 } from "lucide-react";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function TambahSimpananForm({ anggota, jenisSimpanan, user }) {
   const [state, formAction, isPending] = useActionState(createSimpanan, null);
@@ -77,9 +78,8 @@ export default function TambahSimpananForm({ anggota, jenisSimpanan, user }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 ml-1">Jumlah (Rp)</label>
-            <input
+            <CurrencyInput
               name="jumlah"
-              type="number"
               placeholder="0"
               className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-bold text-lg"
               required

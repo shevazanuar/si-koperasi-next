@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { ArrowDownCircle, Search, Trash2, Save, X } from "lucide-react";
 import { showConfirm, showSuccess, showError } from "@/lib/swal";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function PenarikanPage() {
   const [anggotaList, setAnggotaList] = useState([]);
@@ -167,7 +168,7 @@ export default function PenarikanPage() {
                     </div>
                     {form.jenis_simpanan_id && <div className="bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-xl text-sm text-yellow-700">Saldo jenis ini: <strong>Rp {fmt(saldo)}</strong></div>}
                     <div><label className="block text-xs font-semibold text-gray-500 mb-1">Jumlah Penarikan (Rp)</label>
-                      <input type="number" required min="1" value={form.jumlah} onChange={(e) => setForm({ ...form, jumlah: e.target.value })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" /></div>
+                      <CurrencyInput required value={form.jumlah} onChange={(val) => setForm({ ...form, jumlah: val })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500" /></div>
                     <div className="flex gap-2">
                       <button type="submit" className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 text-sm font-medium"><Save className="w-4 h-4" /> Simpan</button>
                       <button type="button" onClick={() => setShowForm(false)} className="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl flex items-center gap-2 text-sm"><X className="w-4 h-4" /> Batal</button>
