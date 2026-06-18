@@ -13,7 +13,7 @@ export default async function KategoriProdukPage({ searchParams }) {
 
   const params = await searchParams;
   const query = params?.q || "";
-  const limit = parseInt(params?.limit) || 20;
+  const limit = parseInt(params?.limit) || 25;
 
   const kategori = await prisma.kategori_produk.findMany({
     where: {

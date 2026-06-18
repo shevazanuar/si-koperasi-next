@@ -12,8 +12,16 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Download,
+  Wallet,
+  CreditCard,
+  ArrowDownCircle,
+  Receipt,
+  AlertTriangle,
+  Layers,
+  Filter,
 } from "lucide-react";
 import { exportToExcel } from "@/lib/exportUtils";
+import CustomSelect from "@/components/CustomSelect";
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -188,6 +196,85 @@ function calculateTotal(data, col) {
 
 const LIMIT_OPTIONS = [25, 50, 100];
 
+const printHexMap = {
+  blue: { bg: "#2563eb", border: "#1d4ed8" },
+  green: { bg: "#059669", border: "#047857" },
+  orange: { bg: "#ea580c", border: "#c2410c" },
+  purple: { bg: "#9333ea", border: "#7e22ce" },
+  red: { bg: "#dc2626", border: "#b91c1c" },
+};
+
+const dynamicColorMap = {
+  blue: {
+    iconBg: "bg-blue-50",
+    iconText: "text-blue-600",
+    bg: "bg-blue-600",
+    hoverBg: "hover:bg-blue-700",
+    ring: "focus:ring-blue-500/20",
+    badgeText: "text-blue-700",
+    headerBg: "bg-blue-50",
+    headerBorder: "border-blue-200",
+    headerText: "text-blue-700",
+    lightBg: "bg-blue-50",
+  },
+  green: {
+    iconBg: "bg-emerald-50",
+    iconText: "text-emerald-600",
+    bg: "bg-emerald-600",
+    hoverBg: "hover:bg-emerald-700",
+    ring: "focus:ring-emerald-500/20",
+    badgeText: "text-emerald-700",
+    headerBg: "bg-emerald-50",
+    headerBorder: "border-emerald-200",
+    headerText: "text-emerald-700",
+    lightBg: "bg-emerald-50",
+  },
+  orange: {
+    iconBg: "bg-orange-50",
+    iconText: "text-orange-600",
+    bg: "bg-orange-600",
+    hoverBg: "hover:bg-orange-700",
+    ring: "focus:ring-orange-500/20",
+    badgeText: "text-orange-700",
+    headerBg: "bg-orange-50",
+    headerBorder: "border-orange-200",
+    headerText: "text-orange-700",
+    lightBg: "bg-orange-50",
+  },
+  red: {
+    iconBg: "bg-red-50",
+    iconText: "text-red-600",
+    bg: "bg-red-600",
+    hoverBg: "hover:bg-red-700",
+    ring: "focus:ring-red-500/20",
+    badgeText: "text-red-700",
+    headerBg: "bg-red-50",
+    headerBorder: "border-red-200",
+    headerText: "text-red-700",
+    lightBg: "bg-red-50",
+  },
+  purple: {
+    iconBg: "bg-purple-50",
+    iconText: "text-purple-600",
+    bg: "bg-purple-600",
+    hoverBg: "hover:bg-purple-700",
+    ring: "focus:ring-purple-500/20",
+    badgeText: "text-purple-700",
+    headerBg: "bg-purple-50",
+    headerBorder: "border-purple-200",
+    headerText: "text-purple-700",
+    lightBg: "bg-purple-50",
+  },
+};
+
+const dynamicIconMap = {
+  simpanan: Wallet,
+  penarikan: ArrowDownCircle,
+  pinjaman: CreditCard,
+  pembayaran: Receipt,
+  tunggakan: AlertTriangle,
+};
+
 export default function ReportForm({
   title,
   type,
@@ -211,10 +298,30 @@ export default function ReportForm({
   const [error, setError] = useState(null);
   const tableRef = useRef(null);
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(50);
   const [pagination, setPagination] = useState(null);
+  const [q, setQ] = useState("");
+
+  const limitOptions = LIMIT_OPTIONS.map(opt => ({ value: String(opt), label: `${opt} Data` }));
+
+  const filteredData = data
+    ? data.filter((row) => {
+        if (!q) return true;
+        const query = q.toLowerCase();
+        return (
+          (row.nomor && row.nomor.toLowerCase().includes(query)) ||
+          (row.nomor_bayar && row.nomor_bayar.toLowerCase().includes(query)) ||
+          (row.nama_anggota && row.nama_anggota.toLowerCase().includes(query)) ||
+          (row.nik && row.nik.toLowerCase().includes(query))
+        );
+      })
+    : [];
+
+  const handleJenisSimpananChange = (val) => {
+    setJenisSimpanan(val);
+    fetchData(1, perPage, val);
+  };
 
   const columns = COLUMN_DEFS[type] || [];
 
@@ -223,7 +330,7 @@ export default function ReportForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchData = async (page = currentPage, limit = perPage) => {
+  const fetchData = async (page = currentPage, limit = perPage, overrideJenisSimpanan = jenisSimpanan) => {
     setLoading(true);
     setError(null);
     try {
@@ -231,7 +338,9 @@ export default function ReportForm({
       if (fromDate) params.set("from", fromDate);
       if (toDate) params.set("to", toDate);
       if (anggotaId) params.set("anggota_id", anggotaId);
-      if (jenisSimpanan) params.set("jenis_simpanan", jenisSimpanan);
+      
+      const jsVal = overrideJenisSimpanan;
+      if (jsVal) params.set("jenis_simpanan", jsVal);
       if (perusahaan) params.set("perusahaan", perusahaan);
       params.set("page", page.toString());
       params.set("limit", limit.toString());
@@ -336,13 +445,13 @@ export default function ReportForm({
             h2 { margin-bottom: 5px; color: #333; }
             .subtitle { color: #666; font-size: 14px; margin-bottom: 15px; }
             table { border-collapse: collapse; width: 100%; font-size: 12px; }
-            th { background: #B47B5A; color: white; padding: 8px 6px; text-align: center; border: 1px solid #9C6141; }
+            th { background: ${printHexMap[accentColor]?.bg || "#2563eb"}; color: white; padding: 8px 6px; text-align: center; border: 1px solid ${printHexMap[accentColor]?.border || "#1d4ed8"}; }
             td { padding: 6px; border: 1px solid #ddd; }
             tr:nth-child(even) { background: #f8f9fa; }
             tr:hover { background: #e3e8f0; }
             .text-right { text-align: right; }
             .text-center { text-align: center; }
-            .total-row { font-weight: bold; background: #FDF3E7 !important; }
+            .total-row { font-weight: bold; background: ${accentColor === "green" ? "#ecfdf5" : accentColor === "orange" ? "#fff7ed" : accentColor === "purple" ? "#faf5ff" : accentColor === "red" ? "#fef2f2" : "#eff6ff"} !important; }
             @media print { body { margin: 10px; } }
           </style>
         </head>
@@ -362,40 +471,9 @@ export default function ReportForm({
     }
   };
 
-  const colorMap = {
-    blue: {
-      headerBg: "bg-blue-50",
-      headerBorder: "border-blue-200",
-      headerText: "text-blue-700",
-      lightBg: "bg-blue-50",
-    },
-    orange: {
-      headerBg: "bg-orange-50",
-      headerBorder: "border-orange-200",
-      headerText: "text-orange-700",
-      lightBg: "bg-orange-50",
-    },
-    green: {
-      headerBg: "bg-emerald-50",
-      headerBorder: "border-emerald-200",
-      headerText: "text-emerald-700",
-      lightBg: "bg-emerald-50",
-    },
-    red: {
-      headerBg: "bg-red-50",
-      headerBorder: "border-red-200",
-      headerText: "text-red-700",
-      lightBg: "bg-red-50",
-    },
-    purple: {
-      headerBg: "bg-purple-50",
-      headerBorder: "border-purple-200",
-      headerText: "text-purple-700",
-      lightBg: "bg-purple-50",
-    },
-  };
-
-  const colors = colorMap[accentColor] || colorMap.blue;
+  const theme = dynamicColorMap[accentColor] || dynamicColorMap.blue;
+  const colors = theme;
+  const IconComponent = dynamicIconMap[type] || FileText;
 
   const historyTitleMap = {
     simpanan: "History Laporan Simpanan Terbaru",
@@ -433,15 +511,21 @@ export default function ReportForm({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
-      {/* Report Form Card */}
-      <div className="bg-slate-50 rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-        {/* Header */}
-        <div className="px-6 py-4 border-b" style={{ backgroundColor: "#B47B5A" }}>
-          <h1 className="text-lg font-semibold text-white flex items-center gap-2">
-            <FileText className="w-5 h-5" />
-            {title}
-          </h1>
+      {/* Page Header */}
+      <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className={`${theme.iconBg} p-2.5 rounded-xl ${theme.iconText}`}>
+            <IconComponent className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-xl font-black text-gray-900">{title}</h1>
+            <p className="text-sm text-gray-500">Laporan keuangan koperasi berdasarkan periode dan filter</p>
+          </div>
         </div>
+      </div>
+
+      {/* Report Form Card */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
 
         {/* Form Body */}
         <form className="p-6 sm:p-8" onSubmit={handleLihat}>
@@ -548,8 +632,7 @@ export default function ReportForm({
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-6 py-3 text-white text-sm font-semibold rounded-2xl hover:opacity-90 transition-all shadow-sm active:scale-95 disabled:opacity-50"
-              style={{ backgroundColor: "#B47B5A" }}
+              className={`inline-flex items-center gap-2 px-6 py-3 text-white text-sm font-semibold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50 ${theme.bg} ${theme.hoverBg} focus:outline-none focus:ring-2 ${theme.ring}`}
             >
               <Search className="w-4 h-4" />
               {loading ? "Memuat..." : "LIHAT"}
@@ -558,7 +641,7 @@ export default function ReportForm({
             <button
               type="button"
               onClick={handleRefresh}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-500 text-white text-sm font-semibold rounded-2xl hover:bg-slate-600 transition-all shadow-sm active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-500 text-white text-sm font-semibold rounded-xl hover:bg-slate-600 transition-all shadow-sm active:scale-95"
             >
               <RefreshCw className="w-4 h-4" />
               REFRESH
@@ -568,7 +651,7 @@ export default function ReportForm({
               type="button"
               onClick={handleCetakExcel}
               disabled={!data || data.length === 0}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white text-sm font-semibold rounded-2xl hover:bg-emerald-700 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download className="w-4 h-4" />
               CETAK EXCEL
@@ -578,7 +661,7 @@ export default function ReportForm({
               type="button"
               onClick={handleCetakPDF}
               disabled={!data || data.length === 0}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white text-sm font-semibold rounded-2xl hover:bg-red-700 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white text-sm font-semibold rounded-xl hover:bg-red-700 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Printer className="w-4 h-4" />
               CETAK PDF
@@ -596,32 +679,57 @@ export default function ReportForm({
 
       {/* Data Table */}
       {data && (
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-          <div className="px-6 py-4 border-b flex items-center justify-between" style={{ backgroundColor: "#B47B5A" }}>
-            <h3 className="font-semibold text-white flex items-center gap-2 text-sm">
-              {historyTitle}
-              <span className="text-xs font-normal text-white/80">
-                ({pagination ? `${formatNumber(pagination.totalCount)} data` : `${data.length} data`})
-              </span>
-            </h3>
-            {/* Per page selector */}
-            {pagination && pagination.totalCount > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-white/80">Tampilkan</span>
-                <select
-                  value={perPage}
-                  onChange={(e) => handlePerPageChange(parseInt(e.target.value))}
-                  className="px-2 py-1 bg-white/20 text-white text-xs font-semibold rounded-lg border border-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 appearance-none cursor-pointer"
-                >
-                  {LIMIT_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt} className="text-gray-800">
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-                <span className="text-xs text-white/80">per halaman</span>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50 rounded-t-2xl">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center p-1 pl-3 bg-white border border-gray-200 rounded-xl transition-all shadow-sm hover:shadow-md hover:border-blue-200">
+                <div className="flex items-center gap-2 border-r border-gray-100 pr-2">
+                  <Layers className="w-4 h-4 text-blue-500" />
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Tampilkan</span>
+                </div>
+                <CustomSelect 
+                  options={limitOptions}
+                  value={String(perPage)}
+                  onChange={(val) => handlePerPageChange(parseInt(val))}
+                  className="w-28"
+                />
               </div>
-            )}
+            </div>
+
+            <div className="flex items-center gap-3 flex-1 sm:justify-center">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  value={q}
+                  onChange={(e) => setQ(e.target.value)}
+                  placeholder="Cari nomor / nama / NIK..."
+                  className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all w-72 bg-white"
+                />
+              </div>
+
+              {showJenisSimpanan && (
+                <div className="flex items-center p-1 pl-3 bg-white border border-gray-200 rounded-xl transition-all shadow-sm hover:shadow-md hover:border-blue-200">
+                  <div className="flex items-center gap-2 border-r border-gray-100 pr-2">
+                    <Filter className="w-4 h-4 text-blue-500" />
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Filter</span>
+                  </div>
+                  <CustomSelect 
+                    options={[
+                      { value: "", label: "Semua Jenis" },
+                      ...jenisSimpananList.map(j => ({ value: String(j.id), label: j.nama }))
+                    ]}
+                    value={jenisSimpanan}
+                    onChange={handleJenisSimpananChange}
+                    placeholder="Semua Jenis"
+                    className="w-44"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="text-xs text-gray-400 font-bold uppercase tracking-widest">
+              {filteredData.length} Record
+            </div>
           </div>
 
           <div className="overflow-x-auto">
@@ -645,7 +753,7 @@ export default function ReportForm({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {data.length === 0 ? (
+                {filteredData.length === 0 ? (
                   <tr>
                     <td
                       colSpan={columns.length}
@@ -656,7 +764,7 @@ export default function ReportForm({
                   </tr>
                 ) : (
                   <>
-                    {data.map((row, idx) => (
+                    {filteredData.map((row, idx) => (
                       <tr
                         key={row.id || idx}
                         className="hover:bg-gray-50/80 transition-colors"
@@ -666,10 +774,10 @@ export default function ReportForm({
                             key={col.key}
                             className={`py-3 px-4 ${
                               col.align === "right"
-                                ? "text-right"
-                                : col.align === "center"
-                                ? "text-center"
-                                : ""
+                                  ? "text-right"
+                                  : col.align === "center"
+                                  ? "text-center"
+                                  : ""
                             } ${
                               col.bold
                                 ? "font-semibold text-gray-900"
@@ -706,7 +814,7 @@ export default function ReportForm({
                           );
                         }
                         if (col.totalKey) {
-                          const total = calculateTotal(data, col);
+                          const total = calculateTotal(filteredData, col);
                           return (
                             <td
                               key={col.key}
@@ -779,10 +887,9 @@ export default function ReportForm({
                     disabled={loading}
                     className={`min-w-[36px] h-9 rounded-xl text-sm font-semibold transition-all ${
                       pageNum === currentPage
-                        ? "text-white shadow-md"
+                        ? `text-white shadow-md ${theme.bg}`
                         : "text-gray-600 hover:bg-gray-100"
                     } disabled:cursor-not-allowed`}
-                    style={pageNum === currentPage ? { backgroundColor: "#B47B5A" } : {}}
                   >
                     {pageNum}
                   </button>

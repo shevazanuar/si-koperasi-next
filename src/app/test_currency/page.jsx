@@ -1,6 +1,6 @@
 "use client";
 import React from 'react';
-import CurrencyInput from './src/components/ui/CurrencyInput';
+import CurrencyInput from '@/components/ui/CurrencyInput';
 
 export default function TestPage() {
     return (

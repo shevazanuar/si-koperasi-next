@@ -13,7 +13,7 @@ export default async function PenjualanPage({ searchParams }) {
 
   const params = await searchParams;
   const query = params?.q || "";
-  const limit = parseInt(params?.limit) || 20;
+  const limit = parseInt(params?.limit) || 25;
 
   const penjualan = await prisma.penjualan.findMany({
     where: {

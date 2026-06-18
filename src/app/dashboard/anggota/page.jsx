@@ -14,10 +14,10 @@ export default async function AnggotaPage({ searchParams }) {
 
   const params = await searchParams;
   const query = params?.q || "";
-  const limit = parseInt(params?.limit) || 20;
+  const limit = parseInt(params?.limit) || 25;
   
   // Ensure limit is one of the allowed values to prevent unexpected large queries
-  const safeLimit = [20, 40, 80, 120].includes(limit) ? limit : 20;
+  const safeLimit = [25, 50, 100].includes(limit) ? limit : 25;
 
   // Fetch members with JOIN to level_anggota for level name
   const angkotaRaw = await prisma.$queryRawUnsafe(`

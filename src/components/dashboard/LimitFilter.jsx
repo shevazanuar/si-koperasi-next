@@ -11,11 +11,11 @@ export default function LimitFilter() {
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
-  const currentLimit = searchParams.get("limit") || "20";
+  const currentLimit = searchParams.get("limit") || "25";
 
   const handleChange = (val) => {
     const params = new URLSearchParams(searchParams);
-    if (val && val !== "20") {
+    if (val && val !== "25") {
       params.set("limit", val);
     } else {
       params.delete("limit");
@@ -27,10 +27,9 @@ export default function LimitFilter() {
   };
 
   const options = [
-    { value: "20", label: "20 Data" },
-    { value: "40", label: "40 Data" },
-    { value: "80", label: "80 Data" },
-    { value: "120", label: "120 Data" },
+    { value: "25", label: "25 Data" },
+    { value: "50", label: "50 Data" },
+    { value: "100", label: "100 Data" },
   ];
 
   return (

@@ -13,8 +13,8 @@ export default async function SimpananPage({ searchParams }) {
   const params = await searchParams;
   const query = params?.q || "";
   const typeFilter = params?.type || "";
-  const limit = parseInt(params?.limit) || 20;
-  const safeLimit = [20, 40, 80, 120].includes(limit) ? limit : 20;
+  const limit = parseInt(params?.limit) || 25;
+  const safeLimit = [25, 50, 100].includes(limit) ? limit : 25;
 
   // Build WHERE clause with raw SQL
   let where = `WHERE 1=1`;

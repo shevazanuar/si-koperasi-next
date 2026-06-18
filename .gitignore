@@ -48,3 +48,4 @@ backup-private/
 
 # prisma
 prisma/
+*.rar
