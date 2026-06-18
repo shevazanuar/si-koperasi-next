@@ -120,3 +120,281 @@ body {
     border: 1px solid rgba(180, 123, 90, 0.1);
   }
 }
+
+/* ==========================================
+   MASTER MODULE — Design System Utilities
+   (Hanya digunakan oleh halaman-halaman Master)
+   ========================================== */
+
+@keyframes masterFadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes masterFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes masterShimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@layer utilities {
+
+  /* Page enter animation */
+  .animate-page-enter {
+    animation: masterFadeInUp 0.4s ease-out both;
+  }
+
+  .animate-fade-in {
+    animation: masterFadeIn 0.3s ease-out both;
+  }
+
+  /* Card base */
+  .card-base {
+    background: #ffffff;
+    border: 1px solid #EBE3D5;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .card-base:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  }
+
+  /* Page header gradient bar */
+  .page-header-accent {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #B47B5A, #C4813C, #D19A62, #B47B5A);
+    background-size: 200% 100%;
+    animation: masterShimmer 3s ease-in-out infinite;
+  }
+
+  /* Badge styles */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+  }
+
+  .badge-success {
+    background: #ecfdf5;
+    color: #059669;
+    border-color: #a7f3d0;
+  }
+
+  .badge-danger {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+  }
+
+  .badge-info {
+    background: #FDF3E7;
+    color: #9C6141;
+    border-color: #EACCAE;
+  }
+
+  .badge-warning {
+    background: #fffbeb;
+    color: #d97706;
+    border-color: #fde68a;
+  }
+
+  /* Table styles */
+  .table-modern {
+    width: 100%;
+    font-size: 0.875rem;
+    text-align: left;
+    border-collapse: collapse;
+  }
+
+  .table-modern thead tr {
+    background: #FDFBF7;
+    border-bottom: 2px solid #EBE3D5;
+  }
+
+  .table-modern thead th {
+    padding: 12px 20px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #9C8C78;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .table-modern tbody tr {
+    border-bottom: 1px solid #F6F0E7;
+    transition: background-color 0.15s ease;
+  }
+
+  .table-modern tbody tr:hover {
+    background-color: #FDFBF7;
+  }
+
+  .table-modern tbody td {
+    padding: 14px 20px;
+  }
+
+  /* Form input modern */
+  .input-modern {
+    width: 100%;
+    border: 1.5px solid #EBE3D5;
+    border-radius: 0.75rem;
+    padding: 10px 14px;
+    font-size: 0.875rem;
+    color: #31271D;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    outline: none;
+  }
+
+  .input-modern:hover {
+    border-color: #DED3C1;
+  }
+
+  .input-modern:focus {
+    border-color: #B47B5A;
+    box-shadow: 0 0 0 3px rgba(180, 123, 90, 0.12);
+  }
+
+  /* Primary button */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #C4813C, #B47B5A);
+    color: white;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(180, 123, 90, 0.25);
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #B47B5A, #9C6141);
+    box-shadow: 0 4px 12px rgba(180, 123, 90, 0.35);
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 1px 4px rgba(180, 123, 90, 0.2);
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #F6F0E7;
+    color: #5A4D3E;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: 1px solid #EBE3D5;
+  }
+
+  .btn-secondary:hover {
+    background: #EBE3D5;
+    color: #42372A;
+  }
+
+  /* Action icon button */
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+
+  .btn-icon-edit {
+    color: #B47B5A;
+    background: transparent;
+  }
+
+  .btn-icon-edit:hover {
+    background: #FDF3E7;
+    border-color: #EACCAE;
+  }
+
+  .btn-icon-delete {
+    color: #ef4444;
+    background: transparent;
+  }
+
+  .btn-icon-delete:hover {
+    background: #fef2f2;
+    border-color: #fecaca;
+  }
+
+  /* Label */
+  .label-modern {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #7A6A58;
+    margin-bottom: 6px;
+    letter-spacing: 0.01em;
+  }
+
+  /* Search input */
+  .search-input {
+    padding-left: 2.5rem;
+    padding-right: 1rem;
+    padding-top: 9px;
+    padding-bottom: 9px;
+    border: 1.5px solid #EBE3D5;
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    outline: none;
+    width: 280px;
+  }
+
+  .search-input:focus {
+    border-color: #B47B5A;
+    box-shadow: 0 0 0 3px rgba(180, 123, 90, 0.1);
+  }
+
+  /* Skeleton loading */
+  .skeleton {
+    background: linear-gradient(90deg, #F6F0E7, #EBE3D5, #F6F0E7);
+    background-size: 200% 100%;
+    animation: masterShimmer 1.5s ease-in-out infinite;
+    border-radius: 0.5rem;
+  }
+}

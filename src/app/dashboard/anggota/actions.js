@@ -205,5 +205,5 @@ export async function updateAnggota(id, prevState, formData) {
   }
 
   revalidatePath("/dashboard/anggota");
-  redirect("/dashboard/anggota");
+  return { success: true };
 }

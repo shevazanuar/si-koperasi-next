@@ -5,10 +5,13 @@ import { updateAnggota } from "../../actions";
 import { User, IdCard, Phone, MapPin, Calendar, Save, Loader2, Briefcase, Users } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
-import { showError } from "@/lib/swal";
+import { useRouter } from "next/navigation";
+import { showError, showSuccess } from "@/lib/swal";
 import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function EditAnggotaForm({ data, levelList, perusahaanList }) {
+  const router = useRouter();
+
   // Bind ID to the update action
   const updateAnggotaWithId = updateAnggota.bind(null, data.id);
   const [state, formAction, isPending] = useActionState(updateAnggotaWithId, null);
@@ -17,7 +20,12 @@ export default function EditAnggotaForm({ data, levelList, perusahaanList }) {
     if (state?.error) {
       showError("Gagal Menyimpan", state.error);
     }
-  }, [state?.error]);
+    if (state?.success) {
+      showSuccess("Berhasil", "Data anggota berhasil diperbarui.").then(() => {
+        router.push("/dashboard/anggota");
+      });
+    }
+  }, [state, router]);
 
   return (
     <form action={formAction} className="p-8 lg:p-12 space-y-8">

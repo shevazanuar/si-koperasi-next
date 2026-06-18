@@ -21,12 +21,18 @@ export async function GET(request) {
   const jenisSimpananIdRaw = searchParams.get("jenis_simpanan");
   const perusahaan = searchParams.get("perusahaan") ?? null;
 
+  // Pagination params
+  const page = Math.max(1, parseInt(searchParams.get("page")) || 1);
+  const limit = Math.min(200, Math.max(1, parseInt(searchParams.get("limit")) || 50));
+  const offset = (page - 1) * limit;
+
   // Parse numeric params safely — null jika tidak ada
   const anggotaId = anggotaIdRaw ? parseInt(anggotaIdRaw) : null;
   const jenisSimpananId = jenisSimpananIdRaw ? parseInt(jenisSimpananIdRaw) : null;
 
   try {
     let data = [];
+    let totalCount = 0;
 
     // ── SIMPANAN / PENARIKAN ────────────────────────────────────────────────
     if (type === "simpanan" || type === "penarikan") {
@@ -34,6 +40,22 @@ export async function GET(request) {
       const fromDate = from ? new Date(from) : null;
       const toDate = to ? new Date(to + " 23:59:59") : null;
 
+      // Count query
+      const countResult = await prisma.$queryRaw`
+        SELECT COUNT(*) as cnt
+        FROM simpanan s
+        JOIN anggota a ON s.anggota_id = a.id
+        LEFT JOIN jenis_simpanan js ON s.jenis_simpanan_id = js.id
+        WHERE s.jenis = ${jenis}
+          AND (${fromDate}       IS NULL OR s.tgl              >= ${fromDate})
+          AND (${toDate}         IS NULL OR s.tgl              <= ${toDate})
+          AND (${anggotaId}      IS NULL OR s.anggota_id       = ${anggotaId})
+          AND (${jenisSimpananId} IS NULL OR s.jenis_simpanan_id = ${jenisSimpananId})
+          AND (${perusahaan}     IS NULL OR a.perusahaan       = ${perusahaan})
+      `;
+      totalCount = Number(countResult[0]?.cnt || 0);
+
+      // Data query with pagination
       const raw = await prisma.$queryRaw`
         SELECT
           s.id, s.nomor, s.tgl, s.jumlah,
@@ -49,6 +71,7 @@ export async function GET(request) {
           AND (${jenisSimpananId} IS NULL OR s.jenis_simpanan_id = ${jenisSimpananId})
           AND (${perusahaan}     IS NULL OR a.perusahaan       = ${perusahaan})
         ORDER BY s.tgl DESC, s.nomor DESC
+        LIMIT ${limit} OFFSET ${offset}
       `;
       data = normalizeRows(raw).map((r) => ({ ...r, jumlah: Number(r.jumlah) }));
 
@@ -56,6 +79,18 @@ export async function GET(request) {
     } else if (type === "pinjaman") {
       const fromDate = from ? new Date(from) : null;
       const toDate = to ? new Date(to + " 23:59:59") : null;
+
+      const countResult = await prisma.$queryRaw`
+        SELECT COUNT(*) as cnt
+        FROM pinjaman_header p
+        JOIN anggota a ON p.anggota_id = a.id
+        LEFT JOIN jenis_pinjaman jp ON p.jenis_pinjaman_id = jp.id
+        WHERE (${fromDate}   IS NULL OR p.tgl        >= ${fromDate})
+          AND (${toDate}     IS NULL OR p.tgl        <= ${toDate})
+          AND (${anggotaId}  IS NULL OR p.anggota_id  = ${anggotaId})
+          AND (${perusahaan} IS NULL OR a.perusahaan  = ${perusahaan})
+      `;
+      totalCount = Number(countResult[0]?.cnt || 0);
 
       const raw = await prisma.$queryRaw`
         SELECT
@@ -70,6 +105,7 @@ export async function GET(request) {
           AND (${anggotaId}  IS NULL OR p.anggota_id  = ${anggotaId})
           AND (${perusahaan} IS NULL OR a.perusahaan  = ${perusahaan})
         ORDER BY p.nomor DESC
+        LIMIT ${limit} OFFSET ${offset}
       `;
       data = normalizeRows(raw).map((r) => ({ ...r, jumlah: Number(r.jumlah) }));
 
@@ -77,6 +113,20 @@ export async function GET(request) {
     } else if (type === "pembayaran") {
       const fromDate = from ?? null;
       const toDate = to ?? null;
+
+      const countResult = await prisma.$queryRaw`
+        SELECT COUNT(*) as cnt
+        FROM pinjaman_detail d
+        JOIN pinjaman_header p ON d.pinjaman_id = p.id
+        JOIN anggota a ON p.anggota_id = a.id
+        LEFT JOIN jenis_pinjaman jp ON p.jenis_pinjaman_id = jp.id
+        WHERE d.jumlah_bayar > 0
+          AND (${fromDate}   IS NULL OR d.tgl_bayar  >= ${fromDate})
+          AND (${toDate}     IS NULL OR d.tgl_bayar  <= ${toDate})
+          AND (${anggotaId}  IS NULL OR p.anggota_id  = ${anggotaId})
+          AND (${perusahaan} IS NULL OR a.perusahaan  = ${perusahaan})
+      `;
+      totalCount = Number(countResult[0]?.cnt || 0);
 
       const raw = await prisma.$queryRaw`
         SELECT
@@ -94,6 +144,7 @@ export async function GET(request) {
           AND (${anggotaId}  IS NULL OR p.anggota_id  = ${anggotaId})
           AND (${perusahaan} IS NULL OR a.perusahaan  = ${perusahaan})
         ORDER BY d.nomor_bayar DESC
+        LIMIT ${limit} OFFSET ${offset}
       `;
       data = normalizeRows(raw).map((r) => ({
         ...r,
@@ -105,6 +156,19 @@ export async function GET(request) {
     // ── TUNGGAKAN ───────────────────────────────────────────────────────────
     } else if (type === "tunggakan") {
       const tanggalJT = from ?? null;
+
+      const countResult = await prisma.$queryRaw`
+        SELECT COUNT(*) as cnt
+        FROM pinjaman_detail d
+        JOIN pinjaman_header p ON d.pinjaman_id = p.id
+        JOIN anggota a ON p.anggota_id = a.id
+        LEFT JOIN jenis_pinjaman jp ON p.jenis_pinjaman_id = jp.id
+        WHERE d.jumlah_bayar = 0
+          AND (${tanggalJT}  IS NULL OR d.tgl_jatuh_tempo = ${tanggalJT})
+          AND (${anggotaId}  IS NULL OR p.anggota_id       = ${anggotaId})
+          AND (${perusahaan} IS NULL OR a.perusahaan       = ${perusahaan})
+      `;
+      totalCount = Number(countResult[0]?.cnt || 0);
 
       const raw = await prisma.$queryRaw`
         SELECT
@@ -121,6 +185,7 @@ export async function GET(request) {
           AND (${anggotaId}  IS NULL OR p.anggota_id       = ${anggotaId})
           AND (${perusahaan} IS NULL OR a.perusahaan       = ${perusahaan})
         ORDER BY d.nomor_bayar DESC
+        LIMIT ${limit} OFFSET ${offset}
       `;
       data = normalizeRows(raw).map((r) => ({
         ...r,
@@ -130,7 +195,17 @@ export async function GET(request) {
       }));
     }
 
-    return NextResponse.json({ data });
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return NextResponse.json({
+      data,
+      pagination: {
+        page,
+        limit,
+        totalCount,
+        totalPages,
+      },
+    });
   } catch (error) {
     console.error("Laporan API Error:", error);
     return NextResponse.json(

@@ -71,67 +71,127 @@ export default function PenggunaPage() {
   const getLevelName = (id) => levels.find((l) => l.id === id)?.level || "-";
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="bg-indigo-600 p-2.5 rounded-xl text-white"><UserCog className="w-5 h-5" /></div>
-          <div><h1 className="text-xl font-black text-gray-900">Pengguna</h1><p className="text-sm text-gray-500">Kelola data pengguna sistem</p></div>
+    <div className="space-y-6 animate-page-enter">
+      {/* Page Header */}
+      <div className="card-base page-header-accent p-5 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg"
+            style={{ background: 'linear-gradient(135deg, #6366f1, #4f46e5)' }}>
+            <UserCog className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-gray-900">Pengguna</h1>
+            <p className="text-sm text-gray-500">Kelola data pengguna sistem</p>
+          </div>
         </div>
         <button onClick={() => { setShowForm(true); setEditId(null); setForm({ username: "", namalengkap: "", password: "", level_id: "1", blokir: "T" }); }}
-          className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition text-sm font-medium">
+          className="btn-primary">
           <Plus className="w-4 h-4" /> Tambah
         </button>
       </div>
-      {info && <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm">✅ {info}</div>}
+
+      {/* Form Tambah/Edit */}
       {showForm && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-          <h2 className="font-bold text-gray-900 mb-4">{editId ? "Edit" : "Tambah"} Pengguna</h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label className="block text-xs font-semibold text-gray-500 mb-1">Username *</label>
-              <input type="text" required value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 mb-1">Nama Lengkap</label>
-              <input type="text" value={form.namalengkap} onChange={(e) => setForm({ ...form, namalengkap: e.target.value })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 mb-1">Password {editId ? "(kosongkan jika tidak diubah)" : "*"}</label>
-              <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" /></div>
-            <div><label className="block text-xs font-semibold text-gray-500 mb-1">Level</label>
-              <select value={form.level_id} onChange={(e) => setForm({ ...form, level_id: e.target.value })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                {levels.map((l) => <option key={l.id} value={l.id}>{l.level}</option>)}</select></div>
-            <div><label className="block text-xs font-semibold text-gray-500 mb-1">Status</label>
-              <select value={form.blokir} onChange={(e) => setForm({ ...form, blokir: e.target.value })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
-                <option value="T">Aktif (Tidak diblokir)</option><option value="Y">Diblokir</option></select></div>
-            <div className="md:col-span-2 flex gap-2">
-              <button type="submit" className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition text-sm font-medium"><Save className="w-4 h-4" /> Simpan</button>
-              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="bg-gray-100 text-gray-700 px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-gray-200 transition text-sm"><X className="w-4 h-4" /> Batal</button>
+        <div className="card-base p-6 animate-fade-in">
+          <h2 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
+            <div className="w-1 h-5 rounded-full bg-blue-500"></div>
+            {editId ? "Edit" : "Tambah"} Pengguna
+          </h2>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="label-modern">Username *</label>
+              <input type="text" required value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} 
+                className="input-modern" placeholder="Masukkan username" />
+            </div>
+            <div>
+              <label className="label-modern">Nama Lengkap</label>
+              <input type="text" value={form.namalengkap} onChange={(e) => setForm({ ...form, namalengkap: e.target.value })} 
+                className="input-modern" placeholder="Masukkan nama lengkap" />
+            </div>
+            <div>
+              <label className="label-modern">Password {editId ? "(kosongkan jika tidak diubah)" : "*"}</label>
+              <input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} 
+                className="input-modern" placeholder="••••••••" />
+            </div>
+            <div>
+              <label className="label-modern">Level</label>
+              <select value={form.level_id} onChange={(e) => setForm({ ...form, level_id: e.target.value })} 
+                className="input-modern">
+                {levels.map((l) => <option key={l.id} value={l.id}>{l.level}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="label-modern">Status</label>
+              <select value={form.blokir} onChange={(e) => setForm({ ...form, blokir: e.target.value })} 
+                className="input-modern">
+                <option value="T">Aktif (Tidak diblokir)</option>
+                <option value="Y">Diblokir</option>
+              </select>
+            </div>
+            <div className="md:col-span-2 flex gap-2 pt-2">
+              <button type="submit" className="btn-primary">
+                <Save className="w-4 h-4" /> Simpan
+              </button>
+              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} 
+                className="btn-secondary">
+                <X className="w-4 h-4" /> Batal
+              </button>
             </div>
           </form>
         </div>
       )}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        {loading ? <div className="p-12 text-center text-gray-400">Memuat...</div> : (
-          <table className="w-full text-sm">
-            <thead><tr className="bg-gray-50 border-b border-gray-100">
-              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">ID</th>
-              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Username</th>
-              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Nama Lengkap</th>
-              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Level</th>
-              <th className="text-left px-6 py-4 text-xs font-bold text-gray-500 uppercase">Status</th>
-              <th className="text-center px-6 py-4 text-xs font-bold text-gray-500 uppercase">Aksi</th>
-            </tr></thead>
-            <tbody>{users.map((u) => (
-              <tr key={u.id} className="border-b border-gray-50 hover:bg-blue-50/30">
-                <td className="px-6 py-3 text-gray-500">{u.id}</td>
-                <td className="px-6 py-3 font-bold text-gray-900">{u.username}</td>
-                <td className="px-6 py-3 text-gray-700">{u.namalengkap}</td>
-                <td className="px-6 py-3"><span className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-lg font-medium">{getLevelName(u.level_id)}</span></td>
-                <td className="px-6 py-3"><span className={`text-xs px-2 py-1 rounded-lg font-medium ${u.blokir === "T" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{u.blokir === "T" ? "Aktif" : "Diblokir"}</span></td>
-                <td className="px-6 py-3 text-center">
-                  <div className="flex justify-center gap-1">
-                    <button onClick={() => handleEdit(u)} className="p-2 hover:bg-blue-50 rounded-lg text-blue-600"><Pencil className="w-4 h-4" /></button>
-                    <button onClick={() => handleDelete(u.id)} className="p-2 hover:bg-red-50 rounded-lg text-red-500"><Trash2 className="w-4 h-4" /></button>
-                  </div>
-                </td>
+
+      {/* Table */}
+      <div className="card-base overflow-hidden">
+        {loading ? (
+          <div className="p-12 text-center">
+            <div className="inline-flex items-center gap-2 text-gray-400 text-sm">
+              <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+              Memuat data...
+            </div>
+          </div>
+        ) : users.length === 0 ? (
+          <div className="p-16 text-center">
+            <UserCog className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-400 text-sm">Belum ada data pengguna.</p>
+          </div>
+        ) : (
+          <table className="table-modern">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Nama Lengkap</th>
+                <th>Level</th>
+                <th>Status</th>
+                <th className="text-center">Aksi</th>
               </tr>
-            ))}</tbody>
+            </thead>
+            <tbody>
+              {users.map((u) => (
+                <tr key={u.id}>
+                  <td className="text-gray-400 font-mono text-xs">{u.id}</td>
+                  <td className="font-semibold text-gray-900">{u.username}</td>
+                  <td className="text-gray-600">{u.namalengkap}</td>
+                  <td><span className="badge badge-info">{getLevelName(u.level_id)}</span></td>
+                  <td>
+                    <span className={`badge ${u.blokir === "T" ? "badge-success" : "badge-danger"}`}>
+                      {u.blokir === "T" ? "Aktif" : "Diblokir"}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="flex justify-center gap-1">
+                      <button onClick={() => handleEdit(u)} className="btn-icon btn-icon-edit" title="Edit pengguna">
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => handleDelete(u.id)} className="btn-icon btn-icon-delete" title="Hapus pengguna">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         )}
       </div>

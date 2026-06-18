@@ -7,6 +7,10 @@ import {
   Printer,
   FileText,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
   Download,
 } from "lucide-react";
 import { exportToExcel } from "@/lib/exportUtils";
@@ -182,6 +186,8 @@ function calculateTotal(data, col) {
   return data.reduce((sum, row) => sum + (row[col.totalKey] || 0), 0);
 }
 
+const LIMIT_OPTIONS = [25, 50, 100];
+
 export default function ReportForm({
   title,
   type,
@@ -205,14 +211,19 @@ export default function ReportForm({
   const [error, setError] = useState(null);
   const tableRef = useRef(null);
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(50);
+  const [pagination, setPagination] = useState(null);
+
   const columns = COLUMN_DEFS[type] || [];
 
   useEffect(() => {
-    fetchData();
+    fetchData(1, perPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = async (page = currentPage, limit = perPage) => {
     setLoading(true);
     setError(null);
     try {
@@ -222,15 +233,20 @@ export default function ReportForm({
       if (anggotaId) params.set("anggota_id", anggotaId);
       if (jenisSimpanan) params.set("jenis_simpanan", jenisSimpanan);
       if (perusahaan) params.set("perusahaan", perusahaan);
+      params.set("page", page.toString());
+      params.set("limit", limit.toString());
 
       const res = await fetch(`/api/laporan?${params.toString()}`);
       const json = await res.json();
 
       if (!res.ok) throw new Error(json.error || "Gagal memuat data");
       setData(json.data);
+      setPagination(json.pagination);
+      setCurrentPage(page);
     } catch (err) {
       setError(err.message);
       setData(null);
+      setPagination(null);
     } finally {
       setLoading(false);
     }
@@ -238,7 +254,8 @@ export default function ReportForm({
 
   const handleLihat = (e) => {
     e.preventDefault();
-    fetchData();
+    setCurrentPage(1);
+    fetchData(1, perPage);
   };
 
   const handleRefresh = (e) => {
@@ -250,14 +267,29 @@ export default function ReportForm({
     setPerusahaan("");
     setData(null);
     setError(null);
+    setPagination(null);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || (pagination && newPage > pagination.totalPages)) return;
+    fetchData(newPage, perPage);
+  };
+
+  const handlePerPageChange = (newLimit) => {
+    setPerPage(newLimit);
+    setCurrentPage(1);
+    fetchData(1, newLimit);
   };
 
   const handleCetakExcel = (e) => {
     e.preventDefault();
     if (!data || data.length === 0) return;
 
+    const startNo = pagination ? (pagination.page - 1) * pagination.limit : 0;
+
     const excelData = data.map((row, idx) => {
-      const obj = { No: idx + 1 };
+      const obj = { No: startNo + idx + 1 };
       columns.forEach((col) => {
         if (col.key === "no") return;
         obj[col.label] = formatValue(row[col.key], col.formatType, row);
@@ -319,6 +351,7 @@ export default function ReportForm({
           <div class="subtitle">
             ${fromDate ? `Dari: ${formatDate(fromDate)}` : ""}
             ${toDate ? ` s/d ${formatDate(toDate)}` : ""}
+            ${pagination ? ` | Halaman ${pagination.page} dari ${pagination.totalPages} (${pagination.totalCount} data)` : ""}
           </div>
           ${tableRef.current.outerHTML}
           <script>window.print();<\/script>
@@ -373,6 +406,30 @@ export default function ReportForm({
   };
 
   const historyTitle = historyTitleMap[type] || "History Laporan Terbaru";
+
+  // Calculate row number offset for pagination
+  const rowOffset = pagination ? (pagination.page - 1) * pagination.limit : 0;
+
+  // Generate page numbers for pagination display
+  const getPageNumbers = () => {
+    if (!pagination) return [];
+    const { page, totalPages } = pagination;
+    const pages = [];
+    const maxVisible = 5;
+
+    let start = Math.max(1, page - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages, start + maxVisible - 1);
+
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-12">
@@ -540,13 +597,31 @@ export default function ReportForm({
       {/* Data Table */}
       {data && (
         <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
-          <div className="px-6 py-4 border-b" style={{ backgroundColor: "#B47B5A" }}>
+          <div className="px-6 py-4 border-b flex items-center justify-between" style={{ backgroundColor: "#B47B5A" }}>
             <h3 className="font-semibold text-white flex items-center gap-2 text-sm">
               {historyTitle}
               <span className="text-xs font-normal text-white/80">
-                ({data.length} data)
+                ({pagination ? `${formatNumber(pagination.totalCount)} data` : `${data.length} data`})
               </span>
             </h3>
+            {/* Per page selector */}
+            {pagination && pagination.totalCount > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-white/80">Tampilkan</span>
+                <select
+                  value={perPage}
+                  onChange={(e) => handlePerPageChange(parseInt(e.target.value))}
+                  className="px-2 py-1 bg-white/20 text-white text-xs font-semibold rounded-lg border border-white/30 focus:outline-none focus:ring-1 focus:ring-white/50 appearance-none cursor-pointer"
+                >
+                  {LIMIT_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt} className="text-gray-800">
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-xs text-white/80">per halaman</span>
+              </div>
+            )}
           </div>
 
           <div className="overflow-x-auto">
@@ -602,7 +677,7 @@ export default function ReportForm({
                             }`}
                           >
                             {col.key === "no"
-                              ? idx + 1
+                              ? rowOffset + idx + 1
                               : formatValue(row[col.key], col.formatType, row)}
                           </td>
                         ))}
@@ -651,6 +726,92 @@ export default function ReportForm({
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {pagination && pagination.totalPages > 1 && (
+            <div className="px-6 py-4 border-t border-slate-200 bg-slate-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Info */}
+              <div className="text-xs text-gray-500">
+                Menampilkan{" "}
+                <span className="font-semibold text-gray-700">
+                  {formatNumber(rowOffset + 1)}
+                </span>
+                {" - "}
+                <span className="font-semibold text-gray-700">
+                  {formatNumber(Math.min(rowOffset + pagination.limit, pagination.totalCount))}
+                </span>
+                {" dari "}
+                <span className="font-semibold text-gray-700">
+                  {formatNumber(pagination.totalCount)}
+                </span>
+                {" data"}
+              </div>
+
+              {/* Page buttons */}
+              <div className="flex items-center gap-1">
+                {/* First */}
+                <button
+                  onClick={() => handlePageChange(1)}
+                  disabled={currentPage === 1 || loading}
+                  className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  title="Halaman pertama"
+                >
+                  <ChevronsLeft className="w-4 h-4" />
+                </button>
+                {/* Prev */}
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1 || loading}
+                  className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  title="Halaman sebelumnya"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {/* Page numbers */}
+                {getPageNumbers()[0] > 1 && (
+                  <span className="px-1 text-gray-400 text-xs">...</span>
+                )}
+                {getPageNumbers().map((pageNum) => (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    disabled={loading}
+                    className={`min-w-[36px] h-9 rounded-xl text-sm font-semibold transition-all ${
+                      pageNum === currentPage
+                        ? "text-white shadow-md"
+                        : "text-gray-600 hover:bg-gray-100"
+                    } disabled:cursor-not-allowed`}
+                    style={pageNum === currentPage ? { backgroundColor: "#B47B5A" } : {}}
+                  >
+                    {pageNum}
+                  </button>
+                ))}
+                {getPageNumbers()[getPageNumbers().length - 1] < pagination.totalPages && (
+                  <span className="px-1 text-gray-400 text-xs">...</span>
+                )}
+
+                {/* Next */}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === pagination.totalPages || loading}
+                  className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  title="Halaman berikutnya"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                {/* Last */}
+                <button
+                  onClick={() => handlePageChange(pagination.totalPages)}
+                  disabled={currentPage === pagination.totalPages || loading}
+                  className="p-2 rounded-xl text-gray-500 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  title="Halaman terakhir"
+                >
+                  <ChevronsRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
