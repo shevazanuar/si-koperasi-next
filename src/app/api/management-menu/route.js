@@ -16,8 +16,8 @@ export async function GET() {
   if (!user) return unauthorized();
 
   try {
-    const levels = await prisma.level.findMany({ orderBy: { id: "asc" } });
-    const menus = await prisma.menu.findMany({ orderBy: { kode: "asc" } });
+    const levels = await prisma.level.findMany({ orderBy: { id: "desc" } });
+    const menus = await prisma.menu.findMany({ orderBy: { kode: "desc" } });
     return NextResponse.json({ levels, menus });
   } catch (error) {
     return NextResponse.json({ error: "Gagal memuat data" }, { status: 500 });

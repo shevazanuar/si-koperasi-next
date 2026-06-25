@@ -95,13 +95,13 @@ export async function createAnggota(prevState, formData) {
         unit_seksi,
         jabatan,
         level_anggota_id: level_anggota_id ? parseInt(level_anggota_id) : null,
-        gaji: gaji && !isNaN(parseInt(gaji)) ? parseInt(gaji) : null,
+        gaji: (gaji && !isNaN(parseInt(gaji))) ? parseInt(gaji) : null,
         nama_pasangan,
-        jml_anak: jml_anak && !isNaN(parseInt(jml_anak)) ? parseInt(jml_anak) : null,
+        jml_anak: (jml_anak && !isNaN(parseInt(jml_anak))) ? parseInt(jml_anak) : null,
         status: status || "Aktif",
         pwd: await hashPassword(nik), // Default password is NIK (migrated to bcrypt)
         tgl_masuk: tgl_masuk ? new Date(tgl_masuk) : new Date(),
-        simpanan_wajib_per_bulan: simpanan_wajib_per_bulan && !isNaN(parseInt(simpanan_wajib_per_bulan)) ? parseInt(simpanan_wajib_per_bulan) : null,
+        simpanan_wajib_per_bulan: (simpanan_wajib_per_bulan && !isNaN(parseInt(simpanan_wajib_per_bulan))) ? parseInt(simpanan_wajib_per_bulan) : null,
         insert_date: new Date(),
       },
     });

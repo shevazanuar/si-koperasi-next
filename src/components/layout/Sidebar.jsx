@@ -115,6 +115,12 @@ const menuItems = [
         icon: Tag,
         dbId: null,
       },
+      {
+        name: "Kategori Aset Tetap",
+        href: "/dashboard/config/kategori-aset-tetap",
+        icon: Tag,
+        dbId: null,
+      },
     ],
   },
   {
@@ -331,6 +337,17 @@ export default function Sidebar({ role = "admin", allowedMenuIds = null }) {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState({});
   const [pendingCount, setPendingCount] = useState(0);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const handleToggle = () => setIsMobileOpen((prev) => !prev);
+    window.addEventListener("toggleMobileSidebar", handleToggle);
+    return () => window.removeEventListener("toggleMobileSidebar", handleToggle);
+  }, []);
+
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     let intervalId;
@@ -347,7 +364,7 @@ export default function Sidebar({ role = "admin", allowedMenuIds = null }) {
 
     // Listen for custom event when approval happens
     window.addEventListener("pinjamanUpdated", fetchPendingCount);
-    
+
     // Fallback polling every 30 seconds
     intervalId = setInterval(fetchPendingCount, 30000);
 
@@ -384,29 +401,30 @@ export default function Sidebar({ role = "admin", allowedMenuIds = null }) {
       return isAllowed(item) || item.children.length > 0;
     });
 
-  const toggleMenu = (name) =>
-    setOpenMenus((prev) => ({ ...prev, [name]: !prev[name] }));
+  const toggleMenu = (name) => setOpenMenus((prev) => ({ ...prev, [name]: !prev[name] }));
 
-  const isChildActive = (children) =>
-    children?.some(
-      (c) => pathname === c.href || pathname.startsWith(c.href + "/"),
-    );
+  const isChildActive = (children) => children?.some((c) => pathname === c.href || pathname.startsWith(c.href + "/"));
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-100 flex-col h-full fixed left-0 top-0 hidden md:flex">
+    <>
+      {/* Mobile Overlay */}
+      <div 
+        className={`fixed inset-0 bg-gray-900/40 backdrop-blur-sm z-30 md:hidden transition-opacity duration-300 ${isMobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        onClick={() => setIsMobileOpen(false)}
+      />
+
+      <aside 
+        className={`w-64 bg-white/95 backdrop-blur-xl border-r border-gray-100 flex flex-col h-full fixed left-0 top-0 z-40 transition-transform duration-300 ease-in-out md:translate-x-0 ${isMobileOpen ? "translate-x-0 shadow-2xl shadow-amber-900/10" : "-translate-x-full"}`}
+      >
       <div className="p-6 flex items-center gap-3 border-b border-gray-50">
-        <div className="bg-blue-600 p-2 rounded-xl text-white shadow-md shadow-blue-500/20">
+        <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-2 rounded-xl text-white shadow-md shadow-orange-500/20">
           <Landmark className="w-5 h-5" />
         </div>
-        <div className="font-bold text-xl text-gray-800 tracking-tight">
-          Koperasi
-        </div>
+        <div className="font-bold text-xl text-gray-800 tracking-tight">Koperasi</div>
       </div>
 
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 mt-2 px-3">
-          {role === "admin" ? "Menu Utama" : "Portal Anggota"}
-        </div>
+        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4 mt-2 px-3">{role === "admin" ? "Menu Utama" : "Portal Anggota"}</div>
 
         {filteredItems.map((item) => {
           if (item.children) {
@@ -416,50 +434,28 @@ export default function Sidebar({ role = "admin", allowedMenuIds = null }) {
               <div key={item.name}>
                 <button
                   onClick={() => toggleMenu(item.name)}
-                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${
-                    childActive
-                      ? "bg-blue-50 text-blue-700 font-medium"
-                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${childActive ? "bg-amber-50 text-amber-700 font-medium" : "text-gray-500 hover:bg-amber-50 hover:text-amber-700"}`}
                 >
-                  <item.icon
-                    className={`w-5 h-5 ${childActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"}`}
-                  />
+                  <item.icon className={`w-5 h-5 ${childActive ? "text-amber-600" : "text-gray-400 group-hover:text-amber-500"}`} />
                   <span className="flex-1 text-left">{item.name}</span>
-                  <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${childActive ? "text-blue-500" : "text-gray-400"}`}
-                  />
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""} ${childActive ? "text-amber-500" : "text-gray-400"}`} />
                 </button>
-                <div
-                  className={`overflow-hidden transition-all duration-200 ${isOpen ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"}`}
-                >
+                <div className={`overflow-hidden transition-all duration-200 ${isOpen ? "max-h-96 opacity-100 mt-1" : "max-h-0 opacity-0"}`}>
                   <div className="ml-4 pl-4 border-l-2 border-gray-100 space-y-1">
                     {item.children.map((child) => {
-                      const isActive =
-                        pathname === child.href ||
-                        pathname.startsWith(child.href + "/");
+                      const isActive = pathname === child.href || pathname.startsWith(child.href + "/");
                       return (
                         <Link
                           key={child.href}
                           href={child.href}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm group ${
-                            isActive
-                              ? "bg-blue-50 text-blue-700 font-medium"
-                              : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-                          }`}
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm group ${isActive ? "bg-amber-50 text-amber-700 font-medium" : "text-gray-500 hover:bg-amber-50 hover:text-amber-700"}`}
                         >
-                          <child.icon
-                            className={`w-4 h-4 ${isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"}`}
-                          />
+                          <child.icon className={`w-4 h-4 ${isActive ? "text-amber-600" : "text-gray-400 group-hover:text-amber-500"}`} />
                           <span className="flex-1">{child.name}</span>
-                          
-                          {child.name === "Pengajuan Pinjaman" && pendingCount > 0 && role === "admin" && (
-                            <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm shadow-red-500/50"></span>
-                          )}
 
-                          {isActive && (
-                            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-600"></div>
-                          )}
+                          {child.name === "Pengajuan Pinjaman" && pendingCount > 0 && role === "admin" && <span className="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-sm shadow-red-500/50"></span>}
+
+                          {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-600"></div>}
                         </Link>
                       );
                     })}
@@ -469,36 +465,25 @@ export default function Sidebar({ role = "admin", allowedMenuIds = null }) {
             );
           }
 
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/dashboard" && pathname.startsWith(item.href));
+          const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${
-                isActive
-                  ? "bg-blue-50 text-blue-700 font-medium"
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
-              }`}
+              className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 group ${isActive ? "bg-amber-50 text-amber-700 font-medium" : "text-gray-500 hover:bg-amber-50 hover:text-amber-700"}`}
             >
-              <item.icon
-                className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-400 group-hover:text-gray-600"}`}
-              />
+              <item.icon className={`w-5 h-5 ${isActive ? "text-amber-600" : "text-gray-400 group-hover:text-amber-500"}`} />
               {item.name}
-              {isActive && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-600"></div>
-              )}
+              {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-amber-600"></div>}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-gray-50 m-4 bg-gray-50 rounded-xl">
-        <p className="text-xs text-gray-500 text-center font-medium">
-          Koperasi Polines
-        </p>
+      <div className="p-4 border-t border-gray-50 m-4 bg-gradient-to-br from-gray-50 to-amber-50/30 rounded-xl">
+        <p className="text-xs text-gray-500 text-center font-medium">Koperasi Polines</p>
       </div>
     </aside>
+    </>
   );
 }

@@ -38,7 +38,7 @@ export default function LaporanSHUPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
         <div className="flex items-center gap-3">
-          <div className="bg-purple-600 p-2.5 rounded-xl text-white"><PieChart className="w-5 h-5" /></div>
+          <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-2.5 rounded-xl text-white shadow-md shadow-orange-500/20"><PieChart className="w-5 h-5" /></div>
           <div>
             <h1 className="text-xl font-black text-gray-900">Laporan SHU</h1>
             <p className="text-sm text-gray-500">Sisa Hasil Usaha berdasarkan data pinjaman</p>
@@ -56,7 +56,7 @@ export default function LaporanSHUPage() {
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Anggota</label>
             <select value={filters.anggota_id} onChange={(e) => setFilters({ ...filters, anggota_id: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 outline-none">
               <option value="">Semua Anggota</option>
               {anggotaList.map((a) => <option key={a.id} value={a.id}>{a.nama} ({a.nik})</option>)}
             </select>
@@ -64,36 +64,36 @@ export default function LaporanSHUPage() {
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Tanggal Dari</label>
             <input type="date" value={filters.tgl1} onChange={(e) => setFilters({ ...filters, tgl1: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 outline-none" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-gray-500 mb-1">Tanggal Sampai</label>
             <input type="date" value={filters.tgl2} onChange={(e) => setFilters({ ...filters, tgl2: e.target.value })}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 outline-none" />
           </div>
         </div>
-        <button onClick={fetchData} className="mt-4 bg-blue-600 text-white px-6 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition text-sm font-medium">
+        <button onClick={fetchData} className="mt-4 btn-primary">
           <Search className="w-4 h-4" /> Tampilkan
         </button>
       </div>
 
       {/* Summary cards for SHU */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-blue-50 rounded-2xl p-5 border border-blue-100">
-          <p className="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">Total Bunga (Referal)</p>
-          <p className="text-xl font-black text-blue-700">Rp {fmt(totalBunga)}</p>
+        <div className="bg-blue-50 rounded-2xl p-5 border border-blue-200">
+          <p className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1">Total Bunga (Referal)</p>
+          <p className="text-xl font-black text-gray-800">Rp {fmt(totalBunga)}</p>
         </div>
-        <div className="bg-green-50 rounded-2xl p-5 border border-green-100">
-          <p className="text-xs font-bold text-green-500 uppercase tracking-wider mb-1">Total Pendapatan</p>
-          <p className="text-xl font-black text-green-700">Rp {fmt(summaryData.totalPendapatan)}</p>
+        <div className="bg-emerald-50 rounded-2xl p-5 border border-emerald-200">
+          <p className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Total Pendapatan</p>
+          <p className="text-xl font-black text-gray-800">Rp {fmt(summaryData.totalPendapatan)}</p>
         </div>
-        <div className="bg-red-50 rounded-2xl p-5 border border-red-100">
-          <p className="text-xs font-bold text-red-500 uppercase tracking-wider mb-1">Total Biaya Operasional</p>
-          <p className="text-xl font-black text-red-700">Rp {fmt(summaryData.totalBiayaOperasional)}</p>
+        <div className="bg-orange-50 rounded-2xl p-5 border border-orange-200">
+          <p className="text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">Total Biaya Operasional</p>
+          <p className="text-xl font-black text-gray-800">Rp {fmt(summaryData.totalBiayaOperasional)}</p>
         </div>
-        <div className="bg-purple-50 rounded-2xl p-5 border border-purple-100">
-          <p className="text-xs font-bold text-purple-500 uppercase tracking-wider mb-1">Sisa Hasil Usaha (SHU)</p>
-          <p className="text-xl font-black text-purple-700">Rp {fmt(summaryData.totalPendapatan - summaryData.totalBiayaOperasional)}</p>
+        <div className="bg-amber-50 rounded-2xl p-5 border border-amber-200">
+          <p className="text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">Sisa Hasil Usaha (SHU)</p>
+          <p className="text-xl font-black text-gray-900">Rp {fmt(summaryData.totalPendapatan - summaryData.totalBiayaOperasional)}</p>
         </div>
       </div>
 
@@ -101,7 +101,7 @@ export default function LaporanSHUPage() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
           <h3 className="text-xs font-bold text-gray-500 uppercase">
-            Data SHU — <span className="text-purple-600">{data.length} record</span>
+            Data SHU — <span className="text-amber-600">{data.length} record</span>
           </h3>
         </div>
         {loading ? <div className="p-12 text-center text-gray-400">Memuat...</div> : data.length === 0 ? (
@@ -122,9 +122,9 @@ export default function LaporanSHUPage() {
               </tr></thead>
               <tbody>
                 {data.map((row, idx) => (
-                  <tr key={row.id} className="border-b border-gray-50 hover:bg-purple-50/20">
+                  <tr key={row.id} className="border-b border-gray-50 hover:bg-amber-50/50">
                     <td className="px-6 py-3 text-gray-400">{idx + 1}</td>
-                    <td className="px-6 py-3 font-mono text-xs text-purple-600 font-bold">{row.nomor}</td>
+                    <td className="px-6 py-3 font-mono text-xs text-amber-600 font-bold">{row.nomor}</td>
                     <td className="px-6 py-3">
                       <p className="font-bold text-gray-900">{row.nama_anggota}</p>
                       <p className="text-xs text-gray-400">{row.nik}</p>

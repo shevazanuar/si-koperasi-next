@@ -18,7 +18,7 @@ export default async function TambahPinjamanPage() {
     }),
     prisma.jenis_pinjaman.findMany({
       select: { id: true, nama: true, lama: true, bunga: true, jumlah: true },
-      orderBy: { id: "asc" }
+      orderBy: { id: "desc" }
     })
   ]);
 

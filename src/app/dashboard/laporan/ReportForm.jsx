@@ -206,16 +206,16 @@ const printHexMap = {
 
 const dynamicColorMap = {
   blue: {
-    iconBg: "bg-blue-50",
-    iconText: "text-blue-600",
-    bg: "bg-blue-600",
-    hoverBg: "hover:bg-blue-700",
-    ring: "focus:ring-blue-500/20",
-    badgeText: "text-blue-700",
-    headerBg: "bg-blue-50",
-    headerBorder: "border-blue-200",
-    headerText: "text-blue-700",
-    lightBg: "bg-blue-50",
+    iconBg: "bg-amber-50",
+    iconText: "text-amber-600",
+    bg: "bg-amber-600",
+    hoverBg: "hover:bg-amber-700",
+    ring: "focus:ring-amber-500/20",
+    badgeText: "text-amber-700",
+    headerBg: "bg-amber-50",
+    headerBorder: "border-amber-200",
+    headerText: "text-amber-700",
+    lightBg: "bg-amber-50",
   },
   green: {
     iconBg: "bg-emerald-50",
@@ -242,28 +242,28 @@ const dynamicColorMap = {
     lightBg: "bg-orange-50",
   },
   red: {
-    iconBg: "bg-red-50",
-    iconText: "text-red-600",
-    bg: "bg-red-600",
-    hoverBg: "hover:bg-red-700",
-    ring: "focus:ring-red-500/20",
-    badgeText: "text-red-700",
-    headerBg: "bg-red-50",
-    headerBorder: "border-red-200",
-    headerText: "text-red-700",
-    lightBg: "bg-red-50",
+    iconBg: "bg-orange-50",
+    iconText: "text-orange-600",
+    bg: "bg-orange-600",
+    hoverBg: "hover:bg-orange-700",
+    ring: "focus:ring-orange-500/20",
+    badgeText: "text-orange-700",
+    headerBg: "bg-orange-50",
+    headerBorder: "border-orange-200",
+    headerText: "text-orange-700",
+    lightBg: "bg-orange-50",
   },
   purple: {
-    iconBg: "bg-purple-50",
-    iconText: "text-purple-600",
-    bg: "bg-purple-600",
-    hoverBg: "hover:bg-purple-700",
-    ring: "focus:ring-purple-500/20",
-    badgeText: "text-purple-700",
-    headerBg: "bg-purple-50",
-    headerBorder: "border-purple-200",
-    headerText: "text-purple-700",
-    lightBg: "bg-purple-50",
+    iconBg: "bg-stone-50",
+    iconText: "text-stone-600",
+    bg: "bg-stone-600",
+    hoverBg: "hover:bg-stone-700",
+    ring: "focus:ring-stone-500/20",
+    badgeText: "text-stone-700",
+    headerBg: "bg-stone-50",
+    headerBorder: "border-stone-200",
+    headerText: "text-stone-700",
+    lightBg: "bg-stone-50",
   },
 };
 
@@ -540,7 +540,7 @@ export default function ReportForm({
                   type="date"
                   value={fromDate}
                   onChange={(e) => setFromDate(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white"
                 />
               </div>
             )}
@@ -555,7 +555,7 @@ export default function ReportForm({
                   type="date"
                   value={toDate}
                   onChange={(e) => setToDate(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white"
                 />
               </div>
             )}
@@ -567,7 +567,7 @@ export default function ReportForm({
                 <select
                   value={anggotaId}
                   onChange={(e) => setAnggotaId(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white appearance-none pr-10"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white appearance-none pr-10"
                 >
                   <option value="">Semua Data Anggota Aktif...</option>
                   {anggotaList.map((a) => (
@@ -588,7 +588,7 @@ export default function ReportForm({
                   <select
                     value={jenisSimpanan}
                     onChange={(e) => setJenisSimpanan(e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white appearance-none pr-10"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white appearance-none pr-10"
                   >
                     <option value="">Semua Data ...</option>
                     {jenisSimpananList.map((j) => (
@@ -610,7 +610,7 @@ export default function ReportForm({
                   <select
                     value={perusahaan}
                     onChange={(e) => setPerusahaan(e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-300 bg-white appearance-none pr-10"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white appearance-none pr-10"
                   >
                     <option value="">Semua Data ...</option>
                     {perusahaanList.map((p, i) => (
@@ -628,44 +628,49 @@ export default function ReportForm({
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col md:flex-row items-center justify-end gap-3 mt-8 pt-4 border-t border-slate-200">
-            <button
-              type="submit"
-              disabled={loading}
-              className={`inline-flex items-center gap-2 px-6 py-3 text-white text-sm font-semibold rounded-xl transition-all shadow-sm active:scale-95 disabled:opacity-50 ${theme.bg} ${theme.hoverBg} focus:outline-none focus:ring-2 ${theme.ring}`}
-            >
-              <Search className="w-4 h-4" />
-              {loading ? "Memuat..." : "LIHAT"}
-            </button>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-slate-100">
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary flex-1 md:flex-none justify-center"
+              >
+                <Search className="w-4 h-4" />
+                {loading ? "Memuat..." : "Tampilkan Data"}
+              </button>
 
-            <button
-              type="button"
-              onClick={handleRefresh}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-500 text-white text-sm font-semibold rounded-xl hover:bg-slate-600 transition-all shadow-sm active:scale-95"
-            >
-              <RefreshCw className="w-4 h-4" />
-              REFRESH
-            </button>
+              <button
+                type="button"
+                onClick={handleRefresh}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white border border-gray-200 text-gray-700 text-sm font-bold rounded-xl hover:bg-gray-50 transition-all shadow-sm active:scale-95 flex-1 md:flex-none"
+              >
+                <RefreshCw className="w-4 h-4 text-gray-400" />
+                Reset
+              </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={handleCetakExcel}
-              disabled={!data || data.length === 0}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Download className="w-4 h-4" />
-              CETAK EXCEL
-            </button>
+            <div className="flex items-center gap-3 w-full md:w-auto mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest hidden md:inline-block mr-2">Export:</span>
+              <button
+                type="button"
+                onClick={handleCetakExcel}
+                disabled={!data || data.length === 0}
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200 text-sm font-bold rounded-xl hover:bg-emerald-100 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-1 md:flex-none"
+              >
+                <Download className="w-4 h-4" />
+                Excel
+              </button>
 
-            <button
-              type="button"
-              onClick={handleCetakPDF}
-              disabled={!data || data.length === 0}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white text-sm font-semibold rounded-xl hover:bg-red-700 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Printer className="w-4 h-4" />
-              CETAK PDF
-            </button>
+              <button
+                type="button"
+                onClick={handleCetakPDF}
+                disabled={!data || data.length === 0}
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-orange-50 text-orange-700 border border-orange-200 text-sm font-bold rounded-xl hover:bg-orange-100 transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex-1 md:flex-none"
+              >
+                <Printer className="w-4 h-4" />
+                PDF
+              </button>
+            </div>
           </div>
         </form>
       </div>

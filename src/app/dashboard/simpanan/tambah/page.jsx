@@ -16,7 +16,7 @@ export default async function TambahSimpananPage() {
       orderBy: { nama: "asc" }
     }),
     prisma.jenis_simpanan.findMany({
-      orderBy: { id: "asc" }
+      orderBy: { id: "desc" }
     })
   ]);
 

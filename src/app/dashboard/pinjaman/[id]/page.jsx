@@ -35,7 +35,8 @@ export default async function PinjamanDetailPage({ params }) {
       lama: true,
       satuan: true,
       bunga: true,
-      jumlah: true
+      jumlah: true,
+      user_id: true
     }
   });
 
@@ -48,7 +49,7 @@ export default async function PinjamanDetailPage({ params }) {
       return notFound();
   }
 
-  const [anggota, jenis, installments] = await Promise.all([
+  const [anggota, jenis, installments, admin] = await Promise.all([
     prisma.anggota.findUnique({ 
       where: { id: pinjaman.anggota_id },
       select: { id: true, nama: true, nik: true }
@@ -69,6 +70,10 @@ export default async function PinjamanDetailPage({ params }) {
         tgl_bayar: true,
         jumlah_bayar: true
       }
+    }),
+    prisma.users.findUnique({
+      where: { id: pinjaman.user_id || 0 },
+      select: { namalengkap: true, username: true }
     })
   ]);
 
@@ -188,6 +193,18 @@ export default async function PinjamanDetailPage({ params }) {
                  <span className="text-xs font-bold">Lihat Profil Lengkap</span>
                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
+           </div>
+
+           <div className="mt-6 pt-6 border-t border-gray-50 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                 <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center border border-gray-100 italic font-black text-gray-300 text-xs">
+                    {admin?.username?.charAt(0)?.toUpperCase() || 'A'}
+                 </div>
+                 <div>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Dicairkan Oleh</p>
+                    <p className="text-xs font-bold text-gray-700">{admin?.namalengkap || 'System Administrator'}</p>
+                 </div>
+              </div>
            </div>
 
            <div className="mt-8 p-6 bg-gray-900 rounded-3xl text-white relative overflow-hidden group">

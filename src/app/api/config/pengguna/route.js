@@ -4,8 +4,8 @@ import { hashPassword } from "@/lib/password";
 
 export async function GET() {
   try {
-    const users = await prisma.users.findMany({ orderBy: { id: "asc" } });
-    const levels = await prisma.level.findMany({ orderBy: { id: "asc" } });
+    const users = await prisma.users.findMany({ orderBy: { id: "desc" } });
+    const levels = await prisma.level.findMany({ orderBy: { id: "desc" } });
     return NextResponse.json({ data: users, levels });
   } catch (error) {
     return NextResponse.json({ error: "Gagal memuat data" }, { status: 500 });

@@ -4,12 +4,7 @@ import { useState } from "react";
 import { Upload, FileSpreadsheet, X, Check, Loader2, AlertCircle } from "lucide-react";
 import * as XLSX from "xlsx";
 
-export default function ImportExcelButton({ 
-  type, 
-  title = "Import Data", 
-  apiUrl,
-  onSuccess 
-}) {
+export default function ImportExcelButton({ type, title = "Import Data", apiUrl, onSuccess }) {
   const [isOpen, setIsOpen] = useState(false);
   const [file, setFile] = useState(null);
   const [previewData, setPreviewData] = useState([]);
@@ -21,7 +16,7 @@ export default function ImportExcelButton({
     if (!selectedFile) return;
 
     setFile(selectedFile);
-    
+
     const reader = new FileReader();
     reader.onload = (evt) => {
       try {
@@ -87,7 +82,7 @@ export default function ImportExcelButton({
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-5 py-2.5 rounded-xl font-bold text-sm transition-all hover:bg-emerald-100 flex items-center gap-2 shadow-sm active:scale-95"
       >
@@ -109,11 +104,7 @@ export default function ImportExcelButton({
                   <p className="text-xs text-gray-500">Pilih file Excel (.xlsx atau .csv)</p>
                 </div>
               </div>
-              <button 
-                onClick={closeModal}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                disabled={loading}
-              >
+              <button onClick={closeModal} className="p-2 hover:bg-gray-100 rounded-lg transition-colors" disabled={loading}>
                 <X className="w-5 h-5 text-gray-400" />
               </button>
             </div>
@@ -132,55 +123,60 @@ export default function ImportExcelButton({
               ) : (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-                     <div className="flex items-center gap-3">
-                        <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
-                        <span className="font-bold text-emerald-900 text-sm">{file.name}</span>
-                     </div>
-                     <button 
-                        onClick={() => { setFile(null); setPreviewData([]); }}
-                        className="text-[10px] font-black uppercase text-rose-600 hover:text-rose-700"
-                        disabled={loading}
-                     >
-                        Ganti File
-                     </button>
+                    <div className="flex items-center gap-3">
+                      <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
+                      <span className="font-bold text-emerald-900 text-sm">{file.name}</span>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setFile(null);
+                        setPreviewData([]);
+                      }}
+                      className="text-[10px] font-black uppercase text-rose-600 hover:text-rose-700"
+                      disabled={loading}
+                    >
+                      Ganti File
+                    </button>
                   </div>
 
                   {previewData.length > 0 && (
                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Preview 5 Data Pertama</p>
-                        <div className="bg-gray-50 border border-gray-100 rounded-xl overflow-hidden max-h-40 overflow-y-auto">
-                            <table className="w-full text-left text-[10px]">
-                                <thead className="bg-gray-100 text-gray-500 font-bold uppercase sticky top-0">
-                                    <tr>
-                                        {Object.keys(previewData[0]).map(key => (
-                                            <th key={key} className="p-2 border-b border-gray-200">{key}</th>
-                                        ))}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {previewData.map((row, i) => (
-                                        <tr key={i} className="bg-white hover:bg-gray-50">
-                                            {Object.values(row).map((val, j) => (
-                                                <td key={j} className="p-2 border-b border-gray-50 text-gray-600 truncate max-w-[100px]">{String(val)}</td>
-                                            ))}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 ml-1">Preview 5 Data Pertama</p>
+                      <div className="bg-gray-50 border border-gray-100 rounded-xl overflow-hidden max-h-40 overflow-y-auto">
+                        <table className="w-full text-left text-[10px]">
+                          <thead className="bg-gray-100 text-gray-500 font-bold uppercase sticky top-0">
+                            <tr>
+                              {Object.keys(previewData[0]).map((key) => (
+                                <th key={key} className="p-2 border-b border-gray-200">
+                                  {key}
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {previewData.map((row, i) => (
+                              <tr key={i} className="bg-white hover:bg-gray-50">
+                                {Object.values(row).map((val, j) => (
+                                  <td key={j} className="p-2 border-b border-gray-50 text-gray-600 truncate max-w-[100px]">
+                                    {String(val)}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   )}
 
                   {status.message && (
-                    <div className={`p-4 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-2 ${
-                        status.type === 'error' ? 'bg-rose-50 text-rose-700 border border-rose-100' : 
-                        status.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' :
-                        'bg-blue-50 text-blue-700 border border-blue-100'
-                    }`}>
-                        {status.type === 'error' ? <AlertCircle className="w-5 h-5" /> : 
-                         status.type === 'success' ? <Check className="w-5 h-5" /> : 
-                         <Loader2 className="w-5 h-5 animate-spin" />}
-                        <p className="text-xs font-bold">{status.message}</p>
+                    <div
+                      className={`p-4 rounded-xl flex items-center gap-3 animate-in slide-in-from-top-2 ${
+                        status.type === "error" ? "bg-rose-50 text-rose-700 border border-rose-100" : status.type === "success" ? "bg-amber-50 text-amber-700 border border-amber-100" : "bg-amber-50 text-amber-700 border border-amber-100"
+                      }`}
+                    >
+                      {status.type === "error" ? <AlertCircle className="w-5 h-5" /> : status.type === "success" ? <Check className="w-5 h-5" /> : <Loader2 className="w-5 h-5 animate-spin" />}
+                      <p className="text-xs font-bold">{status.message}</p>
                     </div>
                   )}
                 </div>
@@ -189,21 +185,17 @@ export default function ImportExcelButton({
 
             {/* Footer */}
             <div className="p-6 border-t border-gray-100 bg-gray-50/50 flex justify-end gap-3">
-                <button 
-                  onClick={closeModal}
-                  className="px-6 py-2.5 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-200 transition-colors"
-                  disabled={loading}
-                >
-                  Batal
-                </button>
-                <button 
-                  onClick={handleImport}
-                  disabled={!file || loading}
-                  className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:shadow-none text-white px-8 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
-                >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Mulai Impor
-                </button>
+              <button onClick={closeModal} className="px-6 py-2.5 rounded-xl font-bold text-sm text-gray-500 hover:bg-gray-200 transition-colors" disabled={loading}>
+                Batal
+              </button>
+              <button
+                onClick={handleImport}
+                disabled={!file || loading}
+                className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-gray-300 disabled:shadow-none text-white px-8 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                Mulai Impor
+              </button>
             </div>
           </div>
         </div>

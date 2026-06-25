@@ -33,41 +33,35 @@ export default function ReportFilter({
       <div className="space-y-5">
         {showDariTanggal && (
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-              {showSampaiTanggal ? "Dari Tanggal" : tanggalLabel}
-            </label>
+            <label className="w-40 text-sm font-medium text-gray-600 shrink-0">{showSampaiTanggal ? "Dari Tanggal" : tanggalLabel}</label>
             <input
               type="date"
               value={fromDate}
               onChange={(e) => onFromDateChange(e.target.value)}
-              className="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white"
+              className="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-400 transition-all bg-white"
             />
           </div>
         )}
 
         {showSampaiTanggal && (
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-              Sampai Tanggal
-            </label>
+            <label className="w-40 text-sm font-medium text-gray-600 shrink-0">Sampai Tanggal</label>
             <input
               type="date"
               value={toDate}
               onChange={(e) => onToDateChange(e.target.value)}
-              className="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white"
+              className="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-400 transition-all bg-white"
             />
           </div>
         )}
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-            Nama Anggota
-          </label>
+          <label className="w-40 text-sm font-medium text-gray-600 shrink-0">Nama Anggota</label>
           <div className="relative flex-1 max-w-md">
             <select
               value={anggotaId}
               onChange={(e) => onAnggotaIdChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white appearance-none pr-10"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-400 transition-all bg-white appearance-none pr-10"
             >
               <option value="">Semua Data Anggota Aktif...</option>
               {anggotaList.map((a) => (
@@ -82,14 +76,12 @@ export default function ReportFilter({
 
         {showJenisSimpanan && (
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-              Jenis Simpanan
-            </label>
+            <label className="w-40 text-sm font-medium text-gray-600 shrink-0">Jenis Simpanan</label>
             <div className="relative flex-1 max-w-md">
               <select
                 value={jenisSimpanan}
                 onChange={(e) => onJenisSimpananChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white appearance-none pr-10"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-400 transition-all bg-white appearance-none pr-10"
               >
                 <option value="">Semua Data ...</option>
                 {jenisSimpananList.map((j) => (
@@ -105,14 +97,12 @@ export default function ReportFilter({
 
         {showPerusahaan && (
           <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-            <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-              Perusahaan
-            </label>
+            <label className="w-40 text-sm font-medium text-gray-600 shrink-0">Perusahaan</label>
             <div className="relative flex-1 max-w-md">
               <select
                 value={perusahaan}
                 onChange={(e) => onPerusahaanChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-400 transition-all bg-white appearance-none pr-10"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-400 transition-all bg-white appearance-none pr-10"
               >
                 <option value="">Semua Data ...</option>
                 {perusahaanList.map((p, i) => (
@@ -129,23 +119,12 @@ export default function ReportFilter({
         <hr className="border-gray-200" />
 
         <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <label className="w-40 text-sm font-medium text-gray-600 shrink-0">
-            Output
-          </label>
+          <label className="w-40 text-sm font-medium text-gray-600 shrink-0">Output</label>
           <div className="flex flex-col gap-2">
             {["html", "excel"].map((fmt) => (
               <label key={fmt} className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="output"
-                  value={fmt}
-                  checked={outputFormat === fmt}
-                  onChange={() => onOutputFormatChange(fmt)}
-                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700 font-medium uppercase">
-                  {fmt}
-                </span>
+                <input type="radio" name="output" value={fmt} checked={outputFormat === fmt} onChange={() => onOutputFormatChange(fmt)} className="w-4 h-4 text-amber-600 border-gray-300 focus:ring-amber-500" />
+                <span className="text-sm text-gray-700 font-medium uppercase">{fmt}</span>
               </label>
             ))}
           </div>
@@ -156,17 +135,13 @@ export default function ReportFilter({
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-600 text-white text-sm font-semibold rounded-lg hover:bg-amber-700 transition-all shadow-sm active:scale-95 disabled:opacity-50"
         >
           <Search className="w-4 h-4" />
           {loading ? "Memuat..." : "Lihat"}
         </button>
 
-        <button
-          type="button"
-          onClick={onRefresh}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white text-sm font-semibold rounded-lg hover:bg-red-600 transition-all shadow-sm active:scale-95"
-        >
+        <button type="button" onClick={onRefresh} className="inline-flex items-center gap-2 px-5 py-2.5 bg-red-500 text-white text-sm font-semibold rounded-lg hover:bg-red-600 transition-all shadow-sm active:scale-95">
           <RefreshCw className="w-4 h-4" />
           Refresh
         </button>

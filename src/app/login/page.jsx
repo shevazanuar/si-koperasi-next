@@ -12,8 +12,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
       {/* Background patterns */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-100/50 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-emerald-100/30 rounded-full blur-3xl"></div>
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-amber-100/50 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-100/30 rounded-full blur-3xl"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03] pointer-events-none select-none">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -27,11 +27,11 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full max-w-[420px] relative z-10 animate-in fade-in zoom-in duration-700">
-        <div className="bg-white p-8 sm:p-10 rounded-[2.5rem] shadow-2xl shadow-blue-900/10 border border-white relative overflow-hidden">
+        <div className="bg-white p-8 sm:p-10 rounded-[2.5rem] shadow-2xl shadow-amber-900/10 border border-white relative overflow-hidden">
 
           {/* Header */}
           <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl shadow-xl shadow-blue-500/30 mb-6 group transition-transform hover:scale-110">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl shadow-xl shadow-orange-500/30 mb-6 group transition-transform hover:scale-110">
               <Landmark className="text-white w-8 h-8" />
             </div>
             <h1 className="text-3xl font-black text-gray-900 tracking-tight mb-2">SI Koperasi</h1>
@@ -49,7 +49,7 @@ export default function LoginPage() {
                     name="username"
                     type="text"
                     placeholder="Masukkan Username"
-                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3.5 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all font-medium"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3.5 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-400 transition-all font-medium"
                     required
                   />
                 </div>
@@ -58,7 +58,7 @@ export default function LoginPage() {
               <div>
                 <div className="flex items-center justify-between mb-2 ml-1">
                   <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest">Password</label>
-                  <Link href="/lupa-password" className="text-[10px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-tighter">Lupa Password?</Link>
+                  <Link href="/lupa-password" className="text-[10px] font-bold text-amber-600 hover:text-amber-700 uppercase tracking-tighter">Lupa Password?</Link>
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -66,7 +66,7 @@ export default function LoginPage() {
                     name="password"
                     type="password"
                     placeholder="Masukkan Password"
-                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3.5 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all font-medium"
+                    className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-3.5 pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-4 focus:ring-amber-500/10 focus:border-amber-400 transition-all font-medium"
                     required
                   />
                 </div>
@@ -82,7 +82,7 @@ export default function LoginPage() {
 
             <button
               disabled={isPending}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-500/20 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 group mt-4"
+              className="w-full btn-primary py-4 rounded-2xl flex items-center justify-center gap-2 group mt-4 text-base"
             >
               {isPending ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -105,12 +105,12 @@ export default function LoginPage() {
         {/* Outer decorations */}
         <div className="mt-8 flex justify-center gap-6">
           <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase tracking-wider">
-
-
+            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full shadow-sm shadow-emerald-500/50"></div>
+            Server Online
           </div>
           <div className="flex items-center gap-2 text-gray-400 text-[10px] font-bold uppercase tracking-wider">
-
-
+            <div className="w-1.5 h-1.5 bg-amber-500 rounded-full shadow-sm shadow-amber-500/50"></div>
+            v2.0.4 Secure
           </div>
         </div>
       </div>

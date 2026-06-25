@@ -110,7 +110,7 @@ export default async function SimpananDetailPage({ params }) {
            <div className="bg-gray-50 p-6 rounded-3xl border border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-4">
                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center border border-gray-100 italic font-black text-gray-300 text-xs">
-                    {user?.username?.charAt(0).toUpperCase() || 'A'}
+                    {user?.username?.charAt(0)?.toUpperCase() || 'A'}
                  </div>
                  <div>
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Diinput Oleh</p>

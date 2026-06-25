@@ -1,39 +1,63 @@
 @import "tailwindcss";
 
 :root {
-  --background: #FDFBF7;
-  --foreground: #31271D;
+  --background: #fdfbf7;
+  --foreground: #31271d;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
 
   /* Primary Brand (Earthy Brown instead of Blue) */
-  --color-blue-50: #FDF3E7;
-  --color-blue-100: #F7E5D4;
-  --color-blue-200: #EACCAE;
-  --color-blue-300: #DDB388;
-  --color-blue-400: #D19A62;
-  --color-blue-500: #C4813C;
-  --color-blue-600: #B47B5A;
-  --color-blue-700: #9C6141;
-  --color-blue-800: #804E33;
-  --color-blue-900: #663C26;
+  --color-blue-50: #fdf3e7;
+  --color-blue-100: #f7e5d4;
+  --color-blue-200: #eaccae;
+  --color-blue-300: #ddb388;
+  --color-blue-400: #d19a62;
+  --color-blue-500: #c4813c;
+  --color-blue-600: #b47b5a;
+  --color-blue-700: #9c6141;
+  --color-blue-800: #804e33;
+  --color-blue-900: #663c26;
+
+  /* Secondary Accent (Warm Amber/Brown for badges and highlights) */
+  --color-orange-50: #f9efe0;
+  --color-orange-100: #ecd5be;
+  --color-orange-200: #dcb58f;
+  --color-orange-300: #c99970;
+  --color-orange-400: #ba8559;
+  --color-orange-500: #a87045;
+  --color-orange-600: #925e3b;
+  --color-orange-700: #7b4a2f;
+  --color-orange-800: #613b26;
+  --color-orange-900: #4c2f1f;
+
+  /* Success / Positive Accent (Muted Golden Brown) */
+  --color-emerald-50: #f7efe0;
+  --color-emerald-100: #ead7bc;
+  --color-emerald-200: #d8bb95;
+  --color-emerald-300: #c9a079;
+  --color-emerald-400: #b1815d;
+  --color-emerald-500: #9b6d46;
+  --color-emerald-600: #82593b;
+  --color-emerald-700: #6a4630;
+  --color-emerald-800: #533824;
+  --color-emerald-900: #422d1f;
 
   /* Neutral Backgrounds and Text (Warm Grays instead of Slate/Gray) */
-  --color-gray-50: #FDFBF7;
-  --color-gray-100: #F6F0E7;
-  --color-gray-200: #EBE3D5;
-  --color-gray-300: #DED3C1;
-  --color-gray-400: #C0B19D;
-  --color-gray-500: #9C8C78;
-  --color-gray-600: #7A6A58;
-  --color-gray-700: #5A4D3E;
-  --color-gray-800: #42372A;
-  --color-gray-900: #31271D;
+  --color-gray-50: #fdfbf7;
+  --color-gray-100: #f6f0e7;
+  --color-gray-200: #ebe3d5;
+  --color-gray-300: #ded3c1;
+  --color-gray-400: #c0b19d;
+  --color-gray-500: #9c8c78;
+  --color-gray-600: #7a6a58;
+  --color-gray-700: #5a4d3e;
+  --color-gray-800: #42372a;
+  --color-gray-900: #31271d;
 
   /* Remap slate to warm gray */
   --color-slate-50: var(--color-gray-50);
@@ -50,22 +74,24 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #1A1510;
-    --foreground: #F6F0E7;
+    --background: #1a1510;
+    --foreground: #f6f0e7;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), sans-serif;
 }
 
 @layer base {
-  input, select, textarea {
+  input,
+  select,
+  textarea {
     color: #000000 !important;
   }
-  
+
   /* Custom modern styling for select elements */
   select {
     appearance: none;
@@ -82,9 +108,11 @@ body {
     transition: all 0.2s ease-in-out;
     cursor: pointer;
   }
-  
+
   /* Warm earthy focus ring instead of default blue */
-  select:focus, input:focus, textarea:focus {
+  select:focus,
+  input:focus,
+  textarea:focus {
     outline: none !important;
     border-color: var(--color-blue-400) !important;
     box-shadow: 0 0 0 4px rgba(196, 129, 60, 0.15) !important;
@@ -93,12 +121,13 @@ body {
   /* Style the options slightly where browser allows */
   select option {
     background-color: #ffffff;
-    color: #31271D;
+    color: #31271d;
     padding: 12px;
     font-weight: 500;
   }
 
-  input::placeholder, textarea::placeholder {
+  input::placeholder,
+  textarea::placeholder {
     color: #000000 !important;
     opacity: 0.6 !important;
   }
@@ -106,11 +135,8 @@ body {
 
 @layer utilities {
   .mesh-gradient {
-    background-color: #1A1510;
-    background-image: 
-      radial-gradient(at 0% 0%, hsla(25, 40%, 15%, 1) 0, transparent 50%), 
-      radial-gradient(at 50% 0%, hsla(30, 30%, 20%, 1) 0, transparent 50%), 
-      radial-gradient(at 100% 0%, hsla(20, 50%, 15%, 1) 0, transparent 50%);
+    background-color: #1a1510;
+    background-image: radial-gradient(at 0% 0%, hsla(25, 40%, 15%, 1) 0, transparent 50%), radial-gradient(at 50% 0%, hsla(30, 30%, 20%, 1) 0, transparent 50%), radial-gradient(at 100% 0%, hsla(20, 50%, 15%, 1) 0, transparent 50%);
   }
 
   .glass {
@@ -127,22 +153,35 @@ body {
    ========================================== */
 
 @keyframes masterFadeInUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes masterFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes masterShimmer {
-  0%   { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
-@layer utilities {
-
+@layer components {
   /* Page enter animation */
   .animate-page-enter {
     animation: masterFadeInUp 0.4s ease-out both;
@@ -155,14 +194,20 @@ body {
   /* Card base */
   .card-base {
     background: #ffffff;
-    border: 1px solid #EBE3D5;
+    border: 1px solid #ebe3d5;
     border-radius: 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow:
+      0 1px 3px rgba(0, 0, 0, 0.04),
+      0 1px 2px rgba(0, 0, 0, 0.06);
+    transition:
+      box-shadow 0.2s ease,
+      border-color 0.2s ease;
   }
 
   .card-base:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      0 2px 4px rgba(0, 0, 0, 0.04);
   }
 
   /* Page header gradient bar */
@@ -172,13 +217,13 @@ body {
   }
 
   .page-header-accent::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #B47B5A, #C4813C, #D19A62, #B47B5A);
+    background: linear-gradient(90deg, #b47b5a, #c4813c, #d19a62, #b47b5a);
     background-size: 200% 100%;
     animation: masterShimmer 3s ease-in-out infinite;
   }
@@ -210,9 +255,9 @@ body {
   }
 
   .badge-info {
-    background: #FDF3E7;
-    color: #9C6141;
-    border-color: #EACCAE;
+    background: #fdf3e7;
+    color: #9c6141;
+    border-color: #eaccae;
   }
 
   .badge-warning {
@@ -230,26 +275,26 @@ body {
   }
 
   .table-modern thead tr {
-    background: #FDFBF7;
-    border-bottom: 2px solid #EBE3D5;
+    background: #fdfbf7;
+    border-bottom: 2px solid #ebe3d5;
   }
 
   .table-modern thead th {
     padding: 12px 20px;
     font-size: 11px;
     font-weight: 700;
-    color: #9C8C78;
+    color: #9c8c78;
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
 
   .table-modern tbody tr {
-    border-bottom: 1px solid #F6F0E7;
+    border-bottom: 1px solid #f6f0e7;
     transition: background-color 0.15s ease;
   }
 
   .table-modern tbody tr:hover {
-    background-color: #FDFBF7;
+    background-color: #fdfbf7;
   }
 
   .table-modern tbody td {
@@ -259,22 +304,22 @@ body {
   /* Form input modern */
   .input-modern {
     width: 100%;
-    border: 1.5px solid #EBE3D5;
+    border: 1.5px solid #ebe3d5;
     border-radius: 0.75rem;
     padding: 10px 14px;
     font-size: 0.875rem;
-    color: #31271D;
+    color: #31271d;
     background: #ffffff;
     transition: all 0.2s ease;
     outline: none;
   }
 
   .input-modern:hover {
-    border-color: #DED3C1;
+    border-color: #ded3c1;
   }
 
   .input-modern:focus {
-    border-color: #B47B5A;
+    border-color: #b47b5a;
     box-shadow: 0 0 0 3px rgba(180, 123, 90, 0.12);
   }
 
@@ -284,7 +329,7 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: linear-gradient(135deg, #C4813C, #B47B5A);
+    background: linear-gradient(135deg, #c4813c, #b47b5a);
     color: white;
     font-size: 0.875rem;
     font-weight: 600;
@@ -296,7 +341,7 @@ body {
   }
 
   .btn-primary:hover {
-    background: linear-gradient(135deg, #B47B5A, #9C6141);
+    background: linear-gradient(135deg, #b47b5a, #9c6141);
     box-shadow: 0 4px 12px rgba(180, 123, 90, 0.35);
     transform: translateY(-1px);
   }
@@ -312,19 +357,19 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background: #F6F0E7;
-    color: #5A4D3E;
+    background: #f6f0e7;
+    color: #5a4d3e;
     font-size: 0.875rem;
     font-weight: 500;
     border-radius: 0.75rem;
     transition: all 0.2s ease;
     cursor: pointer;
-    border: 1px solid #EBE3D5;
+    border: 1px solid #ebe3d5;
   }
 
   .btn-secondary:hover {
-    background: #EBE3D5;
-    color: #42372A;
+    background: #ebe3d5;
+    color: #42372a;
   }
 
   /* Action icon button */
@@ -341,13 +386,13 @@ body {
   }
 
   .btn-icon-edit {
-    color: #B47B5A;
+    color: #b47b5a;
     background: transparent;
   }
 
   .btn-icon-edit:hover {
-    background: #FDF3E7;
-    border-color: #EACCAE;
+    background: #fdf3e7;
+    border-color: #eaccae;
   }
 
   .btn-icon-delete {
@@ -365,7 +410,7 @@ body {
     display: block;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #7A6A58;
+    color: #7a6a58;
     margin-bottom: 6px;
     letter-spacing: 0.01em;
   }
@@ -376,7 +421,7 @@ body {
     padding-right: 1rem;
     padding-top: 9px;
     padding-bottom: 9px;
-    border: 1.5px solid #EBE3D5;
+    border: 1.5px solid #ebe3d5;
     border-radius: 0.75rem;
     font-size: 0.875rem;
     background: #ffffff;
@@ -386,13 +431,13 @@ body {
   }
 
   .search-input:focus {
-    border-color: #B47B5A;
+    border-color: #b47b5a;
     box-shadow: 0 0 0 3px rgba(180, 123, 90, 0.1);
   }
 
   /* Skeleton loading */
   .skeleton {
-    background: linear-gradient(90deg, #F6F0E7, #EBE3D5, #F6F0E7);
+    background: linear-gradient(90deg, #f6f0e7, #ebe3d5, #f6f0e7);
     background-size: 200% 100%;
     animation: masterShimmer 1.5s ease-in-out infinite;
     border-radius: 0.5rem;

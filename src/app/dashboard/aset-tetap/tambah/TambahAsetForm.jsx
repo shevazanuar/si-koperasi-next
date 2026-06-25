@@ -10,19 +10,7 @@ export default function TambahAsetForm({ kategoriList, kasList, bankList }) {
   const [state, formAction, isPending] = useActionState(createAsetTetap, null);
   const [sumberDana, setSumberDana] = useState("Kas");
   const [nilaiPembelian, setNilaiPembelian] = useState(0);
-  const [nilaiResidu, setNilaiResidu] = useState(0);
-  const [masaManfaatTahun, setMasaManfaatTahun] = useState(0);
-  const [penyusutanBln, setPenyusutanBln] = useState(0);
 
-  useEffect(() => {
-    const masaManfaatBulan = masaManfaatTahun * 12;
-    if (nilaiPembelian >= 0 && masaManfaatBulan > 0) {
-      const perBulan = (nilaiPembelian - nilaiResidu) / masaManfaatBulan;
-      setPenyusutanBln(perBulan > 0 ? perBulan : 0);
-    } else {
-      setPenyusutanBln(0);
-    }
-  }, [nilaiPembelian, nilaiResidu, masaManfaatTahun]);
 
   const formatRupiah = (angka) => {
     return new Intl.NumberFormat("id-ID", {
@@ -85,7 +73,7 @@ export default function TambahAsetForm({ kategoriList, kasList, bankList }) {
         <div className="space-y-6">
           <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-50">
             <DollarSign className="w-5 h-5 text-blue-600" />
-            Nilai & Penyusutan
+            Nilai Aset
           </h3>
           
           <div className="space-y-4">
@@ -102,38 +90,6 @@ export default function TambahAsetForm({ kategoriList, kasList, bankList }) {
                   required
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700 ml-1">Nilai Residu</label>
-              <div className="relative">
-                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <CurrencyInput
-                  name="nilai_residu"
-                  placeholder="0"
-                  value={nilaiResidu === 0 ? "" : nilaiResidu}
-                  onChange={(val) => setNilaiResidu(Number(val))}
-                  className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700 ml-1">Masa Pakai (Tahun)</label>
-              <input
-                name="masa_manfaat_tahun"
-                type="number"
-                placeholder="Contoh: 4 (untuk 4 tahun / 48 bulan)"
-                value={masaManfaatTahun || ""}
-                onChange={(e) => setMasaManfaatTahun(Number(e.target.value))}
-                className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
-                required
-              />
-            </div>
-
-            <div className="p-4 bg-blue-50 border border-blue-100 rounded-2xl mt-4">
-              <div className="text-xs text-blue-600 font-bold uppercase tracking-wider mb-1">Simulasi Penyusutan</div>
-              <div className="text-2xl font-black text-blue-800">{formatRupiah(penyusutanBln)} <span className="text-sm text-blue-600/70 font-medium">/ bulan</span></div>
             </div>
           </div>
         </div>

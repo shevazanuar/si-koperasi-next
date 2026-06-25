@@ -16,7 +16,8 @@ export default async function PenjualanPage({ searchParams }) {
   const limit = parseInt(params?.limit) || 25;
 
   const penjualan = await prisma.penjualan.findMany({
-    where: {
+    orderBy: { id: "desc" },
+        where: {
       OR: [
         { kode_penjualan: { contains: query } },
         { nama_pembeli: { contains: query } },

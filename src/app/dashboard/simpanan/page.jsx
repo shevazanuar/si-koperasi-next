@@ -58,9 +58,7 @@ export default async function SimpananPage({ searchParams }) {
 
   sqlParams.push(safeLimit);
 
-  const jenisRaw = await prisma.$queryRawUnsafe(
-    "SELECT id, nama FROM jenis_simpanan ORDER BY id ASC"
-  );
+  const jenisRaw = await prisma.$queryRawUnsafe("SELECT id, nama FROM jenis_simpanan ORDER BY id ASC");
 
   const raw = await prisma.$queryRawUnsafe(sql, ...sqlParams);
 
@@ -71,7 +69,7 @@ export default async function SimpananPage({ searchParams }) {
     jumlah: Number(r.jumlah),
   }));
 
-  const jenisTypes = jenisRaw.map(j => ({
+  const jenisTypes = jenisRaw.map((j) => ({
     ...j,
     id: typeof j.id === "bigint" ? Number(j.id) : j.id,
   }));
@@ -96,39 +94,28 @@ export default async function SimpananPage({ searchParams }) {
     GROUP BY js.id, js.nama
   `;
   const summaryRaw = await prisma.$queryRawUnsafe(summarySql, ...summaryParams);
-  
-  const summaries = summaryRaw.map(s => ({
+
+  const summaries = summaryRaw.map((s) => ({
     jenis_nama: s.jenis_nama,
-    total_saldo: Number(s.total_saldo)
+    total_saldo: Number(s.total_saldo),
   }));
   const totalAll = summaries.reduce((acc, curr) => acc + curr.total_saldo, 0);
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500 pb-20">
-
       {/* Header */}
       <div className="flex items-center justify-between bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
         <div>
           <h1 className="text-xl font-black text-gray-900">Data Simpanan Anggota</h1>
           <p className="text-gray-400 text-sm mt-0.5">Kelola dan pantau seluruh transaksi simpanan</p>
         </div>
-        <div className="flex items-center gap-2">
-          {user.role !== "anggota" && (
-            <Link
-              href="/dashboard/simpanan/tambah"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 active:scale-95 text-sm"
-            >
-              <Plus className="w-4 h-4" />
-              Tambah
-            </Link>
-          )}
-        </div>
+        <div className="flex items-center gap-2"></div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Keseluruhan */}
-        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/30 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-amber-600 to-orange-700 rounded-2xl p-5 text-white shadow-lg shadow-amber-500/30 relative overflow-hidden">
           <div className="relative z-10">
             <div className="flex justify-between items-start mb-4">
               <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm">
@@ -136,7 +123,7 @@ export default async function SimpananPage({ searchParams }) {
               </div>
             </div>
             <div>
-              <p className="text-blue-100 text-sm font-medium mb-1">Total Keseluruhan</p>
+              <p className="text-amber-100 text-sm font-medium mb-1">Total Keseluruhan</p>
               <h3 className="text-2xl font-black">Rp {fmt(totalAll)}</h3>
             </div>
           </div>
@@ -145,9 +132,9 @@ export default async function SimpananPage({ searchParams }) {
 
         {/* Breakdown */}
         {summaries.map((s, idx) => (
-          <div key={idx} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm relative overflow-hidden group hover:border-blue-100 hover:shadow-md transition-all">
+          <div key={idx} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm relative overflow-hidden group hover:border-amber-100 hover:shadow-md transition-all">
             <div className="flex justify-between items-start mb-4">
-              <div className="bg-blue-50 p-2.5 rounded-xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+              <div className="bg-amber-50 p-2.5 rounded-xl text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-colors">
                 <Wallet className="w-5 h-5" />
               </div>
             </div>
@@ -161,31 +148,15 @@ export default async function SimpananPage({ searchParams }) {
 
       {/* Table Card */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm">
-
         {/* Toolbar */}
         <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50 rounded-t-2xl">
           <div className="flex items-center gap-4">
             <LimitFilter />
           </div>
           <div className="flex items-center gap-3">
-            {user.role !== "anggota" && (
-              <form method="GET" className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  name="q"
-                  defaultValue={query}
-                  placeholder="Cari nomor / nama / NIK..."
-                  className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all w-72"
-                />
-                {typeFilter && <input type="hidden" name="type" value={typeFilter} />}
-              </form>
-            )}
-
             <TypeFilter types={jenisTypes} />
           </div>
-          <div className="text-xs text-gray-400 font-bold uppercase tracking-widest">
-            {data.length} Record
-          </div>
+          <div className="text-xs text-gray-400 font-bold uppercase tracking-widest">{data.length} Record</div>
         </div>
 
         {/* Table */}
@@ -206,20 +177,16 @@ export default async function SimpananPage({ searchParams }) {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {data.map((item) => (
-                <tr key={item.id} className="hover:bg-blue-50/30 transition-colors group">
+                <tr key={item.id} className="hover:bg-amber-50/30 transition-colors group">
                   <td className="py-3 px-4 text-center text-gray-400 font-medium">{item.no}</td>
-                  <td className="py-3 px-4 font-mono text-blue-600 font-bold text-xs whitespace-nowrap">{item.nomor || "-"}</td>
+                  <td className="py-3 px-4 font-mono text-amber-600 font-bold text-xs whitespace-nowrap">{item.nomor || "-"}</td>
                   <td className="py-3 px-4 text-gray-600 text-xs whitespace-nowrap">
-                    {item.tgl && !item.tgl.startsWith("0000") 
-                      ? new Date(item.tgl).toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/\//g, "-")
-                      : "-"}
+                    {item.tgl && !item.tgl.startsWith("0000") ? new Date(item.tgl).toLocaleDateString("id-ID", { day: "2-digit", month: "2-digit", year: "numeric" }).replace(/\//g, "-") : "-"}
                   </td>
                   <td className="py-3 px-4 font-mono text-gray-500 text-xs whitespace-nowrap">{item.nik}</td>
                   <td className="py-3 px-4 font-semibold text-gray-800 whitespace-nowrap">{item.nama_anggota}</td>
                   <td className="py-3 px-4">
-                    <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-bold whitespace-nowrap">
-                      {item.jenis_nama || "-"}
-                    </span>
+                    <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-100 text-[10px] font-bold whitespace-nowrap">{item.jenis_nama || "-"}</span>
                   </td>
                   <td className="py-3 px-4 text-center">
                     {item.jenis_transaksi === "S" ? (
@@ -231,13 +198,11 @@ export default async function SimpananPage({ searchParams }) {
                     )}
                   </td>
                   <td className={`py-3 px-4 text-right font-bold whitespace-nowrap ${item.jenis_transaksi === "T" ? "text-red-600" : "text-gray-800"}`}>
-                    {item.jenis_transaksi === "T" ? "- " : ""}{fmt(item.jumlah)}
+                    {item.jenis_transaksi === "T" ? "- " : ""}
+                    {fmt(item.jumlah)}
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <Link
-                      href={`/dashboard/simpanan/${item.id}`}
-                      className="text-blue-600 hover:text-blue-800 font-bold text-[10px] uppercase bg-blue-50 px-2.5 py-1.5 rounded-lg border border-blue-100 transition-all active:scale-95"
-                    >
+                    <Link href={`/dashboard/simpanan/${item.id}`} className="text-amber-600 hover:text-amber-800 font-bold text-[10px] uppercase bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-100 transition-all active:scale-95">
                       Detail
                     </Link>
                   </td>

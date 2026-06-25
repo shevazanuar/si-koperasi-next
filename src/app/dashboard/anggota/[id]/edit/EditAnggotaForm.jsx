@@ -21,9 +21,8 @@ export default function EditAnggotaForm({ data, levelList, perusahaanList }) {
       showError("Gagal Menyimpan", state.error);
     }
     if (state?.success) {
-      showSuccess("Berhasil", "Data anggota berhasil diperbarui.").then(() => {
-        router.push("/dashboard/anggota");
-      });
+      showSuccess("Berhasil", "Data anggota berhasil diperbarui.");
+      router.push("/dashboard/anggota");
     }
   }, [state, router]);
 

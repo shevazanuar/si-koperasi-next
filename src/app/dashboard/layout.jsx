@@ -22,7 +22,7 @@ export default async function DashboardLayout({ children }) {
   }
 
   return (
-    <div className="flex bg-gray-50/50 min-h-screen">
+    <div className="flex bg-[#FDF9F1] min-h-screen">
       <SweetAlertTrigger />
       <Sidebar role={user?.role} allowedMenuIds={allowedMenuIds} />
       <div className="flex-1 md:ml-64 flex flex-col">

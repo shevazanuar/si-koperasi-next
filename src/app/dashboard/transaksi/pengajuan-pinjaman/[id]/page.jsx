@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
+import ActionButtons from "./ActionButtons";
 
 export default async function PengajuanDetailPage({ params }) {
   const userSession = await getSession();
@@ -176,14 +177,7 @@ export default async function PengajuanDetailPage({ params }) {
            {pengajuan.status === 'Open' && userSession.role === 'admin' && (
               <div className="bg-blue-600 p-6 rounded-3xl text-white shadow-xl shadow-blue-500/20">
                  <h4 className="font-bold text-sm mb-4 text-center uppercase tracking-widest">Tindakan Cepat</h4>
-                 <div className="grid grid-cols-2 gap-3">
-                    <button className="bg-white text-blue-600 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-50 transition-colors">
-                       Setujui
-                    </button>
-                    <button className="bg-blue-700 text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-800 transition-colors">
-                       Tolak
-                    </button>
-                 </div>
+                 <ActionButtons nomor={pengajuan.nomor} />
                  <p className="text-[10px] text-blue-200 mt-4 text-center italic">Anda juga dapat melakukan tindakan ini dari halaman utama daftar pengajuan.</p>
               </div>
            )}

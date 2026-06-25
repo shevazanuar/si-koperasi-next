@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const data = await prisma.kategori_pinjaman.findMany({ orderBy: { kategpinj_id: "asc" } });
+    const data = await prisma.kategori_pinjaman.findMany({ orderBy: { kategpinj_id: "desc" } });
     return NextResponse.json({ data });
   } catch (error) {
     return NextResponse.json({ error: "Gagal memuat data" }, { status: 500 });

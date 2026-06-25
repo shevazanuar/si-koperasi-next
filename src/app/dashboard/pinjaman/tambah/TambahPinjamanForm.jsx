@@ -160,6 +160,49 @@ export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
             className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium text-sm min-h-[100px]"
           ></textarea>
         </div>
+
+        {/* Loan Calculator / Simulasi */}
+        {selectedType && (
+          <div className="bg-orange-50 border border-orange-100 rounded-3xl p-6 mt-8 animate-in slide-in-from-bottom-4 fade-in duration-500">
+            <h3 className="text-orange-800 font-black text-lg mb-4 flex items-center gap-2">
+              <Percent className="w-5 h-5" />
+              Simulasi Cicilan Pinjaman
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Pokok / Bulan</p>
+                <p className="text-lg font-black text-gray-900">
+                  Rp {new Intl.NumberFormat("id-ID").format(Math.round(selectedType.jumlah / selectedType.lama))}
+                </p>
+              </div>
+              
+              <div className="bg-white p-4 rounded-2xl border border-orange-100 shadow-sm">
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Bunga / Bulan</p>
+                <p className="text-lg font-black text-gray-900">
+                  Rp {new Intl.NumberFormat("id-ID").format(Math.round((selectedType.jumlah * selectedType.bunga) / 100))}
+                </p>
+              </div>
+              
+              <div className="bg-orange-600 p-4 rounded-2xl shadow-md shadow-orange-500/20 text-white relative overflow-hidden">
+                <div className="absolute right-0 top-0 opacity-10 transform translate-x-4 -translate-y-4">
+                  <Percent className="w-24 h-24" />
+                </div>
+                <p className="text-xs font-bold text-orange-200 uppercase tracking-wider mb-1 relative z-10">Total Cicilan / Bulan</p>
+                <p className="text-xl font-black relative z-10">
+                  Rp {new Intl.NumberFormat("id-ID").format(
+                    Math.round(selectedType.jumlah / selectedType.lama) + 
+                    Math.round((selectedType.jumlah * selectedType.bunga) / 100)
+                  )}
+                </p>
+              </div>
+            </div>
+            
+            <p className="text-xs text-orange-600/80 mt-4 italic font-medium flex items-center gap-1.5">
+              * Ini adalah estimasi menggunakan perhitungan bunga tetap (flat) per bulan. Nilai aktual dapat sedikit berbeda akibat pembulatan sistem.
+            </p>
+          </div>
+        )}
       </div>
 
       {state?.error && (

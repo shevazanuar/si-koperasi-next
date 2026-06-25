@@ -33,17 +33,12 @@ export default function LimitFilter() {
   ];
 
   return (
-    <div className={`flex items-center p-1 pl-3 bg-white border border-gray-200 rounded-xl transition-all shadow-sm hover:shadow-md hover:border-blue-200 ${isPending ? 'opacity-50' : 'opacity-100'}`}>
+    <div className={`flex items-center p-1 pl-3 bg-white border border-gray-200 rounded-xl transition-all shadow-sm hover:shadow-md hover:border-amber-200 ${isPending ? "opacity-50" : "opacity-100"}`}>
       <div className="flex items-center gap-2 border-r border-gray-100 pr-2">
-        <Layers className="w-4 h-4 text-blue-500" />
+        <Layers className="w-4 h-4 text-amber-500" />
         <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Tampilkan</span>
       </div>
-      <CustomSelect 
-        options={options}
-        value={currentLimit}
-        onChange={handleChange}
-        className="w-28"
-      />
+      <CustomSelect options={options} value={currentLimit} onChange={handleChange} className="w-28" />
     </div>
   );
 }

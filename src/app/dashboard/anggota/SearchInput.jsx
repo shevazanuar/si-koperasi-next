@@ -13,6 +13,10 @@ export default function SearchInput() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
+      // Mencegah infinite loop: cek apakah value sama dengan parameter URL saat ini
+      const currentQ = searchParams.get("q") || "";
+      if (currentQ === value) return;
+
       const params = new URLSearchParams(searchParams);
       if (value) {
         params.set("q", value);

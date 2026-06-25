@@ -102,7 +102,7 @@ export async function PUT(request) {
         // 1. Update status pengajuan
         const updatedPengajuan = await tx.pengajuan_pinjaman.update({
           where: { id: pengajuan.id },
-          data: { status: "Acc", update_date: new Date() },
+          data: { status: "Acc", update_date: new Date(), user_id: user.id },
         });
 
         if (sumber_dana === "Kas" && kas_id) {

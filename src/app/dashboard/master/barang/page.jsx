@@ -16,7 +16,8 @@ export default async function MasterBarangPage({ searchParams }) {
   const limit = parseInt(params?.limit) || 25;
 
   const barang = await prisma.master_barang.findMany({
-    where: {
+    orderBy: { id: "desc" },
+        where: {
       OR: [
         { kode_barang: { contains: query } },
         { nama_barang: { contains: query } },

@@ -14,7 +14,7 @@ export default async function EditBarangPage({ params }) {
       where: { id: Number(id) }
     }),
     prisma.kategori_produk.findMany({
-      orderBy: { nama_kategori: "asc" }
+      orderBy: { nama_kategori: "desc" }
     })
   ]);
 

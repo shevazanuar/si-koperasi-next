@@ -4,10 +4,18 @@ import { useActionState } from "react";
 import { createAnggota } from "../actions";
 import { User, IdCard, Phone, MapPin, Calendar, Save, Loader2, Briefcase, Users } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
+import { showError } from "@/lib/swal";
 import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function TambahAnggotaForm({ levelList, perusahaanList }) {
   const [state, formAction, isPending] = useActionState(createAnggota, null);
+
+  useEffect(() => {
+    if (state?.error) {
+      showError("Gagal", state.error);
+    }
+  }, [state?.error]);
 
   return (
     <form action={formAction} className="p-8 lg:p-12 space-y-8">

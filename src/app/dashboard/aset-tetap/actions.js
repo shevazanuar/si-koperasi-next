@@ -14,12 +14,12 @@ export async function createAsetTetap(prevState, formData) {
     const kategori_id = parseInt(formData.get("kategori_id"));
     const tanggal_pembelian = formData.get("tanggal_pembelian");
     const nilai_pembelian = parseFloat(formData.get("nilai_pembelian") || "0");
-    const nilai_residu = parseFloat(formData.get("nilai_residu") || "0");
-    const masa_manfaat_tahun = parseInt(formData.get("masa_manfaat_tahun") || "0");
-    const masa_manfaat = masa_manfaat_tahun * 12; // Konversi ke bulan
+    const nilai_residu = 0;
+    const masa_manfaat_tahun = 0;
+    const masa_manfaat = 0; // Konversi ke bulan
     const sumber_dana = formData.get("sumber_dana"); // "Kas" or "Bank"
 
-    if (!nama_aset || !kategori_id || !tanggal_pembelian || nilai_pembelian <= 0 || masa_manfaat <= 0) {
+    if (!nama_aset || !kategori_id || !tanggal_pembelian || nilai_pembelian <= 0) {
       return { error: "Semua kolom wajib diisi dengan benar." };
     }
 

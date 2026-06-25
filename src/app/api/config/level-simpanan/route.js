@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     // Join with jenis_simpanan and level_anggota for display
-    const data = await prisma.level_simpanan.findMany({ orderBy: { id: "asc" } });
+    const data = await prisma.level_simpanan.findMany({ orderBy: { id: "desc" } });
     const jenisSimpanan = await prisma.jenis_simpanan.findMany({ select: { id: true, nama: true } });
     const levelAnggota = await prisma.level_anggota.findMany({ select: { id: true, nama: true } });
 

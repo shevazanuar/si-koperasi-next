@@ -63,7 +63,7 @@ export const showAlert = (title, text, icon = "info") => {
     text,
     icon,
     confirmButtonText: "Ok",
-    iconColor: icon === "warning" ? "#f59e0b" : "#3b82f6",
+    iconColor: icon === "warning" ? "#f59e0b" : "#f59e0b",
   });
 };
 
@@ -88,7 +88,8 @@ export const showConfirm = async (title, text, confirmText = "Ya, Hapus", cancel
       popup: "rounded-3xl p-6 shadow-2xl border border-gray-100 font-sans max-w-sm md:max-w-md",
       title: "text-lg md:text-xl font-black text-gray-900",
       htmlContainer: "text-xs md:text-sm text-gray-500 font-medium mt-2 leading-relaxed",
-      confirmButton: "px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm outline-none transition-all active:scale-95 shadow-md shadow-red-500/20 cursor-pointer inline-flex justify-center items-center gap-1",
+      confirmButton:
+        "px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-sm outline-none transition-all active:scale-95 shadow-md shadow-amber-500/20 cursor-pointer inline-flex justify-center items-center gap-1",
       cancelButton: "px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-bold text-sm outline-none transition-all active:scale-95 cursor-pointer inline-flex justify-center items-center gap-1 ml-2",
     },
   });

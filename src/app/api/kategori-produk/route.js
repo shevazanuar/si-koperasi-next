@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const kategori = await prisma.kategori_produk.findMany({
-      orderBy: { nama_kategori: "asc" },
+      orderBy: { nama_kategori: "desc" },
     });
     return NextResponse.json(kategori);
   } catch (error) {
