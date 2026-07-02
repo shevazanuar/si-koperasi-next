@@ -14,6 +14,11 @@ const bayarSchema = z.object({
   jumlah_bayar: z.coerce.number().int().positive("Jumlah bayar harus lebih dari 0"),
 });
 
+const pelunasanSchema = z.object({
+  pinjaman_id: z.coerce.number().int().positive(),
+  tgl_bayar: z.string().min(1),
+});
+
 export async function GET() {
   try {
     const user = await getSession();
@@ -61,9 +66,21 @@ export async function POST(request) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       const hdrs = await prisma.pinjaman_header.findMany({ where: { anggota_id: targetAnggotaId } });
       const headerIds = hdrs.map((h) => h.id);
+      const jenisIds = [...new Set(hdrs.map((h) => h.jenis_pinjaman_id).filter(Boolean))];
+      const jenisList = await prisma.jenis_pinjaman.findMany({ where: { id: { in: jenisIds } } });
+      const jenisMap = Object.fromEntries(jenisList.map((j) => [j.id, j]));
       const details = await prisma.pinjaman_detail.findMany({ where: { pinjaman_id: { in: headerIds }, jumlah_bayar: 0 }, orderBy: { cicilan: "asc" } });
       const headerMap = Object.fromEntries(hdrs.map((h) => [h.id, h]));
-      const data = details.map((d) => ({ ...d, tgl_jatuh_tempo: d.tgl_jatuh_tempo?.toISOString() || null, nomor_pinjaman: headerMap[d.pinjaman_id]?.nomor || "-" }));
+      const data = details.map((d) => {
+        const header = headerMap[d.pinjaman_id] || {};
+        const jenis = jenisMap[header.jenis_pinjaman_id] || {};
+        return { 
+          ...d, 
+          tgl_jatuh_tempo: d.tgl_jatuh_tempo?.toISOString() || null, 
+          nomor_pinjaman: header.nomor || "-",
+          nama_pinjaman: jenis.nama || header.nomor || "-"
+        };
+      });
       return NextResponse.json({ data });
     }
 
@@ -98,9 +115,67 @@ export async function POST(request) {
           VALUES (${user.id}, ${user.username}, ${AUDIT_AKSI.BAYAR_CICILAN}, 'pinjaman_detail', ${detail_id},
                   ${JSON.stringify(cicilanBefore)}, ${JSON.stringify(updated)}, ${ip}, ${`Bayar cicilan ${nomorBayar}`})
         `;
+      }, {
+        timeout: 15000,
+        maxWait: 5000
       });
 
       return NextResponse.json({ message: "Pembayaran berhasil", nomor_bayar: nomorBayar });
+    }
+
+    if (body.action === "pelunasan") {
+      const parsed = pelunasanSchema.safeParse(body);
+      if (!parsed.success)
+        return NextResponse.json({ error: parsed.error.issues[0]?.message || "Input tidak valid" }, { status: 422 });
+      
+      const { pinjaman_id, tgl_bayar } = parsed.data;
+
+      const cicilanBelumBayar = await prisma.pinjaman_detail.findMany({ 
+        where: { pinjaman_id: pinjaman_id, jumlah_bayar: 0 },
+        orderBy: { cicilan: "asc" }
+      });
+
+      if (cicilanBelumBayar.length === 0) {
+        return NextResponse.json({ error: "Tidak ada cicilan yang belum dibayar untuk pinjaman ini" }, { status: 404 });
+      }
+
+      const year = new Date().getFullYear();
+      const last = await prisma.pinjaman_detail.findFirst({ 
+        where: { nomor_bayar: { not: null }, insert_date: { gte: new Date(`${year}-01-01`) } }, 
+        orderBy: { nomor_bayar: "desc" } 
+      });
+      
+      const nomorBayar = last?.nomor_bayar ? `B${year}${String(parseInt(last.nomor_bayar.slice(5)) + 1).padStart(6, "0")}` : `B${year}000001`;
+
+      let totalPelunasan = 0;
+
+      await prisma.$transaction(async (tx) => {
+        for (const cicilan of cicilanBelumBayar) {
+          const tagihan = cicilan.angsuran + cicilan.bunga;
+          totalPelunasan += tagihan;
+          
+          const updated = await tx.pinjaman_detail.update({
+            where: { id: cicilan.id },
+            data: { 
+              nomor_bayar: nomorBayar, 
+              tgl_bayar: tgl_bayar || new Date().toISOString().split("T")[0], 
+              jumlah_bayar: tagihan, 
+              update_date: new Date() 
+            },
+          });
+          
+          await tx.$executeRaw`
+            INSERT INTO audit_log (user_id, username, aksi, tabel, record_id, before_data, after_data, ip_address, keterangan)
+            VALUES (${user.id}, ${user.username}, ${AUDIT_AKSI.BAYAR_CICILAN}, 'pinjaman_detail', ${cicilan.id},
+                    ${JSON.stringify(cicilan)}, ${JSON.stringify(updated)}, ${ip}, ${`Pelunasan cicilan ${nomorBayar}`})
+          `;
+        }
+      }, {
+        timeout: 30000,
+        maxWait: 10000
+      });
+
+      return NextResponse.json({ message: `Pelunasan berhasil diproses (Total: Rp ${totalPelunasan.toLocaleString("id-ID")})`, nomor_bayar: nomorBayar });
     }
 
     if (body.action === "hapus") {

@@ -60,7 +60,7 @@ export default async function MutasiPage() {
         <div className="relative z-10 flex items-center gap-3">
            <Link 
             href="/dashboard/mutasi/tambah"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-blue-500/20"
+            className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] hover:from-[#b07044] hover:to-[#8c4819] text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-orange-500/20"
            >
              <Plus className="w-5 h-5" />
              Transfer Dana
@@ -79,6 +79,7 @@ export default async function MutasiPage() {
                 <th className="py-4 px-6">Dari</th>
                 <th className="py-4 px-6">Ke</th>
                 <th className="py-4 px-6">Nominal</th>
+                <th className="py-4 px-6">Bukti</th>
                 <th className="py-4 px-6">Keterangan</th>
               </tr>
             </thead>
@@ -102,6 +103,20 @@ export default async function MutasiPage() {
                   <td className="py-4 px-6 font-bold text-emerald-600">
                     {formatRupiah(item.nominal)}
                   </td>
+                  <td className="py-4 px-6">
+                    {item.bukti_transfer ? (
+                      <a 
+                        href={item.bukti_transfer} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="inline-flex items-center text-xs px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-semibold rounded-lg transition-colors border border-blue-100"
+                      >
+                        Lihat Bukti
+                      </a>
+                    ) : (
+                      <span className="text-xs text-gray-400">-</span>
+                    )}
+                  </td>
                   <td className="py-4 px-6 text-gray-500 text-xs">
                     {item.keterangan || '-'}
                   </td>
@@ -110,8 +125,8 @@ export default async function MutasiPage() {
               
               {mutasiList.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="py-20 text-center flex flex-col items-center gap-2">
-                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-2">
+                  <td colSpan="7" className="py-20 text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-2 mx-auto">
                         <ArrowRightLeft className="w-8 h-8 text-gray-300" />
                     </div>
                     <p className="text-gray-500 font-medium">Belum ada data mutasi transfer.</p>

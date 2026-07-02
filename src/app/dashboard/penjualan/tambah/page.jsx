@@ -135,7 +135,9 @@ export default function TambahPenjualanPage() {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-1">ID Anggota</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                     value={anggotaId}
                     onChange={e => setAnggotaId(e.target.value)}
                     required={isAnggota}
@@ -226,7 +228,9 @@ export default function TambahPenjualanPage() {
                       
                       <div className="w-24">
                         <input
-                          type="number"
+                          type="text"
+                          inputMode="numeric"
+                          onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                           value={item.qty}
                           onChange={e => updateItem(index, "qty", e.target.value)}
                           min="1"

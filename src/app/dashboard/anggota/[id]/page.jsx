@@ -49,14 +49,12 @@ export default async function AnggotaDetailPage({ params }) {
   let totalPinjamanAktif = 0;
   if (pinjamanHeaders.length > 0) {
     const pinjamanIds = pinjamanHeaders.map(ph => ph.id);
-    const pinjamanDetails = await prisma.pinjaman_detail.aggregate({
-      where: { pinjaman_id: { in: pinjamanIds } },
-      _sum: { jumlah_bayar: true }
+    const unpaidDetails = await prisma.pinjaman_detail.aggregate({
+      where: { pinjaman_id: { in: pinjamanIds }, jumlah_bayar: 0 },
+      _sum: { angsuran: true, bunga: true }
     });
     
-    const totalPinjaman = pinjamanHeaders.reduce((sum, ph) => sum + ph.jumlah, 0);
-    const totalBayar = pinjamanDetails._sum.jumlah_bayar || 0;
-    totalPinjamanAktif = Math.max(0, totalPinjaman - totalBayar);
+    totalPinjamanAktif = (unpaidDetails._sum.angsuran || 0) + (unpaidDetails._sum.bunga || 0);
   }
 
   const fmt = (n) => `Rp ${new Intl.NumberFormat("id-ID").format(n || 0)}`;
@@ -225,12 +223,12 @@ export default async function AnggotaDetailPage({ params }) {
                  <h4 className="font-bold text-xl mb-2">Histori Transaksi</h4>
                  <p className="text-blue-100/60 text-sm leading-relaxed mb-6">Akses riwayat tabungan dan angsuran pinjaman anggota ini secara detail.</p>
                  <div className="flex gap-4">
-                    <button className="bg-white text-blue-600 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-blue-50 transition-all active:scale-95 shadow-lg shadow-blue-900/20">
+                    <Link href={`/dashboard/laporan/simpanan?anggota_id=${id}`} className="bg-white text-blue-600 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-blue-50 transition-all active:scale-95 shadow-lg shadow-blue-900/20 text-center">
                         Lihat Tabungan
-                    </button>
-                    <button className="bg-blue-500/50 border border-blue-400/30 text-white px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-blue-500 transition-all active:scale-95">
+                    </Link>
+                    <Link href={`/dashboard/laporan/pinjaman?anggota_id=${id}`} className="bg-blue-500/50 border border-blue-400/30 text-white px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-blue-500 transition-all active:scale-95 text-center">
                         Lihat Pinjaman
-                    </button>
+                    </Link>
                  </div>
               </div>
               <Wallet className="absolute -right-4 -bottom-4 w-32 h-32 opacity-10 group-hover:scale-110 transition-transform duration-700" />

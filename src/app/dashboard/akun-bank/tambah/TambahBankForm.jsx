@@ -2,8 +2,9 @@
 
 import { useActionState } from "react";
 import { createBank } from "../actions";
-import { Landmark, Hash, User, DollarSign, Save, Loader2, Activity } from "lucide-react";
+import { Landmark, Hash, User, Save, Loader2, Activity } from "lucide-react";
 import Link from "next/link";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function TambahBankForm() {
   const [state, formAction, isPending] = useActionState(createBank, null);
@@ -25,6 +26,7 @@ export default function TambahBankForm() {
               <input
                 name="nama_bank"
                 type="text"
+                onInput={(e) => { e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''); }}
                 placeholder="Contoh: Bank BCA, Bank Mandiri"
                 className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                 required
@@ -39,6 +41,7 @@ export default function TambahBankForm() {
               <input
                 name="nomor_rekening"
                 type="text"
+                onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                 placeholder="Masukkan nomor rekening"
                 className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                 required
@@ -53,6 +56,7 @@ export default function TambahBankForm() {
               <input
                 name="nama_pemilik"
                 type="text"
+                onInput={(e) => { e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''); }}
                 placeholder="Nama pemilik rekening"
                 className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                 required
@@ -63,13 +67,12 @@ export default function TambahBankForm() {
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 ml-1">Saldo Awal</label>
             <div className="relative">
-              <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-gray-400">Rp</span>
+              <CurrencyInput
                 name="saldo"
-                type="number"
                 placeholder="0"
                 defaultValue={0}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
+                className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium text-emerald-600 font-bold"
                 required
               />
             </div>

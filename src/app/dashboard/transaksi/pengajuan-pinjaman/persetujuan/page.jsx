@@ -73,7 +73,7 @@ export default function PersetujuanPinjamanPage() {
   };
 
   const statusBadge = (s) => {
-    return <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-bold bg-amber-50 text-amber-700"><Clock className="w-3 h-3" /> Menunggu</span>;
+    return <span className="badge badge-warning"><Clock className="w-3 h-3" /> Menunggu</span>;
   };
 
   return (

@@ -81,7 +81,7 @@ export default function MenuPage() {
           </div>
         </div>
         <button onClick={() => { setShowForm(true); setEditId(null); setForm({ kode: "", nama: "", url: "", icon: "", class: "", root: "0" }); }}
-          className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition font-medium text-sm shadow-md shadow-blue-500/20">
+          className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-[#b07044] hover:to-[#8c4819] transition font-medium text-sm shadow-md shadow-orange-500/20">
           <Plus className="w-4 h-4" /> Tambah Menu
         </button>
       </div>

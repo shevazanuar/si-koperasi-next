@@ -1,7 +1,10 @@
 import prisma from "@/lib/prisma";
 import ReportForm from "../ReportForm";
 
-export default async function LaporanSimpananPage() {
+export default async function LaporanSimpananPage(props) {
+  const searchParams = await props.searchParams;
+  const initialAnggotaId = searchParams?.anggota_id || "";
+
   const [anggotaList, jenisSimpananList] = await Promise.all([
     prisma.anggota.findMany({
       where: { status: "Aktif" },
@@ -22,6 +25,7 @@ export default async function LaporanSimpananPage() {
       showJenisSimpanan={true}
       showPerusahaan={false}
       accentColor="blue"
+      initialAnggotaId={initialAnggotaId}
     />
   );
 }

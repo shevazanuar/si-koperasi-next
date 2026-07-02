@@ -72,9 +72,9 @@ export default function PengajuanPinjamanPage() {
   const handleStatus = async () => {}; // Moved to persetujuan page
 
   const statusBadge = (s) => {
-    if (s === "Acc") return <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-50 text-emerald-700"><CheckCircle className="w-3 h-3" /> Disetujui</span>;
-    if (s === "Cancel") return <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-bold bg-red-50 text-red-700"><XCircle className="w-3 h-3" /> Ditolak</span>;
-    return <span className="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-bold bg-amber-50 text-amber-700"><Clock className="w-3 h-3" /> Menunggu</span>;
+    if (s === "Acc") return <span className="badge badge-success"><CheckCircle className="w-3 h-3" /> Disetujui</span>;
+    if (s === "Cancel") return <span className="badge badge-danger"><XCircle className="w-3 h-3" /> Ditolak</span>;
+    return <span className="badge badge-warning"><Clock className="w-3 h-3" /> Menunggu</span>;
   };
 
   return (

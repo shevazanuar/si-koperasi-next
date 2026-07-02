@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { exportToExcel } from "@/lib/exportUtils";
 import CustomSelect from "@/components/CustomSelect";
+import SearchableSelect from "@/components/SearchableSelect";
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat("id-ID", {
@@ -287,10 +288,11 @@ export default function ReportForm({
   showPerusahaan = false,
   tanggalLabel = "Dari Tanggal",
   accentColor = "blue",
+  initialAnggotaId = "",
 }) {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [anggotaId, setAnggotaId] = useState("");
+  const [anggotaId, setAnggotaId] = useState(initialAnggotaId);
   const [jenisSimpanan, setJenisSimpanan] = useState("");
   const [perusahaan, setPerusahaan] = useState("");
   const [data, setData] = useState(null);
@@ -563,21 +565,18 @@ export default function ReportForm({
             {/* Nama Anggota */}
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-600">Nama Anggota</label>
-              <div className="relative">
-                <select
-                  value={anggotaId}
-                  onChange={(e) => setAnggotaId(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-2xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 bg-white appearance-none pr-10"
-                >
-                  <option value="">Semua Data Anggota Aktif...</option>
-                  {anggotaList.map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.nama} | {a.nik}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-              </div>
+              <SearchableSelect
+                value={anggotaId}
+                onChange={(val) => setAnggotaId(val)}
+                placeholder="Semua Data Anggota Aktif..."
+                options={[
+                  { value: "", label: "Semua Data Anggota Aktif..." },
+                  ...anggotaList.map((a) => ({
+                    value: a.id,
+                    label: `${a.nama} | ${a.nik}`
+                  }))
+                ]}
+              />
             </div>
 
             {/* Jenis Simpanan (only for simpanan) */}

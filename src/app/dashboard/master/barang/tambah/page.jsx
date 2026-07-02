@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useTransition, useState } from "react";
 import { addBarang } from "../actions";
 import { showError } from "@/lib/swal";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function TambahBarangPage() {
   const [isPending, startTransition] = useTransition();
@@ -103,11 +104,10 @@ export default function TambahBarangPage() {
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-bold">Rp</span>
-                <input
-                  type="number"
+                <CurrencyInput
                   name="harga_modal"
                   required
-                  min="0"
+                  placeholder="0"
                   className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
@@ -118,11 +118,10 @@ export default function TambahBarangPage() {
               </label>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm font-bold">Rp</span>
-                <input
-                  type="number"
+                <CurrencyInput
                   name="harga_jual"
                   required
-                  min="0"
+                  placeholder="0"
                   className="w-full pl-10 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
                 />
               </div>
@@ -133,10 +132,11 @@ export default function TambahBarangPage() {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Stok Awal</label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                 name="stok"
                 defaultValue={0}
-                min="0"
                 className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
               />
             </div>

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Layers, Plus, Pencil, Trash2, Save, X } from "lucide-react";
 import { showConfirm, showSuccess, showError } from "@/lib/swal";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 const fmt = (n) => new Intl.NumberFormat("id-ID").format(n || 0);
 
@@ -70,7 +71,7 @@ export default function LevelSimpananPage() {
           <div className="bg-violet-600 p-2.5 rounded-xl text-white"><Layers className="w-5 h-5" /></div>
           <div><h1 className="text-xl font-black text-gray-900">Level Simpanan</h1><p className="text-sm text-gray-500">Kelola iuran simpanan per level anggota</p></div>
         </div>
-        <button onClick={() => { setShowForm(true); setEditId(null); setForm({ level_anggota_id: "", jenis_simpanan_id: "", jumlah: "" }); }} className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 text-sm font-medium">
+        <button onClick={() => { setShowForm(true); setEditId(null); setForm({ level_anggota_id: "", jenis_simpanan_id: "", jumlah: "" }); }} className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-[#b07044] hover:to-[#8c4819] text-sm font-medium">
           <Plus className="w-4 h-4" /> Tambah
         </button>
       </div>
@@ -95,7 +96,7 @@ export default function LevelSimpananPage() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Jumlah Iuran (Rp) *</label>
-              <input type="number" required min="0" value={form.jumlah} onChange={(e) => setForm({ ...form, jumlah: e.target.value })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
+              <CurrencyInput required value={form.jumlah} onChange={(val) => setForm({ ...form, jumlah: val })} className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
             </div>
             <div className="md:col-span-3 flex gap-2">
               <button type="submit" className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 text-sm font-medium"><Save className="w-4 h-4" /> Simpan</button>

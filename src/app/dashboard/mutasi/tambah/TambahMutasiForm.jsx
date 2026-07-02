@@ -2,8 +2,9 @@
 
 import { useActionState, useState } from "react";
 import { createMutasi } from "../actions";
-import { ArrowRightLeft, DollarSign, Upload, Save, Loader2, FileText } from "lucide-react";
+import { ArrowRightLeft, Upload, Save, Loader2, FileText } from "lucide-react";
 import Link from "next/link";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function TambahMutasiForm({ kasList, bankList }) {
   const [state, formAction, isPending] = useActionState(createMutasi, null);
@@ -108,10 +109,9 @@ export default function TambahMutasiForm({ kasList, bankList }) {
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 ml-1">Nominal Transfer</label>
             <div className="relative">
-              <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-gray-400">Rp</span>
+              <CurrencyInput
                 name="nominal"
-                type="number"
                 placeholder="Masukkan nominal"
                 className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium text-emerald-600 font-bold"
                 required
@@ -123,16 +123,14 @@ export default function TambahMutasiForm({ kasList, bankList }) {
             <label className="text-sm font-semibold text-gray-700 ml-1 flex items-center gap-2">
               <Upload className="w-4 h-4 text-blue-500" /> Upload Bukti Transfer (Wajib)
             </label>
-            {/* Note: This is a placeholder for file upload, as server actions for file upload require setup, we use text input for the URL/Filename or a simulated input */}
             <input
               name="bukti_transfer"
-              type="text"
-              placeholder="Masukkan link/nama file bukti transfer (Simulasi)"
-              defaultValue="bukti_tf_123.jpg"
-              className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
+              type="file"
+              accept="image/jpeg, image/png, image/webp"
+              className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
               required
             />
-            <p className="text-xs text-gray-400 mt-1 ml-1">Untuk simulasi, kolom ini dapat diisi dengan nama file sementara.</p>
+            <p className="text-xs text-gray-400 mt-1 ml-1">Format gambar: JPG, PNG, WEBP (Maksimal 2 MB).</p>
           </div>
 
           <div className="space-y-2">

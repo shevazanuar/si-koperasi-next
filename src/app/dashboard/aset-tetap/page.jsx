@@ -108,7 +108,7 @@ export default async function AsetTetapPage() {
         <div className="relative z-10 flex items-center gap-3">
            <Link 
             href="/dashboard/aset-tetap/tambah"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-blue-500/20"
+            className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] hover:from-[#b07044] hover:to-[#8c4819] text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-orange-500/20"
            >
              <Plus className="w-5 h-5" />
              Catat Aset Baru
@@ -123,9 +123,9 @@ export default async function AsetTetapPage() {
             <thead>
               <tr className="bg-gray-50 text-gray-500 text-[10px] uppercase font-bold tracking-widest border-b border-gray-100">
                 <th className="py-4 px-6">Nama Aset</th>
+                <th className="py-4 px-6">Kategori</th>
                 <th className="py-4 px-6">Tgl Beli</th>
-                <th className="py-4 px-6">Perolehan & Residu</th>
-                <th className="py-4 px-6">Penyusutan Bulanan</th>
+                <th className="py-4 px-6">Nilai Pembelian</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
@@ -133,20 +133,17 @@ export default async function AsetTetapPage() {
                 <tr key={item.id} className="hover:bg-gray-50/80 transition-colors group">
                   <td className="py-4 px-6">
                     <div className="font-bold text-gray-900">{item.nama_aset}</div>
-                    <div className="text-[10px] text-gray-400 mt-1">{item.nama_kategori} • Masa: {item.masa_manfaat} bln</div>
-                  </td>
-                  <td className="py-4 px-6 text-gray-600">
-                    <div>{formatDate(item.tanggal_pembelian)}</div>
-                    {item.tanggal_penghentian && (
-                       <div className="text-[10px] text-rose-500 mt-1 font-bold">Dihentikan: {formatDate(item.tanggal_penghentian)}</div>
-                    )}
                   </td>
                   <td className="py-4 px-6">
-                    <div className="font-semibold text-gray-800">{formatRupiah(item.nilai_pembelian)}</div>
-                    <div className="text-[10px] text-gray-400 mt-1">Residu: {formatRupiah(item.nilai_residu)}</div>
+                    <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-tight bg-blue-50 text-blue-700 border border-blue-100">
+                      {item.nama_kategori}
+                    </span>
                   </td>
-                  <td className="py-4 px-6 font-medium text-rose-600">
-                    - {formatRupiah(item.penyusutanPerBulan)}
+                  <td className="py-4 px-6 text-gray-600 font-medium">
+                    {formatDate(item.tanggal_pembelian)}
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="font-bold text-emerald-600">{formatRupiah(item.nilai_pembelian)}</div>
                   </td>
 
                 </tr>

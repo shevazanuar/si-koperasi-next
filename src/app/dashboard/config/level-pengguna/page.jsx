@@ -66,7 +66,7 @@ export default function LevelPenggunaPage() {
           <div><h1 className="text-xl font-black text-gray-900">Level Pengguna</h1><p className="text-sm text-gray-500">Kelola level akses pengguna</p></div>
         </div>
         <button onClick={() => { setShowForm(true); setEditId(null); setForm({ level: "" }); }}
-          className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition text-sm font-medium">
+          className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-[#b07044] hover:to-[#8c4819] transition text-sm font-medium">
           <Plus className="w-4 h-4" /> Tambah
         </button>
       </div>

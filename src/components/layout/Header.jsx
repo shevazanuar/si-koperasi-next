@@ -4,7 +4,7 @@ import { LogOut, User as UserIcon, Bell } from "lucide-react";
 import { getSession, destroySession } from "@/lib/session";
 import MobileMenuButton from "./MobileMenuButton";
 import NotificationBell from "./NotificationBell";
-
+import LogoutForm from "./LogoutForm";
 export default async function Header() {
   const session = await getSession();
   const user = session ?? { name: "User", role: "guest" };
@@ -31,18 +31,13 @@ export default async function Header() {
           </div>
         </Link>
 
-        <form
+        <LogoutForm
           action={async () => {
             "use server";
             await destroySession();
             redirect("/login");
           }}
-        >
-          <button className="flex items-center gap-2 text-gray-400 hover:text-red-500 transition-colors p-2 rounded-xl hover:bg-red-50">
-            <LogOut className="w-5 h-5" />
-            <span className="text-sm font-semibold hidden md:block">Keluar</span>
-          </button>
-        </form>
+        />
       </div>
     </header>
   );

@@ -115,7 +115,7 @@ export default function LaporanAnggotaPage() {
                   <td className="px-6 py-3 text-gray-600">{row.perusahaan || "-"}</td>
                   <td className="px-6 py-3 text-gray-500">{fmt(row.tgl_masuk)}</td>
                   <td className="px-6 py-3 text-center">
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-bold ${row.status === "Aktif" ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>
+                    <span className={`badge ${row.status === "Aktif" ? "badge-success" : "badge-danger"}`}>
                       {row.status}
                     </span>
                   </td>

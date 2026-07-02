@@ -43,7 +43,7 @@ export default async function KasPage() {
         <div className="relative z-10 flex items-center gap-3">
            <Link 
             href="/dashboard/kas/tambah"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-blue-500/20"
+            className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] hover:from-[#b07044] hover:to-[#8c4819] text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-orange-500/20"
            >
              <Plus className="w-5 h-5" />
              Tambah Kas
@@ -60,6 +60,7 @@ export default async function KasPage() {
                 <th className="py-4 px-6">Nomor</th>
                 <th className="py-4 px-6">Nama Kas</th>
                 <th className="py-4 px-6">Saldo</th>
+                <th className="py-4 px-6">Status</th>
                 <th className="py-4 px-6 text-right">Aksi</th>
               </tr>
             </thead>
@@ -72,6 +73,15 @@ export default async function KasPage() {
                   </td>
                   <td className="py-4 px-6 font-semibold text-emerald-600">
                     {formatRupiah(item.saldo)}
+                  </td>
+                  <td className="py-4 px-6">
+                    <span className={`badge ${
+                      item.status === 'Aktif' || !item.status
+                        ? 'badge-success' 
+                        : 'badge-danger'
+                    }`}>
+                      {item.status || "Aktif"}
+                    </span>
                   </td>
                   <td className="py-4 px-6 text-right space-x-2">
                     <Link 

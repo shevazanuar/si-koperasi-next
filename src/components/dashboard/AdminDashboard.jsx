@@ -1,6 +1,7 @@
 import { Users, CreditCard, Wallet, ArrowDownCircle, ArrowUpRight, Building2, Newspaper } from "lucide-react";
 import DashboardCharts from "@/components/dashboard/DashboardCharts";
 import ClockWidget from "@/components/dashboard/ClockWidget";
+import RecentActivitiesWidget from "@/components/dashboard/RecentActivitiesWidget";
 
 export default function AdminDashboard({ stats, chartData, profileInfo, informasiList }) {
   const cards = [
@@ -108,32 +109,7 @@ export default function AdminDashboard({ stats, chartData, profileInfo, informas
             <ArrowUpRight className="w-4 h-4 text-gray-300" />
           </h3>
           <div className="space-y-4">
-            {stats.recentActivities.length > 0 ? (
-              stats.recentActivities.map((act) => (
-                <div key={act.id} className="flex gap-3 group cursor-default">
-                  <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-amber-600 group-hover:text-white transition-all">
-                    <Wallet className="w-4 h-4" />
-                  </div>
-                  <div className="overflow-hidden">
-                    <p className="text-xs font-bold text-gray-900 truncate">{act.title}</p>
-                    <p className="text-[10px] text-gray-400 font-medium">
-                      {new Intl.NumberFormat("id-ID", {
-                        style: "currency",
-                        currency: "IDR",
-                        minimumFractionDigits: 0,
-                      }).format(act.amount)}{" "}
-                      •{" "}
-                      {new Date(act.date).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-400 italic font-medium text-center py-4">Belum ada aktivitas.</p>
-            )}
+            <RecentActivitiesWidget />
           </div>
         </div>
       </div>

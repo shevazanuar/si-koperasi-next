@@ -100,7 +100,7 @@ export async function GET() {
           title: 'Tagihan Cicilan',
           message: `Cicilan ke-${t.cicilan} pinjaman ${pinjamanData?.nomor || ''} sebesar Rp ${new Intl.NumberFormat('id-ID').format(t.jumlah_bayar)} ${isOverdue ? 'telah jatuh tempo' : 'akan segera jatuh tempo'}.`,
           date: t.tgl_jatuh_tempo || new Date(),
-          href: `/dashboard/transaksi/pinjaman`
+          href: `/dashboard/pinjaman`
         });
       }
     }

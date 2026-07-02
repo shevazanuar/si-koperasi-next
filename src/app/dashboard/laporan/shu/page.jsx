@@ -14,19 +14,36 @@ export default function LaporanSHUPage() {
 
   const fetchData = async () => {
     setLoading(true);
-    const params = new URLSearchParams();
-    if (filters.tgl1) params.set("tgl1", filters.tgl1);
-    if (filters.tgl2) params.set("tgl2", filters.tgl2);
-    if (filters.anggota_id) params.set("anggota_id", filters.anggota_id);
-    const res = await fetch(`/api/laporan/shu?${params}`);
-    const json = await res.json();
-    setData(json.data || []);
-    setAnggotaList(json.anggotaList || []);
-    setSummaryData({
-      totalPendapatan: json.totalPendapatan || 0,
-      totalBiayaOperasional: json.totalBiayaOperasional || 0
-    });
-    setLoading(false);
+    try {
+      const params = new URLSearchParams();
+      if (filters.tgl1) params.set("tgl1", filters.tgl1);
+      if (filters.tgl2) params.set("tgl2", filters.tgl2);
+      if (filters.anggota_id) params.set("anggota_id", filters.anggota_id);
+      const res = await fetch(`/api/laporan/shu?${params}`);
+      
+      if (!res.ok) {
+        throw new Error(`Gagal mengambil data: ${res.status}`);
+      }
+
+      const text = await res.text();
+      try {
+        const json = JSON.parse(text);
+        setData(json.data || []);
+        setAnggotaList(json.anggotaList || []);
+        setSummaryData({
+          totalPendapatan: json.totalPendapatan || 0,
+          totalBiayaOperasional: json.totalBiayaOperasional || 0
+        });
+      } catch (e) {
+        console.error("Failed to parse JSON, received:", text.substring(0, 100));
+        alert("Gagal memuat data dari server (format tidak valid).");
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+      alert("Terjadi kesalahan saat mengambil data laporan.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchData(); }, []);

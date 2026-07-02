@@ -97,7 +97,7 @@ export default function BiayaOperasionalPage() {
             <p className="text-sm text-gray-500">Kelola data pengeluaran operasional koperasi</p>
           </div>
         </div>
-        <Link href="/dashboard/biaya/tambah" className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all shadow-sm">
+        <Link href="/dashboard/biaya/tambah" className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] hover:from-[#b07044] hover:to-[#8c4819] text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center gap-2 transition-all shadow-sm">
           <Plus className="w-4 h-4" /> Tambah Biaya
         </Link>
       </div>

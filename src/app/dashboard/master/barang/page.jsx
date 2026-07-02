@@ -49,7 +49,7 @@ export default async function MasterBarangPage({ searchParams }) {
             <p className="text-sm text-gray-500">Kelola data barang dan stok</p>
           </div>
         </div>
-        <Link href="/dashboard/master/barang/tambah" className="btn-primary">
+        <Link href="/dashboard/master/barang/tambah" className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] hover:from-[#b07044] hover:to-[#8c4819] text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-orange-500/20">
           <Plus className="w-4 h-4" />
           Tambah Barang
         </Link>

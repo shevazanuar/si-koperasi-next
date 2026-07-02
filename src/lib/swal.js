@@ -7,7 +7,7 @@ const swalCustom = Swal.mixin({
     title: "text-lg md:text-xl font-black text-gray-900",
     htmlContainer: "text-xs md:text-sm text-gray-500 font-medium mt-2 leading-relaxed",
     confirmButton: "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-sm outline-none transition-all active:scale-95 shadow-md shadow-blue-500/20 cursor-pointer inline-flex justify-center items-center gap-1",
-    cancelButton: "px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-bold text-sm outline-none transition-all active:scale-95 cursor-pointer inline-flex justify-center items-center gap-1 ml-2",
+    cancelButton: "px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-bold text-sm outline-none transition-all active:scale-95 cursor-pointer inline-flex justify-center items-center gap-1 ml-2",
   },
   buttonsStyling: false,
 });
@@ -75,12 +75,12 @@ export const showAlert = (title, text, icon = "info") => {
  * @param {string} cancelText - Teks tombol batal
  * @returns {Promise<boolean>} - Mengembalikan true jika dikonfirmasi, false jika dibatalkan
  */
-export const showConfirm = async (title, text, confirmText = "Ya, Hapus", cancelText = "Batal") => {
+export const showConfirm = async (title, text, confirmText = "Ya, Hapus", cancelText = "Batal", isDanger = false, isSuccess = false) => {
   const result = await swalCustom.fire({
     title,
     text,
-    icon: "warning",
-    iconColor: "#f59e0b", // Amber 500
+    icon: isSuccess ? "question" : "warning",
+    iconColor: isDanger ? "#ef4444" : isSuccess ? "#10b981" : "#f59e0b", // Red 500 or Emerald 500 or Amber 500
     showCancelButton: true,
     confirmButtonText: confirmText,
     cancelButtonText: cancelText,
@@ -88,9 +88,12 @@ export const showConfirm = async (title, text, confirmText = "Ya, Hapus", cancel
       popup: "rounded-3xl p-6 shadow-2xl border border-gray-100 font-sans max-w-sm md:max-w-md",
       title: "text-lg md:text-xl font-black text-gray-900",
       htmlContainer: "text-xs md:text-sm text-gray-500 font-medium mt-2 leading-relaxed",
-      confirmButton:
-        "px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-sm outline-none transition-all active:scale-95 shadow-md shadow-amber-500/20 cursor-pointer inline-flex justify-center items-center gap-1",
-      cancelButton: "px-6 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl font-bold text-sm outline-none transition-all active:scale-95 cursor-pointer inline-flex justify-center items-center gap-1 ml-2",
+      confirmButton: isDanger
+        ? "px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm outline-none transition-all active:scale-95 shadow-md shadow-red-500/20 cursor-pointer inline-flex justify-center items-center gap-1"
+        : isSuccess
+          ? "px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm outline-none transition-all active:scale-95 shadow-md shadow-emerald-500/20 cursor-pointer inline-flex justify-center items-center gap-1"
+          : "px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-sm outline-none transition-all active:scale-95 shadow-md shadow-amber-500/20 cursor-pointer inline-flex justify-center items-center gap-1",
+      cancelButton: "px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-bold text-sm outline-none transition-all active:scale-95 cursor-pointer inline-flex justify-center items-center gap-1 ml-2",
     },
   });
   return result.isConfirmed;

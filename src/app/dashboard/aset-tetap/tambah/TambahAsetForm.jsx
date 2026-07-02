@@ -2,7 +2,7 @@
 
 import { useActionState, useState, useEffect } from "react";
 import { createAsetTetap } from "../actions";
-import { MonitorPlay, DollarSign, Save, Loader2, Calendar, CreditCard } from "lucide-react";
+import { MonitorPlay, Save, Loader2, Calendar, CreditCard } from "lucide-react";
 import Link from "next/link";
 import CurrencyInput from "@/components/ui/CurrencyInput";
 
@@ -72,7 +72,7 @@ export default function TambahAsetForm({ kategoriList, kasList, bankList }) {
 
         <div className="space-y-6">
           <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2 pb-2 border-b border-gray-50">
-            <DollarSign className="w-5 h-5 text-blue-600" />
+            <span className="font-black text-blue-600">Rp</span>
             Nilai Aset
           </h3>
           
@@ -80,7 +80,7 @@ export default function TambahAsetForm({ kategoriList, kasList, bankList }) {
             <div className="space-y-2">
               <label className="text-sm font-semibold text-gray-700 ml-1">Nilai Pembelian (Harga Perolehan)</label>
               <div className="relative">
-                <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-gray-400">Rp</span>
                 <CurrencyInput
                   name="nilai_pembelian"
                   placeholder="0"

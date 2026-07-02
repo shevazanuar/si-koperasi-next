@@ -2,32 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { createKas } from "../actions";
-import { Wallet, DollarSign, Save, Loader2 } from "lucide-react";
+import { Wallet, Save, Loader2 } from "lucide-react";
 import Link from "next/link";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 export default function TambahKasForm() {
   const [state, formAction, isPending] = useActionState(createKas, null);
-  const [saldo, setSaldo] = useState("");
-
-  const formatRupiah = (value) => {
-    const numberString = value.replace(/[^,\d]/g, '').toString();
-    const split = numberString.split(',');
-    const sisa = split[0].length % 3;
-    let rupiah = split[0].substr(0, sisa);
-    const ribuan = split[0].substr(sisa).match(/\d{3}/gi);
-
-    if (ribuan) {
-      const separator = sisa ? '.' : '';
-      rupiah += separator + ribuan.join('.');
-    }
-
-    rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-    return rupiah;
-  };
-
-  const handleSaldoChange = (e) => {
-    setSaldo(formatRupiah(e.target.value));
-  };
 
   return (
     <form action={formAction} className="p-8 lg:p-10 space-y-8">
@@ -56,17 +36,27 @@ export default function TambahKasForm() {
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 ml-1">Saldo Awal</label>
             <div className="relative">
-              <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-gray-400">Rp</span>
+              <CurrencyInput
+                name="saldo"
                 placeholder="0"
-                value={saldo}
-                onChange={handleSaldoChange}
+                defaultValue={0}
                 className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium text-emerald-600 font-bold"
                 required
               />
-              <input type="hidden" name="saldo" value={saldo.replace(/\./g, '')} />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700 ml-1">Status Kas</label>
+            <select
+                name="status"
+                defaultValue="Aktif"
+                className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
+            >
+                <option value="Aktif">Aktif</option>
+                <option value="Nonaktif">Nonaktif</option>
+            </select>
           </div>
 
         </div>

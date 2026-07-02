@@ -4,6 +4,9 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
+import crypto from "crypto";
 
 export async function createMutasi(prevState, formData) {
   try {
@@ -13,18 +16,38 @@ export async function createMutasi(prevState, formData) {
     const jenis_mutasi = formData.get("jenis_mutasi"); // "Kas_ke_Bank" or "Bank_ke_Kas"
     const nominal = parseFloat(formData.get("nominal") || "0");
     const keterangan = formData.get("keterangan") || "";
-    // In a real app we'd process the file. For now we assume a string URL or filename is passed after upload.
-    // However, since we just have a standard form, we will mock the upload path or expect a base64/URL.
-    // For this implementation, we will just store a placeholder or a text input if file upload isn't fully set up in the boilerplate.
-    const bukti_transfer = formData.get("bukti_transfer") || "bukti-transfer.png"; 
+    const buktiFile = formData.get("bukti_transfer"); 
 
     if (nominal <= 0) {
       return { error: "Nominal harus lebih dari 0." };
     }
 
-    if (!bukti_transfer) {
+    if (!buktiFile || buktiFile.size === 0) {
       return { error: "Bukti transfer wajib diunggah." };
     }
+
+    let bukti_transfer = null;
+    const bytes = await buktiFile.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowedTypes.includes(buktiFile.type)) {
+      return { error: "Tipe file gambar tidak diizinkan. Hanya JPG, PNG, WEBP." };
+    }
+
+    if (buktiFile.size > 2 * 1024 * 1024) {
+      return { error: "Ukuran gambar terlalu besar. Maksimal 2 MB." };
+    }
+
+    const uploadDir = path.join(process.cwd(), "public/uploads/mutasi");
+    await mkdir(uploadDir, { recursive: true });
+
+    const ext = path.extname(buktiFile.name);
+    const fileName = `mutasi-${Date.now()}-${crypto.randomBytes(3).toString("hex")}${ext}`;
+    const filePath = path.join(uploadDir, fileName);
+
+    await writeFile(filePath, buffer);
+    bukti_transfer = `/uploads/mutasi/${fileName}`;
 
     // Process Transaction
     await prisma.$transaction(async (tx) => {

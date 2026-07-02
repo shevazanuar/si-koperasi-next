@@ -87,27 +87,32 @@ export default async function LaporanPenjualanPage({ searchParams }) {
             <LimitFilter />
           </div>
           <div className="flex items-center gap-4">
-            <form method="GET" className="flex items-center gap-2">
-              <div className="relative">
-                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="date"
-                  name="start_date"
-                  defaultValue={startDate}
-                  className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all bg-white"
-                />
+            <form method="GET" className="flex items-end gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Dari Tanggal</label>
+                <div className="relative">
+                  <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="date"
+                    name="start_date"
+                    defaultValue={startDate}
+                    className="pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all bg-white font-medium text-gray-700"
+                  />
+                </div>
               </div>
-              <span className="text-gray-400">-</span>
-              <div className="relative">
-                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="date"
-                  name="end_date"
-                  defaultValue={endDate}
-                  className="pl-9 pr-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all bg-white"
-                />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider ml-1">Sampai Tanggal</label>
+                <div className="relative">
+                  <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="date"
+                    name="end_date"
+                    defaultValue={endDate}
+                    className="pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-400 transition-all bg-white font-medium text-gray-700"
+                  />
+                </div>
               </div>
-              <button type="submit" className="bg-gradient-to-br from-amber-500 to-orange-600 text-white p-2 rounded-xl hover:from-amber-600 hover:to-orange-700 transition-colors shadow-sm">
+              <button type="submit" className="bg-gradient-to-br from-amber-500 to-orange-600 text-white p-2.5 rounded-xl hover:from-amber-600 hover:to-orange-700 transition-colors shadow-sm flex items-center justify-center">
                 <Search className="w-5 h-5" />
               </button>
             </form>

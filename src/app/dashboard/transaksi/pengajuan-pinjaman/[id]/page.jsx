@@ -65,9 +65,9 @@ export default async function PengajuanDetailPage({ params }) {
   ]);
 
   const statusColors = {
-    Open: "bg-amber-50 text-amber-700 border-amber-100",
-    Acc: "bg-emerald-50 text-emerald-700 border-emerald-100",
-    Cancel: "bg-red-50 text-red-700 border-red-100",
+    Open: "badge badge-warning",
+    Acc: "badge badge-success",
+    Cancel: "badge badge-danger",
   };
 
   const stats = [
@@ -88,7 +88,7 @@ export default async function PengajuanDetailPage({ params }) {
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           Kembali ke Daftar
         </Link>
-        <div className={`px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 ${statusColors[pengajuan.status || 'Open']}`}>
+        <div className={statusColors[pengajuan.status || 'Open']}>
            {pengajuan.status === 'Acc' ? <CheckCircle className="w-3 h-3" /> : pengajuan.status === 'Cancel' ? <XCircle className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
            {pengajuan.status || 'Menunggu'}
         </div>

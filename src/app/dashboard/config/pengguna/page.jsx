@@ -85,7 +85,7 @@ export default function PenggunaPage() {
           </div>
         </div>
         <button onClick={() => { setShowForm(true); setEditId(null); setForm({ username: "", namalengkap: "", password: "", level_id: "1", blokir: "T" }); }}
-          className="btn-primary">
+          className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] hover:from-[#b07044] hover:to-[#8c4819] text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-orange-500/20">
           <Plus className="w-4 h-4" /> Tambah
         </button>
       </div>

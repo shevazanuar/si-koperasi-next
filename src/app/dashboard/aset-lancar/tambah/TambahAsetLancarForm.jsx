@@ -2,7 +2,7 @@
 
 import { useActionState } from "react";
 import { createAsetLancar } from "../actions";
-import { BarChart3, DollarSign, Save, Loader2, AlignLeft } from "lucide-react";
+import { BarChart3, Save, Loader2, AlignLeft } from "lucide-react";
 import Link from "next/link";
 import CurrencyInput from "@/components/ui/CurrencyInput";
 
@@ -32,7 +32,7 @@ export default function TambahAsetLancarForm() {
           <div className="space-y-2">
             <label className="text-sm font-semibold text-gray-700 ml-1">Nominal</label>
             <div className="relative">
-              <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-black text-gray-400">Rp</span>
               <CurrencyInput
                 name="nominal"
                 placeholder="0"

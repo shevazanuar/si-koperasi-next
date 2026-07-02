@@ -40,7 +40,7 @@ export default async function KategoriProdukPage({ searchParams }) {
         <div className="flex items-center gap-2">
           <Link
             href="/dashboard/master/kategori-produk/tambah"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 active:scale-95 text-sm"
+            className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] hover:from-[#b07044] hover:to-[#8c4819] text-white px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-md shadow-orange-500/20 active:scale-95 text-sm"
           >
             <Plus className="w-4 h-4" />
             Tambah Kategori

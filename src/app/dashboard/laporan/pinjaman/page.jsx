@@ -1,7 +1,10 @@
 import prisma from "@/lib/prisma";
 import ReportForm from "../ReportForm";
 
-export default async function LaporanPinjamanPage() {
+export default async function LaporanPinjamanPage(props) {
+  const searchParams = await props.searchParams;
+  const initialAnggotaId = searchParams?.anggota_id || "";
+
   const anggotaList = await prisma.anggota.findMany({
     where: { status: "Aktif" },
     select: { id: true, nama: true, nik: true, perusahaan: true },
@@ -22,6 +25,7 @@ export default async function LaporanPinjamanPage() {
       showPerusahaan={true}
       showJenisSimpanan={false}
       accentColor="orange"
+      initialAnggotaId={initialAnggotaId}
     />
   );
 }

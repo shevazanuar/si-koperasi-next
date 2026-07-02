@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { BadgeCheck, Search, Trash2, Save, X, CreditCard } from "lucide-react";
+import { BadgeCheck, Search, Trash2, Save, X, CreditCard, Filter } from "lucide-react";
 import { showConfirm, showSuccess, showError } from "@/lib/swal";
 import CurrencyInput from "@/components/ui/CurrencyInput";
+import CustomSelect from "@/components/CustomSelect";
 
 const fmt = (n) => new Intl.NumberFormat("id-ID").format(n || 0);
 
@@ -14,6 +15,7 @@ export default function PembayaranPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [user, setUser] = useState(null);
+  const [selectedPinjamanId, setSelectedPinjamanId] = useState("");
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -61,8 +63,69 @@ export default function PembayaranPage() {
     });
     const json = await res.json();
     setCicilans(json.data || []);
+    setSelectedPinjamanId("");
   };
 
+  const handlePelunasan = async (pinjamanId) => {
+    const loan = uniqueLoans.find((l) => l.id === parseInt(pinjamanId));
+    const total = filteredCicilans.reduce((sum, c) => sum + c.angsuran + c.bunga, 0);
+
+    const confirmed = await showConfirm(
+      "Pelunasan Sekaligus",
+      `Anda akan melunasi seluruh sisa cicilan untuk pinjaman ${
+        loan?.nomor_pinjaman || ""
+      } dengan total Rp ${fmt(total)}. Lanjutkan?`,
+      "Ya, Lunasi",
+      "Batal",
+      false, // isDanger
+      true   // isSuccess
+    );
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch("/api/transaksi/pembayaran", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "pelunasan",
+          pinjaman_id: parseInt(pinjamanId),
+          tgl_bayar: new Date().toISOString().split("T")[0],
+        }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        showSuccess("Berhasil", json.message || "Pelunasan berhasil diproses");
+        setSelectedPinjamanId("");
+        if (selectedAnggota) handleSelectAnggota(selectedAnggota);
+        fetchPayments();
+      } else {
+        showError("Gagal", json.error || json.message || "Gagal memproses pelunasan");
+      }
+    } catch (err) {
+      showError("Kesalahan", "Terjadi kesalahan koneksi server");
+    }
+  };
+
+  const uniqueLoans = [];
+  const loanIds = new Set();
+  cicilans.forEach((c) => {
+    if (!loanIds.has(c.pinjaman_id)) {
+      loanIds.add(c.pinjaman_id);
+      uniqueLoans.push({ 
+        id: c.pinjaman_id, 
+        nomor_pinjaman: c.nomor_pinjaman,
+        nama_pinjaman: c.nama_pinjaman || c.nomor_pinjaman
+      });
+    }
+  });
+
+  const filteredCicilans = selectedPinjamanId
+    ? cicilans.filter((c) => c.pinjaman_id === parseInt(selectedPinjamanId))
+    : cicilans;
+
+  const filtered = anggotaList.filter((a) =>
+    a.nama.toLowerCase().includes(search.toLowerCase()) || a.nik.includes(search)
+  );
   const handleBayar = async (e) => {
     e.preventDefault();
     try {
@@ -104,9 +167,6 @@ export default function PembayaranPage() {
     }
   };
 
-  const filtered = anggotaList.filter((a) =>
-    a.nama.toLowerCase().includes(search.toLowerCase()) || a.nik.includes(search)
-  );
 
   return (
     <div className="space-y-6">
@@ -153,9 +213,37 @@ export default function PembayaranPage() {
                   <p className="text-gray-400 text-sm">Tidak ada cicilan yang belum dibayar.</p>
                 </div>
               ) : (
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible">
+                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50 flex flex-col sm:flex-row justify-between items-center gap-4 rounded-t-2xl">
                     <h3 className="text-xs font-bold text-gray-500 uppercase">Cicilan Belum Dibayar</h3>
+                    
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center p-1 pl-3 bg-white border border-gray-200 rounded-xl transition-all shadow-sm hover:shadow-md hover:border-amber-200">
+                        <div className="flex items-center gap-2 border-r border-gray-100 pr-2">
+                          <Filter className="w-4 h-4 text-amber-500" />
+                          <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Filter</span>
+                        </div>
+                        <CustomSelect 
+                          options={[
+                            { value: "", label: "Semua Pinjaman" },
+                            ...uniqueLoans.map((l) => ({ value: l.id.toString(), label: l.nama_pinjaman }))
+                          ]}
+                          value={selectedPinjamanId}
+                          onChange={(val) => setSelectedPinjamanId(val)}
+                          placeholder="Semua Pinjaman"
+                          className="w-48"
+                        />
+                      </div>
+
+                      {selectedPinjamanId && filteredCicilans.length > 0 && (
+                        <button 
+                          onClick={() => handlePelunasan(selectedPinjamanId)}
+                          className="bg-emerald-600 text-white text-xs px-4 py-2 rounded-xl hover:bg-emerald-700 transition font-bold shadow-md shadow-emerald-500/20"
+                        >
+                          Pelunasan Sekaligus
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <table className="w-full text-sm">
                     <thead><tr className="bg-gray-50 border-b border-gray-100">
@@ -166,7 +254,7 @@ export default function PembayaranPage() {
                       <th className="text-right px-4 py-3 text-xs font-bold text-gray-500 uppercase">Bunga</th>
                       <th className="text-center px-4 py-3 text-xs font-bold text-gray-500 uppercase">Aksi</th>
                     </tr></thead>
-                    <tbody>{cicilans.map((c) => (
+                    <tbody>{filteredCicilans.map((c) => (
                       <React.Fragment key={c.id}>
                         <tr className="border-b border-gray-50 hover:bg-blue-50/20">
                           <td className="px-4 py-2.5 font-mono text-xs text-blue-600">{c.nomor_pinjaman}</td>

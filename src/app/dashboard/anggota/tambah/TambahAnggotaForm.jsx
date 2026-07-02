@@ -51,6 +51,7 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
                   <input
                     name="nik"
                     type="text"
+                    onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                     placeholder="NIK"
                     className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                     required
@@ -62,6 +63,7 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
                 <input
                   name="noidentitas"
                   type="text"
+                  onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                   placeholder="KTP/Lainnya"
                   className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                   required
@@ -92,6 +94,7 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
               <input
                 name="nama_pasangan"
                 type="text"
+                onInput={(e) => { e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''); }}
                 placeholder="Opsional"
                 className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
               />
@@ -100,7 +103,9 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
               <label className="text-sm font-semibold text-gray-700 ml-1">Jumlah Anak</label>
               <input
                 name="jml_anak"
-                type="number"
+                type="text"
+                inputMode="numeric"
+                onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                 placeholder="0"
                 defaultValue={0}
                 className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
@@ -123,6 +128,7 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
                 <input
                   name="tempat_lahir"
                   type="text"
+                  onInput={(e) => { e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''); }}
                   className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                 />
               </div>
@@ -144,6 +150,7 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
                 <input
                   name="hp"
                   type="tel"
+                  onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }}
                   placeholder="08..."
                   className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                 />
@@ -168,6 +175,7 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
               <input
                 name="kota"
                 type="text"
+                onInput={(e) => { e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''); }}
                 placeholder="Kota domisili"
                 className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
               />
@@ -203,16 +211,21 @@ export default function TambahAnggotaForm({ levelList, perusahaanList }) {
                         <input
                           name="unit_seksi"
                           type="text"
+                          onInput={(e) => { e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, ''); }}
                           className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
                         />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-semibold text-gray-700 ml-1">Jabatan</label>
-                        <input
+                        <select
                           name="jabatan"
-                          type="text"
-                          className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium"
-                        />
+                          className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium text-sm"
+                        >
+                          <option value="">-Pilih Jabatan-</option>
+                          {levelList.map(l => (
+                            <option key={`jabatan-${l.id}`} value={l.nama}>{l.nama}</option>
+                          ))}
+                        </select>
                       </div>
                   </div>
                   

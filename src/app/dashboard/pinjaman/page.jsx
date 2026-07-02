@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import LimitFilter from "@/components/dashboard/LimitFilter";
-import { TypeFilter } from "./Filters";
+import { TypeFilter, StatusFilter } from "./Filters";
 
 export default async function PinjamanPage({ searchParams }) {
   const user = await getSession();
@@ -13,6 +13,7 @@ export default async function PinjamanPage({ searchParams }) {
   const params = await searchParams;
   const query = params?.q || "";
   const typeFilter = params?.type || "";
+  const statusFilter = params?.status || "";
   const limit = parseInt(params?.limit) || 25;
   const safeLimit = [25, 50, 100].includes(limit) ? limit : 25;
 
@@ -38,42 +39,52 @@ export default async function PinjamanPage({ searchParams }) {
   // Main query: JOIN pinjaman_header, anggota, jenis_pinjaman, kategori_pinjaman
   // Calculate jumlah_bayar (total paid), jumlah_cicilan (count paid), sisa (remaining)
   const sql = `
-    SELECT
-      ph.id,
-      ph.nomor,
-      ph.tgl,
-      ph.lama,
-      ph.satuan,
-      ph.bunga,
-      ph.jumlah,
-      a.nik,
-      a.nama AS nama_anggota,
-      kp.kategpinj_kode AS kategori,
-      jp.nama AS judul_pinjaman,
-      COALESCE(SUM(pd.jumlah_bayar), 0) AS jumlah_bayar,
-      COALESCE(COUNT(CASE WHEN pd.jumlah_bayar > 0 THEN 1 END), 0) AS jumlah_cicilan,
-      (ph.jumlah - COALESCE(SUM(pd.jumlah_bayar), 0)) AS sisa
-    FROM pinjaman_header ph
-    JOIN anggota a ON ph.anggota_id = a.id
-    LEFT JOIN kategori_pinjaman kp ON ph.kategpinj_id = kp.kategpinj_id
-    LEFT JOIN jenis_pinjaman jp ON ph.jenis_pinjaman_id = jp.id
-    LEFT JOIN pinjaman_detail pd ON ph.id = pd.pinjaman_id
-    ${where}
-    GROUP BY ph.id, ph.nomor, ph.tgl, ph.lama, ph.satuan, ph.bunga, ph.jumlah,
-             a.nik, a.nama, kp.kategpinj_kode, jp.nama
-    ORDER BY ph.tgl DESC
+    SELECT * FROM (
+      SELECT
+        ph.id,
+        ph.nomor,
+        ph.tgl,
+        ph.lama,
+        ph.satuan,
+        ph.bunga,
+        ph.jumlah,
+        a.nik,
+        a.nama AS nama_anggota,
+        kp.kategpinj_kode AS kategori,
+        jp.nama AS judul_pinjaman,
+        COALESCE(SUM(pd.jumlah_bayar), 0) AS jumlah_bayar,
+        COALESCE(COUNT(CASE WHEN pd.jumlah_bayar > 0 THEN 1 END), 0) AS jumlah_cicilan,
+        COALESCE(SUM(CASE WHEN pd.jumlah_bayar = 0 THEN (pd.angsuran + pd.bunga) ELSE 0 END), 0) AS sisa
+      FROM pinjaman_header ph
+      JOIN anggota a ON ph.anggota_id = a.id
+      LEFT JOIN kategori_pinjaman kp ON ph.kategpinj_id = kp.kategpinj_id
+      LEFT JOIN jenis_pinjaman jp ON ph.jenis_pinjaman_id = jp.id
+      LEFT JOIN pinjaman_detail pd ON ph.id = pd.pinjaman_id
+      ${where}
+      GROUP BY ph.id, ph.nomor, ph.tgl, ph.lama, ph.satuan, ph.bunga, ph.jumlah,
+               a.nik, a.nama, kp.kategpinj_kode, jp.nama
+    ) AS sub
+    WHERE 1=1 ${statusFilter === 'aktif' ? 'AND sisa > 0' : statusFilter === 'lunas' ? 'AND sisa <= 0' : ''}
+    ORDER BY ${!statusFilter ? '(sisa > 0) DESC, ' : ''}tgl DESC
     LIMIT ?
   `;
 
   sqlParams.push(safeLimit);
 
-  const jenisRawSql = user.role === "anggota"
-    ? `SELECT DISTINCT jp.id, jp.nama 
-       FROM jenis_pinjaman jp 
-       JOIN pinjaman_header ph ON jp.id = ph.jenis_pinjaman_id 
-       WHERE ph.anggota_id = ? 
-       ORDER BY jp.id ASC`
-    : `SELECT id, nama FROM jenis_pinjaman ORDER BY id ASC`;
+  const jenisRawSql = `
+    SELECT DISTINCT sub.id, sub.nama FROM (
+      SELECT
+        jp.id, jp.nama,
+        COALESCE(SUM(CASE WHEN pd.jumlah_bayar = 0 THEN (pd.angsuran + pd.bunga) ELSE 0 END), 0) AS sisa
+      FROM jenis_pinjaman jp
+      JOIN pinjaman_header ph ON jp.id = ph.jenis_pinjaman_id
+      LEFT JOIN pinjaman_detail pd ON ph.id = pd.pinjaman_id
+      ${user.role === "anggota" ? "WHERE ph.anggota_id = ?" : ""}
+      GROUP BY ph.id, jp.id, jp.nama
+    ) AS sub
+    WHERE 1=1 ${statusFilter === 'aktif' ? 'AND sisa > 0' : statusFilter === 'lunas' ? 'AND sisa <= 0' : ''}
+    ORDER BY sub.id ASC
+  `;
 
   const jenisRawParams = user.role === "anggota" ? [user.id] : [];
   
@@ -111,7 +122,7 @@ export default async function PinjamanPage({ searchParams }) {
 
           <Link
             href="/dashboard/pinjaman/tambah"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-md shadow-blue-500/20 active:scale-95 text-sm"
+            className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] hover:from-[#b07044] hover:to-[#8c4819] text-white px-4 py-2.5 rounded-xl font-bold transition-all flex items-center gap-2 shadow-md shadow-orange-500/20 active:scale-95 text-sm"
           >
             <Plus className="w-4 h-4" />
             Tambah
@@ -124,8 +135,10 @@ export default async function PinjamanPage({ searchParams }) {
 
         {/* Toolbar */}
         <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3 bg-gray-50/50 rounded-t-2xl">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <LimitFilter />
+            <StatusFilter />
+            <TypeFilter types={jenisTypes} />
           </div>
           <div className="flex items-center gap-4">
             {user.role !== "anggota" && (
@@ -140,9 +153,6 @@ export default async function PinjamanPage({ searchParams }) {
                 {typeFilter && <input type="hidden" name="type" value={typeFilter} />}
               </form>
             )}
-            
-            <TypeFilter types={jenisTypes} />
-
             <div className="text-xs text-gray-400 font-bold uppercase tracking-widest">
               {data.length} Record
             </div>
@@ -191,11 +201,11 @@ export default async function PinjamanPage({ searchParams }) {
                   </td>
                   <td className="py-3 px-4 text-center">
                     {item.sisa > 0 ? (
-                      <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-100 text-[10px] font-bold whitespace-nowrap">
+                      <span className="badge badge-success">
                         Aktif
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded bg-green-50 text-green-700 border border-green-100 text-[10px] font-bold whitespace-nowrap">
+                      <span className="badge badge-info">
                         Lunas
                       </span>
                     )}

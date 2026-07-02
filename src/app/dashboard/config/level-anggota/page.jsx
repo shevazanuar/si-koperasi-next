@@ -64,7 +64,7 @@ export default function LevelAnggotaPage() {
           <div className="bg-emerald-600 p-2.5 rounded-xl text-white"><Users className="w-5 h-5" /></div>
           <div><h1 className="text-xl font-black text-gray-900">Level Anggota</h1><p className="text-sm text-gray-500">Kelola level / kategori anggota</p></div>
         </div>
-        <button onClick={() => { setShowForm(true); setEditId(null); setForm({ nama: "" }); }} className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 text-sm font-medium">
+        <button onClick={() => { setShowForm(true); setEditId(null); setForm({ nama: "" }); }} className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-[#b07044] hover:to-[#8c4819] text-sm font-medium">
           <Plus className="w-4 h-4" /> Tambah
         </button>
       </div>

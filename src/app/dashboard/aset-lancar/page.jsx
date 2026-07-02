@@ -96,7 +96,7 @@ export default async function AsetLancarPage() {
         <div className="relative z-10 flex items-center gap-3">
            <Link 
             href="/dashboard/aset-lancar/tambah"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-blue-500/20"
+            className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] hover:from-[#b07044] hover:to-[#8c4819] text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-orange-500/20"
            >
              <Plus className="w-5 h-5" />
              Catat Aset Lainnya

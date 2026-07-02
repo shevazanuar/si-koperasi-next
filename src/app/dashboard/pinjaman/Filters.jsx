@@ -95,3 +95,52 @@ export function TypeFilter({ types }) {
     </div>
   );
 }
+
+export function StatusFilter() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [isPending, startTransition] = useTransition();
+
+  const currentStatus = searchParams.get("status") || "";
+
+  const handleChange = (val) => {
+    const params = new URLSearchParams(searchParams);
+    if (val) {
+      params.set("status", val);
+    } else {
+      params.delete("status");
+    }
+
+    startTransition(() => {
+      router.replace(`${pathname}?${params.toString()}`);
+    });
+  };
+
+  const statuses = [
+    { value: "", label: "Semua" },
+    { value: "aktif", label: "Aktif" },
+    { value: "lunas", label: "Lunas" },
+  ];
+
+  return (
+    <div className={`flex items-center bg-gray-100/80 p-1 rounded-xl ${isPending ? 'opacity-50' : 'opacity-100'}`}>
+      {statuses.map((s) => {
+        const isActive = currentStatus === s.value;
+        return (
+          <button
+            key={s.value}
+            onClick={() => handleChange(s.value)}
+            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${
+              isActive 
+                ? "bg-white text-emerald-600 shadow-sm" 
+                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+            }`}
+          >
+            {s.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}

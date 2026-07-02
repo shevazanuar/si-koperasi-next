@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { CreditCard, Plus, Pencil, Trash2, Save, X } from "lucide-react";
 import { showConfirm, showSuccess, showError } from "@/lib/swal";
+import CurrencyInput from "@/components/ui/CurrencyInput";
 
 const fmt = (n) => new Intl.NumberFormat("id-ID").format(n || 0);
 
@@ -69,7 +70,7 @@ export default function JenisPinjamanPage() {
           <div><h1 className="text-xl font-black text-gray-900">Jenis Pinjaman</h1><p className="text-sm text-gray-500">Kelola jenis/produk pinjaman</p></div>
         </div>
         <button onClick={() => { setShowForm(true); setEditId(null); setForm({ nama: "", lama: "", satuan: "Bulan", bunga: "", jumlah: "" }); }}
-          className="bg-blue-600 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:bg-blue-700 transition text-sm font-medium shadow-md shadow-blue-500/20">
+          className="bg-gradient-to-r from-[#cd8957] to-[#a05a26] text-white px-4 py-2.5 rounded-xl flex items-center gap-2 hover:from-[#b07044] hover:to-[#8c4819] transition text-sm font-medium shadow-md shadow-orange-500/20">
           <Plus className="w-4 h-4" /> Tambah
         </button>
       </div>
@@ -87,7 +88,7 @@ export default function JenisPinjamanPage() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Lama *</label>
-              <input type="number" required min="0" value={form.lama} onChange={(e) => setForm({ ...form, lama: e.target.value })}
+              <input type="text" inputMode="numeric" required onInput={(e) => { e.target.value = e.target.value.replace(/[^0-9]/g, ''); }} value={form.lama} onChange={(e) => setForm({ ...form, lama: e.target.value })}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
             </div>
             <div>
@@ -106,7 +107,7 @@ export default function JenisPinjamanPage() {
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-500 mb-1">Jumlah Maks (Rp)</label>
-              <input type="number" min="0" value={form.jumlah} onChange={(e) => setForm({ ...form, jumlah: e.target.value })}
+              <CurrencyInput value={form.jumlah} onChange={(val) => setForm({ ...form, jumlah: val })}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none" />
             </div>
             <div className="md:col-span-3 flex gap-2">

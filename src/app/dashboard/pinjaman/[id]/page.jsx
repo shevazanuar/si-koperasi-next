@@ -287,11 +287,11 @@ export default async function PinjamanDetailPage({ params }) {
                             </td>
                             <td className="px-6 py-4 text-center">
                                 {isPaid ? (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase">
+                                  <span className="badge badge-success uppercase tracking-widest">
                                       Lunas
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 text-[10px] font-black uppercase">
+                                  <span className="badge badge-warning uppercase tracking-widest">
                                       Belum
                                   </span>
                                 )}

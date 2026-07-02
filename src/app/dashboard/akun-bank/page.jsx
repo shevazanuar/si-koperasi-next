@@ -40,7 +40,7 @@ export default async function AkunBankPage() {
           </div>
         </div>
         <div className="relative z-10 flex items-center gap-3">
-          <Link href="/dashboard/akun-bank/tambah" className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-amber-500/20">
+          <Link href="/dashboard/akun-bank/tambah" className="bg-gradient-to-r from-[#cd8957] to-[#a05a26]  hover:from-[#b07044] hover:to-[#8c4819] text-white px-5 py-2.5 rounded-xl font-medium transition-colors flex items-center gap-2 shadow-md shadow-orange-500/20">
             <Plus className="w-5 h-5" />
             Tambah Rekening
           </Link>
@@ -72,8 +72,8 @@ export default async function AkunBankPage() {
                   <td className="py-4 px-6 font-semibold text-emerald-600">{formatRupiah(item.saldo)}</td>
                   <td className="py-4 px-6">
                     <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-tight ${
-                        item.status === "Aktif" ? "bg-emerald-50 text-emerald-700 border border-emerald-100" : "bg-rose-50 text-rose-700 border border-rose-100"
+                      className={`badge ${
+                        item.status === "Aktif" ? "badge-success" : "badge-danger"
                       }`}
                     >
                       {item.status || "Aktif"}
