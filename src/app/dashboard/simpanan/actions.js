@@ -113,3 +113,55 @@ export async function createSimpanan(prevState, formData) {
   revalidatePath("/dashboard");
   redirect("/dashboard/simpanan");
 }
+
+export async function deleteSimpanan(id) {
+  const session = await getSession();
+  if (!session || session.role !== "admin") {
+    return { error: "Akses ditolak. Hanya Admin yang dapat menghapus simpanan." };
+  }
+
+  const headersList = await headers();
+  const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+
+  try {
+    const existing = await prisma.simpanan.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existing) {
+      return { error: "Data simpanan tidak ditemukan." };
+    }
+
+    await prisma.$transaction(async (tx) => {
+      // Revert saldo
+      if (existing.metode_pembayaran === "Kas" && existing.kas_id) {
+        await tx.kas.update({
+          where: { id: existing.kas_id },
+          data: { saldo: { decrement: existing.jumlah } }
+        });
+      } else if (existing.metode_pembayaran === "Bank" && existing.akun_bank_id) {
+        await tx.akun_bank.update({
+          where: { id: existing.akun_bank_id },
+          data: { saldo: { decrement: existing.jumlah } }
+        });
+      }
+
+      await tx.simpanan.delete({
+        where: { id: existing.id }
+      });
+
+      await tx.$executeRaw`
+        INSERT INTO audit_log (user_id, username, aksi, tabel, record_id, before_data, after_data, ip_address, keterangan)
+        VALUES (${session.id}, ${session.username}, ${AUDIT_AKSI.HAPUS_SIMPANAN || 'HAPUS_SIMPANAN'}, 'simpanan', ${existing.id},
+                ${JSON.stringify(existing)}, NULL, ${ip}, ${`Hapus simpanan ${existing.nomor}`})
+      `;
+    });
+
+    revalidatePath("/dashboard/simpanan");
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (e) {
+    console.error("Delete Simpanan Error:", e);
+    return { error: "Gagal menghapus transaksi simpanan. Pastikan tidak ada data yang terkait." };
+  }
+}

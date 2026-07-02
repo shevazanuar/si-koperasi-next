@@ -354,7 +354,7 @@ export default function Sidebar({ role = "admin", allowedMenuIds = null }) {
     const fetchPendingCount = () => {
       if (role === "admin") {
         fetch("/api/transaksi/pengajuan-pinjaman/pending-count")
-          .then((res) => res.json())
+          .then((res) => res.ok ? res.json() : { count: 0 })
           .then((data) => setPendingCount(data.count || 0))
           .catch((err) => console.error(err));
       }

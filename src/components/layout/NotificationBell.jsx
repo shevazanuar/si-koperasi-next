@@ -17,14 +17,14 @@ export default function NotificationBell({ role }) {
     
     const fetchAdminData = () => {
       fetch("/api/transaksi/pengajuan-pinjaman/pending-count")
-        .then((res) => res.json())
+        .then((res) => res.ok ? res.json() : { count: 0 })
         .then((data) => setPendingCount(data.count || 0))
         .catch((err) => console.error(err));
     };
 
     const fetchAnggotaData = () => {
       fetch("/api/notifikasi/anggota", { cache: "no-store" })
-        .then((res) => res.json())
+        .then((res) => res.ok ? res.json() : { notifications: [] })
         .then((data) => {
           if (data.notifications) {
             // Filter notifikasi yang sudah dibaca dari localStorage

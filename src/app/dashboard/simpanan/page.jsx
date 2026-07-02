@@ -5,6 +5,7 @@ import { getSession } from "@/lib/session";
 import { redirect } from "next/navigation";
 import TypeFilter from "./TypeFilter";
 import LimitFilter from "@/components/dashboard/LimitFilter";
+import DeleteButton from "./DeleteButton";
 
 export default async function SimpananPage({ searchParams }) {
   const user = await getSession();
@@ -109,7 +110,17 @@ export default async function SimpananPage({ searchParams }) {
           <h1 className="text-xl font-black text-gray-900">Data Simpanan Anggota</h1>
           <p className="text-gray-400 text-sm mt-0.5">Kelola dan pantau seluruh transaksi simpanan</p>
         </div>
-        <div className="flex items-center gap-2"></div>
+        <div className="flex items-center gap-2">
+          {user.role === "admin" && (
+            <Link 
+              href="/dashboard/simpanan/tambah" 
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all active:scale-95"
+            >
+              <Plus className="w-4 h-4" />
+              Tambah Simpanan
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Summary Cards */}
@@ -202,9 +213,14 @@ export default async function SimpananPage({ searchParams }) {
                     {fmt(item.jumlah)}
                   </td>
                   <td className="py-3 px-4 text-center">
-                    <Link href={`/dashboard/simpanan/${item.id}`} className="text-amber-600 hover:text-amber-800 font-bold text-[10px] uppercase bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-100 transition-all active:scale-95">
-                      Detail
-                    </Link>
+                    <div className="flex items-center justify-center gap-2">
+                      <Link href={`/dashboard/simpanan/${item.id}`} className="text-amber-600 hover:text-amber-800 font-bold text-[10px] uppercase bg-amber-50 px-2.5 py-1.5 rounded-lg border border-amber-100 transition-all active:scale-95">
+                        Detail
+                      </Link>
+                      {user.role === "admin" && (
+                        <DeleteButton id={item.id} nomor={item.nomor} />
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
