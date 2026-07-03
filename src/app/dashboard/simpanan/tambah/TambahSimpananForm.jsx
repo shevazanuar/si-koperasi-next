@@ -1,13 +1,23 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { createSimpanan } from "../actions";
 import { Wallet, User, Calendar, Save, Loader2 } from "lucide-react";
 import CurrencyInput from "@/components/ui/CurrencyInput";
+import { useRouter } from "next/navigation";
+import { showSuccess } from "@/lib/swal";
 
 export default function TambahSimpananForm({ anggota, jenisSimpanan, user }) {
   const [state, formAction, isPending] = useActionState(createSimpanan, null);
   const isMember = user?.role === "anggota";
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state?.success) {
+      showSuccess("Transaksi simpanan berhasil!");
+      router.push("/dashboard/simpanan");
+    }
+  }, [state, router]);
 
   return (
     <form action={formAction} className="p-8 lg:p-10 space-y-6">

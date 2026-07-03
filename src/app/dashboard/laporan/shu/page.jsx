@@ -114,56 +114,15 @@ export default function LaporanSHUPage() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-          <h3 className="text-xs font-bold text-gray-500 uppercase">
-            Data SHU — <span className="text-amber-600">{data.length} record</span>
-          </h3>
+      {/* Maintenance Message for SHU Table */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-12 text-center flex flex-col items-center justify-center">
+        <div className="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mb-4 border border-amber-100">
+          <PieChart className="w-8 h-8 text-amber-500 opacity-80" />
         </div>
-        {loading ? <div className="p-12 text-center text-gray-400">Memuat...</div> : data.length === 0 ? (
-          <div className="p-12 text-center text-gray-400 text-sm">Tidak ada data yang sesuai filter.</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead><tr className="bg-gray-50 border-b border-gray-100">
-                <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase">No</th>
-                <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase">Nomor</th>
-                <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase">Anggota</th>
-                <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase">JK</th>
-                <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase">Jenis Pinjaman</th>
-                <th className="text-left px-6 py-3 text-xs font-bold text-gray-500 uppercase">Tanggal</th>
-                <th className="text-right px-6 py-3 text-xs font-bold text-gray-500 uppercase">Jumlah</th>
-                <th className="text-right px-6 py-3 text-xs font-bold text-gray-500 uppercase">Bunga</th>
-                <th className="text-center px-6 py-3 text-xs font-bold text-gray-500 uppercase">Lama</th>
-              </tr></thead>
-              <tbody>
-                {data.map((row, idx) => (
-                  <tr key={row.id} className="border-b border-gray-50 hover:bg-amber-50/50">
-                    <td className="px-6 py-3 text-gray-400">{idx + 1}</td>
-                    <td className="px-6 py-3 font-mono text-xs text-amber-600 font-bold">{row.nomor}</td>
-                    <td className="px-6 py-3">
-                      <p className="font-bold text-gray-900">{row.nama_anggota}</p>
-                      <p className="text-xs text-gray-400">{row.nik}</p>
-                    </td>
-                    <td className="px-6 py-3 text-gray-600">{row.jk}</td>
-                    <td className="px-6 py-3 text-gray-600">{row.nama_pinjaman}</td>
-                    <td className="px-6 py-3 text-gray-500">{row.tgl ? new Date(row.tgl).toLocaleDateString("id-ID") : "-"}</td>
-                    <td className="px-6 py-3 text-right font-medium text-gray-900">Rp {fmt(row.jumlah)}</td>
-                    <td className="px-6 py-3 text-right font-bold text-orange-600">Rp {fmt(row.bunga)}</td>
-                    <td className="px-6 py-3 text-center text-gray-600">{row.lama} {row.satuan}</td>
-                  </tr>
-                ))}
-                <tr className="bg-gray-50 font-bold">
-                  <td colSpan={6} className="px-6 py-3 text-right text-gray-700">TOTAL</td>
-                  <td className="px-6 py-3 text-right text-gray-900">Rp {fmt(totalJumlah)}</td>
-                  <td className="px-6 py-3 text-right text-orange-700">Rp {fmt(totalBunga)}</td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        )}
+        <h3 className="text-lg font-black text-gray-900 mb-2">Sedang Dalam Perbaikan</h3>
+        <p className="text-sm text-gray-500 max-w-md mx-auto">
+          Fitur tabel pembagian Sisa Hasil Usaha (SHU) per anggota saat ini sedang dalam tahap pengembangan dan penyempurnaan sistem.
+        </p>
       </div>
     </div>
   );

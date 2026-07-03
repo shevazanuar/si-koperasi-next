@@ -14,7 +14,7 @@ const simpananSchema = z.object({
   jenis_simpanan_id: z.coerce.number().int().positive("Jenis simpanan wajib dipilih"),
   jumlah: z.coerce.number().int().positive("Jumlah harus lebih dari 0"),
   tgl: z.string().min(1, "Tanggal wajib diisi"),
-  metode_pembayaran: z.string().optional(),
+  metode_pembayaran: z.string().optional().nullable(),
   kas_id: z.coerce.number().int().optional().nullable(),
   akun_bank_id: z.coerce.number().int().optional().nullable(),
 });
@@ -111,7 +111,7 @@ export async function createSimpanan(prevState, formData) {
 
   revalidatePath("/dashboard/simpanan");
   revalidatePath("/dashboard");
-  redirect("/dashboard/simpanan");
+  return { success: true };
 }
 
 export async function deleteSimpanan(id) {
