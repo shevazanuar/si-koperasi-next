@@ -1,14 +1,24 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { createPinjaman } from "../actions";
 import { CreditCard, User, Calendar, Save, Loader2, Clock, Percent, FileSearch } from "lucide-react";
 import CurrencyInput from "@/components/ui/CurrencyInput";
+import { useRouter } from "next/navigation";
+import { showSuccess } from "@/lib/swal";
 
-export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
+export default function TambahPinjamanForm({ anggota, jenisPinjaman, kategoriPinjaman, user }) {
   const [state, formAction, isPending] = useActionState(createPinjaman, null);
   const [selectedType, setSelectedType] = useState(null);
   const isMember = user?.role === "anggota";
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state?.success) {
+      showSuccess("Pengajuan pinjaman berhasil dikirim!");
+      router.push("/dashboard/transaksi/pengajuan-pinjaman");
+    }
+  }, [state, router]);
 
   const handleTypeChange = (e) => {
     const type = jenisPinjaman.find(j => j.id.toString() === e.target.value);
@@ -60,25 +70,47 @@ export default function TambahPinjamanForm({ anggota, jenisPinjaman, user }) {
           </div>
         </div>
 
-        {/* Jenis Pinjaman */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-gray-700 ml-1 flex items-center gap-2">
-            <CreditCard className="w-4 h-4 text-gray-400" />
-            Pilih Jenis Pinjaman
-          </label>
-          <select
-            name="jenis_pinjaman_id"
-            onChange={handleTypeChange}
-            className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium text-sm"
-            required
-          >
-            <option value="">Pilih Skema Pinjaman...</option>
-            {jenisPinjaman.map((j) => (
-              <option key={j.id} value={j.id}>
-                {j.nama}
-              </option>
-            ))}
-          </select>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Kategori Pinjaman */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700 ml-1 flex items-center gap-2">
+              <FileSearch className="w-4 h-4 text-gray-400" />
+              Kategori Pinjaman
+            </label>
+            <select
+              name="kategpinj_id"
+              className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium text-sm"
+              required
+            >
+              <option value="">Pilih Kategori...</option>
+              {kategoriPinjaman?.map((k) => (
+                <option key={k.kategpinj_id} value={k.kategpinj_id}>
+                  {k.kategpinj_nama}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Jenis Pinjaman */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700 ml-1 flex items-center gap-2">
+              <CreditCard className="w-4 h-4 text-gray-400" />
+              Skema Pinjaman
+            </label>
+            <select
+              name="jenis_pinjaman_id"
+              onChange={handleTypeChange}
+              className="w-full px-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-medium text-sm"
+              required
+            >
+              <option value="">Pilih Skema Pinjaman...</option>
+              {jenisPinjaman.map((j) => (
+                <option key={j.id} value={j.id}>
+                  {j.nama}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

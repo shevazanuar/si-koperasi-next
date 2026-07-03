@@ -26,13 +26,14 @@ async function generatePengajuanNomor() {
 export async function createPinjaman(prevState, formData) {
   const anggota_id = formData.get("anggota_id");
   const jenis_pinjaman_id = formData.get("jenis_pinjaman_id");
+  const kategpinj_id = formData.get("kategpinj_id");
   const jumlah = formData.get("jumlah");
   const lama = formData.get("lama");
   const bunga = formData.get("bunga");
   const tgl = formData.get("tgl") || new Date().toISOString().split("T")[0];
   const keperluan = formData.get("keperluan") || "";
 
-  if (!anggota_id || !jenis_pinjaman_id || !jumlah || !lama) {
+  if (!anggota_id || !jenis_pinjaman_id || !kategpinj_id || !jumlah || !lama) {
     return { error: "Semua kolom wajib diisi." };
   }
 
@@ -46,6 +47,7 @@ export async function createPinjaman(prevState, formData) {
         tanggal: new Date(tgl),
         anggota_id: parseInt(anggota_id),
         jenis_pinjaman_id: parseInt(jenis_pinjaman_id),
+        kategpinj_id: parseInt(kategpinj_id),
         lama: parseInt(lama),
         jumlah: parseFloat(jumlah),
         bunga: parseFloat(bunga || 0),
@@ -63,5 +65,5 @@ export async function createPinjaman(prevState, formData) {
 
   revalidatePath("/dashboard/transaksi/pengajuan-pinjaman");
   revalidatePath("/dashboard/pinjaman");
-  redirect("/dashboard/transaksi/pengajuan-pinjaman");
+  return { success: true };
 }

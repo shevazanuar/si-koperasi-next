@@ -10,7 +10,7 @@ export default async function TambahPinjamanPage() {
   const user = await getSession();
   if (!user) redirect("/login");
 
-  const [anggota, jenisPinjaman] = await Promise.all([
+  const [anggota, jenisPinjaman, kategoriPinjaman] = await Promise.all([
     prisma.anggota.findMany({
       where: { status: "Aktif" },
       select: { id: true, nama: true, nik: true },
@@ -19,6 +19,9 @@ export default async function TambahPinjamanPage() {
     prisma.jenis_pinjaman.findMany({
       select: { id: true, nama: true, lama: true, bunga: true, jumlah: true },
       orderBy: { id: "desc" }
+    }),
+    prisma.kategori_pinjaman.findMany({
+      orderBy: { kategpinj_nama: "asc" }
     })
   ]);
 
@@ -37,7 +40,7 @@ export default async function TambahPinjamanPage() {
       </div>
 
       <div className="bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden">
-        <TambahPinjamanForm anggota={anggota} jenisPinjaman={jenisPinjaman} user={user} />
+        <TambahPinjamanForm anggota={anggota} jenisPinjaman={jenisPinjaman} kategoriPinjaman={kategoriPinjaman} user={user} />
       </div>
     </div>
   );
